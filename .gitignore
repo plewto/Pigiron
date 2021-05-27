@@ -1,0 +1,15 @@
+# pigiron .gitignore
+
+
+# Ignore temp emacs files
+*backup*
+*~
+[#]*[#]
+.\#*
+
+
+# Hide go files.
+*._go
+
+
+*.vscode

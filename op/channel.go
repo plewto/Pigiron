@@ -45,7 +45,7 @@ func ValidateMIDIChannel(channel int) error {
 
 // ChannelSelector interface defines Operator MIDI channel selection.
 //
-// Mode() Returns ChannelMode
+// ChannelMode() Returns ChannelMode
 //
 // EnableChannel(channel int, flag bool) Enables/disables indicated MIDI channel.
 //   NoChannel mode, ignored
@@ -65,7 +65,7 @@ func ValidateMIDIChannel(channel int) error {
 //   MultiChannel mode, sets all channels as deselected.
 //
 type ChannelSelector interface {
-	Mode() ChannelMode
+	ChannelMode() ChannelMode
 	EnableChannel(channel int, flag bool) error
 	SelectChannel(channel int) error
 	SelectedChannels() []int
@@ -88,7 +88,7 @@ func MakeNullChannelSelector() *NullChannelSelector {
 	return nsc
 }
 
-func (n *NullChannelSelector) Mode() ChannelMode {
+func (n *NullChannelSelector) ChannelMode() ChannelMode {
 	return NoChannel
 }
 
@@ -138,7 +138,7 @@ func (s *SingleChannelSelector) String() string {
 }
 
 
-func (s *SingleChannelSelector) Mode() ChannelMode {
+func (s *SingleChannelSelector) ChannelMode() ChannelMode {
 	return SingleChannel
 }
 
@@ -202,7 +202,7 @@ func (s *MultiChannelSelector) String() string {
 }
 
 
-func (s *MultiChannelSelector) Mode() ChannelMode {
+func (s *MultiChannelSelector) ChannelMode() ChannelMode {
 	return MultiChannel
 }
 

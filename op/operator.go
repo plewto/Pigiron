@@ -271,8 +271,8 @@ func (op *Operator) Connect(child PigOp) error {
 }
 
 
-func (op *Operator) Mode() ChannelMode {
-	return op.channelSelector.Mode()
+func (op *Operator) ChannelMode() ChannelMode {
+	return op.channelSelector.ChannelMode()
 }
 
 func (op *Operator) EnableChannel(channel int, flag bool) error {

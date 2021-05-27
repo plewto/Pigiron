@@ -1,9 +1,7 @@
 package main
 
 import (
-	// "fmt"
 	"testing"
-
 	"github.com/plewto/pigiron/op"
 )
 
@@ -27,9 +25,9 @@ func TestChannelValidation(t *testing.T) {
 
 func TestNullSelector(t *testing.T) {
 	ncs := op.MakeNullChannelSelector()
-	mode := ncs.Mode()
+	mode := ncs.ChannelMode()
 	if mode != op.NoChannel {
-		t.Fatalf(".Mode() return incorrect: %s", mode)
+		t.Fatalf(".ChannelMode() return incorrect: %s", mode)
 	}
 	channels := ncs.SelectedChannels()
 	if len(channels) != 0 {
@@ -46,9 +44,9 @@ func TestNullSelector(t *testing.T) {
 
 func TestSingleChannelSelector(t *testing.T) {
 	scs := op.MakeSingleChannelSelector()
-	mode := scs.Mode()
+	mode := scs.ChannelMode()
 	if mode != op.SingleChannel {
-		t.Fatalf(".Mode(), expected SingleChannel, got %v", mode)
+		t.Fatalf(".ChannelMode(), expected SingleChannel, got %v", mode)
 	}
 	odd := []int{1, 3, 5, 7, 9, 11, 13, 15}
 	invalid := []int{0, 17}
@@ -78,9 +76,9 @@ func TestSingleChannelSelector(t *testing.T) {
 
 func TestMultiChannelSelector(t *testing.T) {
 	mcs := op.MakeMultiChannelSelector()
-	mode := mcs.Mode()
+	mode := mcs.ChannelMode()
 	if mode != op.MultiChannel {
-		t.Fatalf(".Mode(), expected MultiChannel, got %v", mode)
+		t.Fatalf(".ChannelMode(), expected MultiChannel, got %v", mode)
 	}
 	primes := []int{2, 3, 5, 7, 11, 13}
 	composite := []int{1, 4, 6, 8, 9, 10, 12, 14, 15, 16}

@@ -1,4 +1,4 @@
 package config
 
-var MaxTreeDepth int = 4
+var MaxTreeDepth int = 12
 var ApplicationOSCPrefix string = "pig"

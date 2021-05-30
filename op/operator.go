@@ -1,18 +1,19 @@
 // Package op defines the primary Pigiron structure, called an Operator.
 //
 // Operators are defined by the PigOp interface with common behavior
-// implemented by the Operator struct and are linked together into
-// a "MIDI Process Tree".  Each Operator has zero or more parents (inputs)
-// and zero or more children (outputs).  Cyclical trees are not allowed.
+// implemented by the Operator struct.
+//
+// Each Operator has zero or more parents (inputs) and zero or more
+// children (outputs).  Various types of Operators are linked together into
+// a "MIDI Process Tree". Cyclical trees are not allowed.
 //
 // The Operator struct corresponds to an 'abstract class' and is not used
 // directly.  Instead several structs extend Operator for specific
 // behaviors.
 //
-// Operators are not directly constructed.  The MakeOperator factory
-// function is used to both create new Operators and to add them to a
-// global registry.   
-
+// Operators should not be directly constructed.  Use The factory  function
+// MakeOperator instead.   In addition to creating new operators
+//
 
 package op
 
@@ -58,6 +59,10 @@ import (
 //
 // Children() returns a copy of the children map.
 //
+// IsParentOf(child) returns true if operator is a parent of child.
+//
+// IsChildOf(parent) returns true if operator is a child of parent.
+//
 // Disconnect(child) removes child from operators children list.
 //   It is not an error if the two operators are not currently connected. 
 //   Returns the child operator.
@@ -96,6 +101,9 @@ type PigOp interface {
 	Parents() map[string]PigOp
 	children() map[string]PigOp
 	Children() map[string]PigOp
+	IsParentOf(child PigOp) bool
+	IsChildOf(parent PigOp) bool
+	circularTreeTest(depth int) bool
 	Disconnect(child PigOp) PigOp
 	Connect(child PigOp) error
 	DisconnectAll()
@@ -250,8 +258,25 @@ func (op *Operator) Disconnect(child PigOp) PigOp{
 	return child
 }
 
-// return True on error
-func (op *Operator) circularTreeError(depth int) bool {  // TODO implement
+func (op *Operator) IsParentOf(child PigOp) bool {
+	_, flag := op.children()[child.Name()]
+	return flag
+}
+
+func (op *Operator) IsChildOf(parent PigOp) bool {
+	_, flag := op.parents()[parent.Name()]
+	return flag
+}
+
+
+func (op *Operator) circularTreeTest(depth int) bool {
+	if depth > config.MaxTreeDepth {
+		return true
+	} else {
+		for _, c := range op.children() {
+			return c.circularTreeTest(depth + 1)
+		}
+	}
 	return false
 }
 
@@ -261,7 +286,7 @@ func (op *Operator) Connect(child PigOp) error {
 	op.children()[child.Name()] = child
 	child.parents()[op.Name()] = op
 	var err error
-	if op.circularTreeError(0) {
+	if op.circularTreeTest(0) {
 		fstr := "Maximum tree depth exceeded at %s -> %s, MaxTreeDepth = %d"
 		msg := fmt.Sprintf(fstr, op.Name(), child.Name(), config.MaxTreeDepth)
 		err = errors.New(msg)

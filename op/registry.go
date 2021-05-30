@@ -76,13 +76,14 @@ func DumpRegistry() {
 }
 
 
-// MakeOperator() creates a new Operator and adds it to the registry.
+// MakeOperator(opType, name) creates a new Operator and adds it to the registry.
 // All operators should be created by MakeOperator.
-// opType indicates the type of Operator to be created, valid options are: 
+//
+// opType indicates the type of Operator, valid options are: 
 //    Null
 //    ...
-// name is the proposed name for the operator.  The actual name may ve
-// different if name is already in use.
+// name is the proposed name for the operator.  
+// The actual name may be different if name is already in use.
 //
 // Returns the new Operator and an error.
 // The error is non nil if opType was invalid.
@@ -110,7 +111,18 @@ func DeleteOperator(name string) {
 	delete(registry, name)
 }
 
-// GetOperator() returns a named operator from the registry.
+
+
+// ClearRegistry() removes all Operators from the registry.
+//
+func ClearRegistry() {  // TODO: May want to add op cleanup code?
+	for key, _ := range registry {
+		delete(registry, key)
+	}
+}
+
+
+// GetOperator() returns named operator from the registry.
 // An error is returned as the second value and is non nil if no such
 // operator exists.
 //
@@ -131,14 +143,14 @@ func GetOperator(name string) (PigOp, error) {
 // Operators() returns an unordered slice of all current operators.
 // 
 func Operators() []PigOp {
-	var acc = make([]PigOp, len(registry))
+	var acc = make([]PigOp, 0, len(registry))
 	for _, op := range(registry) {
 		acc = append(acc, op)
 	}
 	return acc
 }
 
-// RootOperators() returns a slice of all operators which have no parents. 
+// RootOperators() returns a slice of all root operators.
 //
 func RootOperators() []PigOp {
 	var acc = make([]PigOp, 0, len(registry))
@@ -150,7 +162,7 @@ func RootOperators() []PigOp {
 	return acc
 }
 
-// OperatorByType() returns all operators of a specific type.
+// OperatorByType() returns slice of all operators of a specific type.
 //
 func OperatorByType(opType string) []PigOp {
 	var acc = make([]PigOp, 0, len(registry))

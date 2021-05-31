@@ -20,6 +20,8 @@ package op
 import (
 	"fmt"
 	"errors"
+
+	gomidi "gitlab.com/gomidi/midi"
 	"github.com/plewto/pigiron/config"
 )
 
@@ -116,6 +118,10 @@ type PigOp interface {
 	// MIDI
 	MIDIEnabled() bool
 	SetMIDIEnabled(flag bool)
+	Accept(message gomidi.Message) bool
+	distribute(message gomidi.Message)
+	Send(message gomidi.Message)
+	
 }
 
 
@@ -353,3 +359,19 @@ func (op *Operator) SetMIDIEnabled(flag bool) {
 	op.midiEnabled = flag
 }
 	
+func (op *Operator) Accept(msg gomidi.Message) bool {
+	return true
+}
+
+func (op *Operator) distribute(msg gomidi.Message) {
+	for _, child := range op.children() {
+		child.Send(msg)
+	}
+}
+
+
+func (op *Operator) Send(msg gomidi.Message) {
+	if op.Accept(msg) && op.MIDIEnabled() {
+		op.distribute(msg)
+	}
+}

@@ -37,7 +37,6 @@ import (
 //
 // setName() set's the operator's name.
 //
-// Info() returns strings indicating internal state for the Operator.
 //
 // Panic() transmits a MIDI panic.
 //     The behavior of a Panic is dependent on the specific Operator type.
@@ -90,6 +89,7 @@ type PigOp interface {
 	OperatorType() string
 	Name() string
 	setName(s string)
+	commonInfo() string
 	Info() string
 	Panic()
 	Reset()
@@ -121,7 +121,7 @@ type PigOp interface {
 	Accept(message gomidi.Message) bool
 	distribute(message gomidi.Message)
 	Send(message gomidi.Message)
-	
+	Close()
 }
 
 
@@ -174,7 +174,7 @@ func (op *Operator) String() string {
 	return fmt.Sprintf("%s  name: %s  %s\n", op.opType, op.name, op.channelSelector)
 }
 
-func (op *Operator) Info() string {
+func (op *Operator) commonInfo() string {
 	s := fmt.Sprintf("%s  name: %s    %s\n", op.opType, op.name, op.channelSelector)
 	s += fmt.Sprintf("\tMIDI enabled: %v\n", op.MIDIEnabled())
 	s += fmt.Sprintf("\tOSC address: '%s'\n", op.OSCAddress())
@@ -197,6 +197,10 @@ func (op *Operator) Info() string {
 		}
 	}
 	return s
+}
+
+func (op *Operator) Info() string {
+	return op.commonInfo()
 }
 
 func (op *Operator) Panic() {}
@@ -375,3 +379,7 @@ func (op *Operator) Send(msg gomidi.Message) {
 		op.distribute(msg)
 	}
 }
+
+
+func (op *Operator) Close() {}
+	

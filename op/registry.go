@@ -9,14 +9,17 @@ import (
 )
 
 // The registry is a global map holding all current operators. 
-// 
+// MIDIInput and MIDIOutput operators are stored separately.
+//
 var registry map[string]PigOp = make(map[string]PigOp)
 
 // OperatorExists(name) returns true if the registry contains the named operator.
 //
 func OperatorExists(name string) bool {
 	_, flag := registry[name]
-	return flag
+	_, iflag := inputCache[name]
+	_, oflag := outputCache[name]
+	return flag || iflag || oflag
 }
 
 // splitStem separates a string at the final period, if any.
@@ -140,21 +143,27 @@ func GetOperator(name string) (PigOp, error) {
 }
 
 
-// Operators() returns an unordered slice of all current operators.
+// Operators() returns unordered slice of all current operators.
 // 
 func Operators() []PigOp {
 	var acc = make([]PigOp, 0, len(registry))
 	for _, op := range(registry) {
 		acc = append(acc, op)
 	}
+	for _, op := range inputCache {
+		acc = append(acc, op)
+	}
+	for _, op := range outputCache {
+		acc = append(acc, op)
+	}
 	return acc
 }
 
-// RootOperators() returns a slice of all root operators.
+// RootOperators() returns slice of all root operators.
 //
 func RootOperators() []PigOp {
 	var acc = make([]PigOp, 0, len(registry))
-	for _, op := range(registry) {
+	for _, op := range Operators() {
 		if op.IsRoot() {
 			acc = append(acc, op)
 		}
@@ -162,14 +171,4 @@ func RootOperators() []PigOp {
 	return acc
 }
 
-// OperatorByType() returns slice of all operators of a specific type.
-//
-func OperatorByType(opType string) []PigOp {
-	var acc = make([]PigOp, 0, len(registry))
-	for _, op := range(registry) {
-		if op.OperatorType() == opType {
-			acc = append(acc, op)
-		}
-	}
-	return acc
-}
+

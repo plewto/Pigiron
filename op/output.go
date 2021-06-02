@@ -71,22 +71,21 @@ func (op *MIDIOutput) Info() string {
 	s += fmt.Sprintf("\tdevice: %v\n", op.device)
 	return s
 }
-	
-	
-func (op *MIDIOutput) Send(message gomidi.Message) {
-	if op.MIDIEnabled() {
-		if op.writer != nil {
-			op.writer.Write(message)
-		}
-		op.distribute(message)
-	}
-}
-
 
 func (op *MIDIOutput) DeviceName() string {
 	if op.device != nil {
 		return fmt.Sprintf("%v", op.device)
 	} else {
 		return "<nil>"
+	}
+}
+
+
+func (op *MIDIOutput) Send(message gomidi.Message) {
+	if op.MIDIEnabled() {
+		if op.writer != nil {
+			op.writer.Write(message)
+		}
+		op.distribute(message)
 	}
 }

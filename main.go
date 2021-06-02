@@ -13,8 +13,8 @@ func main() {
 	fmt.Println("Pigiron.main()")
 	midi.DumpDevices()
 	fmt.Println("")
-	a, err := op.MakeMIDIOutput("Alpha", "E-MU")
-	b, err := op.MakeMIDIOutput("Beta", "MIDI 2")
+	a, err := op.MakeMIDIInput("Alpha", "E-MU")
+	b, err := op.MakeMIDIInput("Beta", "E-MU")
 
 	fmt.Println(a.Info())
 	fmt.Println("------------------------")

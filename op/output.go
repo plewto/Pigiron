@@ -47,7 +47,7 @@ func newMIDIOutput(name string, deviceName string) (*MIDIOutput, error) {
 	device, err = midi.GetOutputDevice(deviceName)
 	if err == nil {
 		op = new(MIDIOutput)
-		initOperator(&op.Operator, "MIDIOutput", name, NoChannel)
+		initOperator(&op.Operator, "MIDIOutput", name, midi.NoChannel)
 		op.device = device
 		err = op.device.Open()
 		if err == nil {

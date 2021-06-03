@@ -1,4 +1,4 @@
-package op
+package midi
 
 /*
  * Provides MIDI channel selection.

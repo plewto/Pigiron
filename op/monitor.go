@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	gomidi "gitlab.com/gomidi/midi"
+	midi "github.com/plewto/pigiron/midi"
 )
 
 // Monitor is an Operator to display information about MIDI events.
@@ -15,7 +16,7 @@ type Monitor struct {
 
 func makeMonitor(name string) *Monitor {
 	op := new(Monitor)
-	initOperator(&op.Operator, "Monitor", name, NoChannel)
+	initOperator(&op.Operator, "Monitor", name, midi.NoChannel)
 	op.Enabled = true
 	return op
 }

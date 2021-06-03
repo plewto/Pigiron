@@ -42,7 +42,7 @@ func newMIDIInput(name string, deviceName string) (*MIDIInput, error) {
 	device, err = midi.GetInputDevice(deviceName)
 	if err == nil {
 		op = new(MIDIInput)
-		initOperator(&op.Operator, "MIDIInput", name, NoChannel)
+		initOperator(&op.Operator, "MIDIInput", name, midi.NoChannel)
 		op.device = device
 		err = op.device.Open()
 		if err == nil {

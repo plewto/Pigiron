@@ -22,6 +22,7 @@ import (
 	"errors"
 
 	gomidi "gitlab.com/gomidi/midi"
+	midi "github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
 )
 
@@ -31,7 +32,7 @@ import (
 // See Operator struct for concrete implementation.
 //
 type PigOp interface {
-	ChannelSelector
+	midi.ChannelSelector
 	OperatorType() string
 	Name() string
 	setName(s string)
@@ -78,7 +79,7 @@ type PigOp interface {
 type Operator struct {
 	opType string
 	name string
-	channelSelector ChannelSelector
+	channelSelector midi.ChannelSelector
 	parentMap map[string]PigOp
 	childrenMap map[string]PigOp
 	midiEnabled bool
@@ -87,16 +88,16 @@ type Operator struct {
 // initOperator initialize Operator values.
 // Extending structs should call initOperator as part of their construction
 // process. 
-func initOperator(op *Operator, opType string, name string, mode ChannelMode) {
+func initOperator(op *Operator, opType string, name string, mode midi.ChannelMode) {
 	op.opType = opType
 	op.name = name
 	switch mode {
-	case SingleChannel:
-		op.channelSelector = MakeSingleChannelSelector()
-	case MultiChannel:
-		op.channelSelector = MakeMultiChannelSelector()
+	case midi.SingleChannel:
+		op.channelSelector = midi.MakeSingleChannelSelector()
+	case midi.MultiChannel:
+		op.channelSelector = midi.MakeMultiChannelSelector()
 	default:
-		op.channelSelector = MakeNullChannelSelector()
+		op.channelSelector = midi.MakeNullChannelSelector()
 	}
 	op.parentMap = make(map[string]PigOp)
 	op.childrenMap = make(map[string]PigOp)
@@ -177,7 +178,7 @@ func (op *Operator) Info() string {
 // as needed.
 //
 func (op *Operator) Panic() {
-	for _, child := range op.children {
+	for _, child := range op.children() {
 		child.Panic()
 	}
 }
@@ -330,7 +331,7 @@ func (op *Operator) Disjoin() {
 
 // ChannelMode returns an Operator's ChannelSelector mode.
 //
-func (op *Operator) ChannelMode() ChannelMode {
+func (op *Operator) ChannelMode() midi.ChannelMode {
 	return op.channelSelector.ChannelMode()
 }
 

@@ -8,12 +8,19 @@ import (
 	midi "github.com/plewto/pigiron/midi"
 )
 
+
 type DeviceWrapper interface {
 	DeviceName() string
 }
 
 
-// implements PigOp, DeviceWrapper
+// MIDIOutput is an Operator wrapper for MIDI output devices.
+// MIDIOutput implements the PigOp and DeviceWrapper interfaces.
+//
+// There may only be a single MIDIOutput for any one MIDI output device.
+// Upon construct new MIDIutputs are cached.  Attempts to create another
+// MIDIOutput for the same output device returns the cached object.
+//
 type MIDIOutput struct {
 	Operator
 	device gomidi.Out

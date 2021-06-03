@@ -6,9 +6,11 @@ import (
 	gomidi "gitlab.com/gomidi/midi"
 )
 
+// Monitor is an Operator to display information about MIDI events.
+//
 type Monitor struct {
 	Operator
-	Enabled bool 
+	Enabled bool   // If false, do not print MIDI info.
 }
 
 func makeMonitor(name string) *Monitor {

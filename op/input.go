@@ -9,7 +9,13 @@ import (
 )
 
 
-// implements PigOp, DeviceWrapper
+// MIDIInput is an Operator wrapper for MIDI input devices.
+// MIDIInput implements the PigOp and DeviceWrapper interfaces.
+//
+// There may only be a single MIDIInput for any one MIDI input device.
+// Upon construct new MIDIInputs are cached.  Attempts to create another
+// MIDIInput for the same input device returns the cached object.
+//
 type MIDIInput struct {
 	Operator
 	device gomidi.In

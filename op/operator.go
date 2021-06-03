@@ -11,8 +11,8 @@
 // directly.  Instead several structs extend Operator for specific
 // behaviors.
 //
-// Operators should not be directly constructed.  Use The factory  function
-// MakeOperator instead.   In addition to creating new operators
+// Operators should not be directly constructed.  Use The factory function
+// MakeOperator instead.   
 //
 
 package op
@@ -27,62 +27,8 @@ import (
 
 
 // PigOp interface extends ChannelSelector and defines all methods on Operators.
-// 
-// OperatorType() returns type of operator as a string.
 //
-// Name() returns the Operator's name.
-//    Each Operator has a unique name as assigned when it is added to the
-//    registry.  Once assigned by the registry, an Operator's name may not
-//    be changed. 
-//
-// setName() set's the operator's name.
-//
-//
-// Panic() transmits a MIDI panic.
-//     The behavior of a Panic is dependent on the specific Operator type.
-//     The default panic does nothing.
-//
-// Reset() sets Operator parameter's to an initial state.
-//     The default reset does nothing.
-//
-// IsRoot() returns true if the operator has no parents.
-//
-// IsLeaf() returns true if the operator has no children.
-//
-// PrintTree() prints the structure of the MIDI process tree.
-//    Typically PrintTree is called on a root operator.
-//
-// parents() returns the parents map.
-//
-// Parents() returns a copy of the parents map.
-//
-// children() returns the children map.
-//
-// Children() returns a copy of the children map.
-//
-// IsParentOf(child) returns true if operator is a parent of child.
-//
-// IsChildOf(parent) returns true if operator is a child of parent.
-//
-// Disconnect(child) removes child from operators children list.
-//   It is not an error if the two operators are not currently connected. 
-//   Returns the child operator.
-//
-// Connect(child) adds child to the operator.
-//   If as a result of connecting child to parent the maximum tree depth is
-//   exceeded, the two operators are disconnected and an error is returned.
-//
-// DisconnectAll() disconnects all children of the operator.
-//
-// Disjoin() disconnects the operator from all of it's parents.
-//
-// OSCAddress() returns the operator's OSC address prefix.
-//
-// FormatOSCAddress(command) returns the OSC address for the given command.
-//
-// MIDIEnabled() returns true if MIDI input is enabled.
-//
-// SetMIDIEnabled(flag) Enable/disable MIDI input.
+// See Operator struct for concrete implementation.
 //
 type PigOp interface {
 	ChannelSelector
@@ -126,8 +72,8 @@ type PigOp interface {
 
 
 // Operator struct implements PigOp interface.
-// The Operator struct is not used directly, instead it serves as the super
-// struct for all other Operator types.
+// Operator is not used directly, instead it serves as the super struct
+// for all other Operator types.
 //
 type Operator struct {
 	opType string
@@ -157,15 +103,27 @@ func initOperator(op *Operator, opType string, name string, mode ChannelMode) {
 	op.midiEnabled = true
 }
 
-
+// OperatorType returns string representation for this specific Operator type.
+//
 func (op *Operator) OperatorType() string {
 	return op.opType
 }
 
+
+// Name returns an identifying name for an Operator.
+// An Operator's name must be unique.  If a new Operator's name clashes
+// with an existing name, the registry will reassign it to be unique.
+// Other then possible changes made to avoid a clash, an Operator's name
+// is fixed for the duration of it's existence.
+//
 func (op *Operator) Name() string {
 	return op.name
 }
 
+
+// setName changes an Operator's name.
+// setName should be called no more the once for any specific Operator.
+//
 func (op *Operator) setName(s string) {
 	op.name = s
 }
@@ -174,6 +132,10 @@ func (op *Operator) String() string {
 	return fmt.Sprintf("%s  name: %s  %s\n", op.opType, op.name, op.channelSelector)
 }
 
+
+// commonInfo returns a string detailing the current internal state of an Operator.
+// The result is used by the Info method.
+//
 func (op *Operator) commonInfo() string {
 	s := fmt.Sprintf("%s  name: %s    %s\n", op.opType, op.name, op.channelSelector)
 	s += fmt.Sprintf("\tMIDI enabled: %v\n", op.MIDIEnabled())
@@ -199,18 +161,43 @@ func (op *Operator) commonInfo() string {
 	return s
 }
 
+
+// Info returns a string detailing the internal state of an Operator.
+// Extending classes should append specific details the result of
+// commonInfo.   By default Info simply returns the result of commonInfo.
+//
 func (op *Operator) Info() string {
 	return op.commonInfo()
 }
 
-func (op *Operator) Panic() {}
 
+// Panic halts MIDI playback and kills all notes.
+// The default behavior is to propagate a Panic to all child Operators
+// without actually effecting MIDI.  Extending Operators should implement
+// as needed.
+//
+func (op *Operator) Panic() {
+	for _, child := range op.children {
+		child.Panic()
+	}
+}
+
+// Reset restores an Operator to an initial state.
+// By default reset does nothing.  Extending Operators should
+// implement as needed.
+// 
 func (op *Operator) Reset() {}
 
+
+// IsRoot returns true for Operators without parents.
+//
 func (op *Operator) IsRoot() bool {
 	return len(op.parentMap) == 0
 }
 
+
+// IsLeaf returns true for Operators without children.
+//
 func (op *Operator) IsLeaf() bool {
 	return len(op.childrenMap) == 0
 }
@@ -234,6 +221,8 @@ func (op *Operator) printTree(depth int) {
 	}
 }
 
+// PrintTree prints a representation of the MIDI process tree.
+//
 func (op *Operator) PrintTree() {
 	op.printTree(0)
 }
@@ -246,6 +235,8 @@ func (op *Operator) children() map[string]PigOp {
 	return op.childrenMap
 }
 
+// Parents returns a copy of an Operator's parent map.
+//
 func (op *Operator) Parents() map[string]PigOp {
 	result := make(map[string]PigOp)
 	for key, pop := range op.parents() {
@@ -254,6 +245,9 @@ func (op *Operator) Parents() map[string]PigOp {
 	return result
 }
 
+
+// Children returns a copy of an Operator's children map.
+//
 func (op *Operator) Children() map[string]PigOp {
 	result := make(map[string]PigOp)
 	for key, pop := range op.children() {
@@ -262,17 +256,25 @@ func (op *Operator) Children() map[string]PigOp {
 	return result
 }
 
+// Disconnect removes the connection between an Operator and a child.
+// It is not an error to Disconnect two non-connected Operators.
+//
 func (op *Operator) Disconnect(child PigOp) PigOp{
 	delete(op.children(), child.Name())
 	delete(child.parents(), op.Name())
 	return child
 }
 
+
+// IsParentOf returns true if an Operator is a parent of child.
+//
 func (op *Operator) IsParentOf(child PigOp) bool {
 	_, flag := op.children()[child.Name()]
 	return flag
 }
 
+// IsChildOf returns true if an Operator is a child of parent.
+//
 func (op *Operator) IsChildOf(parent PigOp) bool {
 	_, flag := op.parents()[parent.Name()]
 	return flag
@@ -291,6 +293,10 @@ func (op *Operator) circularTreeTest(depth int) bool {
 }
 
 
+// Connect makes a connection between an Operator and a child Operator.
+// Returns an error if a circular-tree is produced as a result of the
+// connection.
+//
 func (op *Operator) Connect(child PigOp) error {
 	op.Disconnect(child)
 	op.children()[child.Name()] = child
@@ -305,32 +311,8 @@ func (op *Operator) Connect(child PigOp) error {
 	return err
 }
 
-
-func (op *Operator) ChannelMode() ChannelMode {
-	return op.channelSelector.ChannelMode()
-}
-
-func (op *Operator) EnableChannel(channel int, flag bool) error {
-	return op.channelSelector.EnableChannel(channel, flag)
-}
-
-func (op *Operator) SelectChannel(channel int) error {
-	return op.channelSelector.SelectChannel(channel)
-}
-
-
-func (op *Operator) SelectedChannels() []int {
-	return op.channelSelector.SelectedChannels()
-}
-
-func (op *Operator) ChannelSelected(channel int) bool {
-	return op.channelSelector.ChannelSelected(channel)
-}
-
-func (op *Operator) DeselectAllChannels() {
-	op.channelSelector.DeselectAllChannels()
-}
-
+// DisconnectAll removes the connection between an Operator and all of it's children.
+//
 func (op *Operator) DisconnectAll() {
 	op.Panic()
 	for _, child := range op.Children() {
@@ -338,35 +320,94 @@ func (op *Operator) DisconnectAll() {
 	}
 }
 
-
+// Disjoin removes the connection between an Operator and all of it's parents.
+//
 func (op *Operator) Disjoin() {
 	for _, parent := range op.Parents() {
 		parent.Disconnect(op)
 	}
 }
 
+// ChannelMode returns an Operator's ChannelSelector mode.
+//
+func (op *Operator) ChannelMode() ChannelMode {
+	return op.channelSelector.ChannelMode()
+}
+
+// EnableChannel enables/disables given MIDI channel.
+// Returns error if channel is invalid.
+//
+func (op *Operator) EnableChannel(channel int, flag bool) error {
+	return op.channelSelector.EnableChannel(channel, flag)
+}
+
+// SelectChannel is the same as EnabledChannel(channel, true)
+// Returns error if channel is invalid.
+//
+func (op *Operator) SelectChannel(channel int) error {
+	return op.channelSelector.SelectChannel(channel)
+}
+
+// SelecrtedChannels returns a slice of currently enabled MIDI channels.
+//
+func (op *Operator) SelectedChannels() []int {
+	return op.channelSelector.SelectedChannels()
+}
+
+
+// ChannelSelected returns true if channel is currently selected.
+// Returns false for all out of bounds channel numbers.
+//
+func (op *Operator) ChannelSelected(channel int) bool {
+	return op.channelSelector.ChannelSelected(channel)
+}
+
+// DeselectAllChannels disables all MIDI channels.
+// For SingleChannel mode, channel 1 is selected.
+//
+func (op *Operator) DeselectAllChannels() {
+	op.channelSelector.DeselectAllChannels()
+}
+
+// OSCAddress returns an Operator's base OSC address.
+//
 func (op *Operator) OSCAddress() string {
-	sfmt := "%s/op/%s/"
+	sfmt := "/%s/op/%s/"
 	return fmt.Sprintf(sfmt, config.ApplicationOSCPrefix, op.Name())
 }
 
+
+// FormatOSCAddress creates an Operator's OSC address for specific command.
+//
 func (op *Operator) FormatOSCAddress(command string) string {
 	return fmt.Sprintf("%s%s", op.OSCAddress(), command)
 }
 
 
+// MIDIEnabled returns true if MIDI processing is enabled.
+//
 func (op *Operator) MIDIEnabled() bool {
 	return op.midiEnabled
 }
 
+// SetMIDIEnabled disables/enables MIDI processing.
+//
 func (op *Operator) SetMIDIEnabled(flag bool) {
 	op.midiEnabled = flag
 }
-	
+
+
+// Accept returns true if a MIDI message should be processed.
+// The Default behavior is to return true for all messages.
+// Extending Operators should override for specific behavior.
+//
 func (op *Operator) Accept(msg gomidi.Message) bool {
 	return true
 }
 
+
+// distribute ends a MIDI message to all child Operators.
+//
 func (op *Operator) distribute(msg gomidi.Message) {
 	for _, child := range op.children() {
 		child.Send(msg)
@@ -374,6 +415,11 @@ func (op *Operator) distribute(msg gomidi.Message) {
 }
 
 
+// Send receives MIDI messages form parent Operators and transmits to all child Operators.
+// Only messages for which Accept returns true are processed.
+// The transmitted message need not be the same as the received message.
+// Extending Operators should override.
+//
 func (op *Operator) Send(msg gomidi.Message) {
 	if op.Accept(msg) && op.MIDIEnabled() {
 		op.distribute(msg)
@@ -381,5 +427,9 @@ func (op *Operator) Send(msg gomidi.Message) {
 }
 
 
+// Close frees resources an Operator may be using.
+// Most Operators simply ignore Close.  The MIDIInput and MIDIOutput
+// Operators should close any open MIDI devices.
+//
 func (op *Operator) Close() {}
 	

@@ -6,8 +6,8 @@ import (
 	"strings"
 	
 	gomidi "gitlab.com/gomidi/midi"
-	driver "gitlab.com/gomidi/portmididrv"
-	// driver "gitlab.com/gomidi/rtmididrv"       // TODO: Conditional import ?
+	// driver "gitlab.com/gomidi/portmididrv"
+	driver "gitlab.com/gomidi/rtmididrv"       // TODO: Conditional import ?
 )
 
 

@@ -17,7 +17,3 @@ func makeNullOperator(name string) *NullOperator {
 }
 	
 	
-func (op *NullOperator) Info() string {
-	s := op.commonInfo()
-	return s
-}

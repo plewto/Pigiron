@@ -40,11 +40,13 @@ func newMIDIInput(name string, deviceName string) (*MIDIInput, error) {
 		op.device = device
 		err = op.device.Open()
 		if err == nil {
+			fmt.Printf("MIDI input %v opened\n", op.device)
 			op.reader = reader.New(
 				reader.NoLogger(),
 				reader.Each(func(pos *reader.Position, msg gomidi.Message) {
 					op.Send(msg)
 				}))
+			err = op.reader.ListenTo(op.device)  // TODO: Handle error
 		}
 		assignName(op)
 	}
@@ -70,6 +72,7 @@ func MakeMIDIInput(name string, deviceSpec string) (*MIDIInput, error) {
 func (op *MIDIInput) Info() string {
 	s := op.commonInfo()
 	s += fmt.Sprintf("\tdevice: %v\n", op.device)
+	s += fmt.Sprintf("\treader: %T  is nil: %v\n", op.reader, op.reader == nil)
 	return s
 }
 

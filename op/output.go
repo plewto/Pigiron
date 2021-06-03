@@ -46,6 +46,7 @@ func newMIDIOutput(name string, deviceName string) (*MIDIOutput, error) {
 		if err == nil {
 			op.writer = writer.New(op.device)
 		}
+		assignName(op)
 	}
 	return op, err
 }

@@ -1,7 +1,10 @@
 github.com/rakyll/portmidi v0.0.0-20170620004031-e434d7284291 h1:hl7rQwLldjB+FCyUuxSFCAx986GONIoRQwsMesdOknE=
 github.com/rakyll/portmidi v0.0.0-20170620004031-e434d7284291/go.mod h1:tO1ylmFo6+hnYFvj/fd92q30wkNQwgWC/8mcHq0KkQU=
+gitlab.com/gomidi/midi v1.21.0/go.mod h1:3ohtNOhqoSakkuLG/Li1OI6I3J1c2LErnJF5o/VBq1c=
 gitlab.com/gomidi/midi v1.23.5/go.mod h1:3ohtNOhqoSakkuLG/Li1OI6I3J1c2LErnJF5o/VBq1c=
 gitlab.com/gomidi/midi v1.23.7 h1:I6qKoIk9s9dcX+pNf0jC+tziCzJFn82bMpuntRkLeik=
 gitlab.com/gomidi/midi v1.23.7/go.mod h1:3ohtNOhqoSakkuLG/Li1OI6I3J1c2LErnJF5o/VBq1c=
 gitlab.com/gomidi/portmididrv v0.7.0 h1:fG5eFJANIXPtfONE18lQbP9CKpWh88S6hWdmXLOqjJ4=
 gitlab.com/gomidi/portmididrv v0.7.0/go.mod h1:H+WVjQPG4D5YJ6+fGKv0apxHN6qbXbNce/3oxZaPSMY=
+gitlab.com/gomidi/rtmididrv v0.13.0 h1:fMX5Wt2wmdt+gJtR7K3ZGvNV4RzdRgS8AquHZ9wW1Zs=
+gitlab.com/gomidi/rtmididrv v0.13.0/go.mod h1:p/6IL1LGgj7utcv3wXudsDWiD9spgAdn0O8LDsGIPG0=

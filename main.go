@@ -13,16 +13,23 @@ func main() {
 	fmt.Println("Pigiron.main()")
 	midi.DumpDevices()
 	fmt.Println("")
-	a, err := op.MakeMIDIInput("Alpha", "E-MU")
-	b, err := op.MakeMIDIInput("Beta", "E-MU")
+	a, _ := op.MakeMIDIInput("a", "Arturia")
+	mon, err := op.MakeOperator("Monitor", "mon")
+	a.Connect(mon)
 
-	fmt.Println(a.Info())
-	fmt.Println("------------------------")
-	fmt.Println(b.Info())
-
-	fmt.Printf("a is b ?  : %v\n", a == b)
+	if err != nil {
+		panic(err)
+	}
 	
-	Ignore(err)
+	// fmt.Println(a.Info())
+	// fmt.Println("--------------------------------")
+	// fmt.Println(mon.Info())
+	// fmt.Println("--------------------------------")
+	// a.PrintTree()
+
+	fmt.Println("Ready....")
+	
+	for {}
 	
 	Cleanup()
 

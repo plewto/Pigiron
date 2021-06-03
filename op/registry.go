@@ -97,6 +97,8 @@ func MakeOperator(opType string, name string) (PigOp, error) {
 	switch opType {
 	case "Null":
 		op = makeNullOperator(name)
+	case "Monitor":
+		op  = makeMonitor(name)
 	default:
 		sfmt := "Invalid Operator type: '%s'"
 		msg := fmt.Sprintf(sfmt, opType)

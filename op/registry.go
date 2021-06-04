@@ -176,3 +176,8 @@ func RootOperators() []PigOp {
 }
 
 
+func Cleanup() {
+	for _, op := range Operators() {
+		op.Close()
+	}
+}

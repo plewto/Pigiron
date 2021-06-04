@@ -14,22 +14,24 @@ func main() {
 	midi.DumpDevices()
 	fmt.Println("")
 	a, _ := op.MakeMIDIInput("a", "Arturia")
-	mon, err := op.MakeOperator("Monitor", "mon")
-	a.Connect(mon)
+	c, _ := op.MakeOperator("ChannelFilter", "filter")
+	mon, _ := op.MakeOperator("Monitor", "monitor")
 
-	if err != nil {
-		panic(err)
+	// Enable all channels
+	for i:=1; i<17; i++ {
+		c.SelectChannel(i)
 	}
-	
-	// fmt.Println(a.Info())
-	// fmt.Println("--------------------------------")
-	// fmt.Println(mon.Info())
-	// fmt.Println("--------------------------------")
-	// a.PrintTree()
 
-	fmt.Println("Ready....")
+	a.Connect(c)
+	c.Connect(mon)
 	
-	for {}
+	fmt.Println(c)
+
+	
+	// fmt.Println("Ready....")
+	// for {}
+
+	
 	
 	Cleanup()
 
@@ -40,5 +42,7 @@ func Ignore(values ...interface{}) {}
 
 func Cleanup() {
 	fmt.Println("pigiron.Cleanup() executes")
+	op.Cleanup()
 	midi.Cleanup()
+	
 }

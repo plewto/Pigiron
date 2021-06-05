@@ -7,10 +7,10 @@ import (
 	midi "github.com/plewto/pigiron/midi"
 )
 
-const channelMask byte = 0xF0
-const statusMask byte = 0x0F
 
 // ChannelFilter is an Operator which filters messages by MIDI channel.
+//
+// It may also filter non-chanel messages.
 //
 type ChannelFilter struct {
 	Operator
@@ -24,14 +24,6 @@ func makeChannelFilter(name string) *ChannelFilter {
 	return op
 }
 
-
-func isChannelMessage(status byte) bool {
-	var sig byte = 0xf0
-	s := status & channelMask
-	return s & sig != sig
-}
-	
-	
 func (op *ChannelFilter) Accept(msg gomidi.Message) bool {
 	raw := msg.Raw()	
 	status := raw[0]
@@ -40,7 +32,7 @@ func (op *ChannelFilter) Accept(msg gomidi.Message) bool {
 		c := int((status & statusMask) + 1)
 		result = op.ChannelSelected(c)
 	} else {
-		result = !op.BlockNonChannel
+		result = op.BlockNonChannel
 	}
 	return result
 }

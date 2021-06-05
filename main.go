@@ -28,8 +28,8 @@ func main() {
 	fmt.Println(c)
 
 	
-	// fmt.Println("Ready....")
-	// for {}
+	fmt.Println("Ready....")
+	for {}
 
 	
 	

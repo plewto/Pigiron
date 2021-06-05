@@ -4,7 +4,9 @@ import (
 	"fmt"
 
 	gomidi "gitlab.com/gomidi/midi"
+	//gochannel "gitlab.com/gomidi/midi/midimessage/channel"
 	midi "github.com/plewto/pigiron/midi"
+
 )
 
 // Monitor is an Operator to display information about MIDI events.
@@ -34,5 +36,6 @@ func (op *Monitor) Send(msg gomidi.Message) {
 	}
 	if op.MonitorEnabled {
 		fmt.Printf("%s\n", msg)
+		
 	}
 }

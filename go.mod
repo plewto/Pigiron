@@ -2,7 +2,4 @@ module github.com/plewto/pigiron
 
 go 1.16
 
-require (
-	gitlab.com/gomidi/midi v1.23.7
-	gitlab.com/gomidi/rtmididrv v0.13.0
-)
+require github.com/rakyll/portmidi v0.0.0-20201020180702-d436ceaa537a

@@ -11,7 +11,7 @@ import (
 // The registry is a global map holding all current operators. 
 // MIDIInput and MIDIOutput operators are stored separately.
 //
-var registry map[string]PigOp = make(map[string]PigOp)
+var registry map[string]Operator = make(map[string]Operator)
 
 // OperatorExists(name) returns true if the registry contains the named operator.
 //
@@ -47,7 +47,7 @@ func splitStem(s string) (string, string) {
 // appending a unique index.
 // Returns the actual name.
 //
-func assignName(op PigOp) string {
+func assignName(op Operator) string {
 	if OperatorExists(op.Name()) {
 		base, _ := splitStem(op.Name())
 		index := 1
@@ -65,7 +65,7 @@ func assignName(op PigOp) string {
 // If needed, the operator's name is changed to make it unique.
 // Returns the actual operator's name.
 //
-func register(op PigOp) string {
+func register(op Operator) string {
 	name := assignName(op)
 	registry[name] = op
 	return name
@@ -93,9 +93,9 @@ func DumpRegistry() {
 // Returns the new Operator and an error.
 // The error is non nil if opType was invalid.
 //
-func MakeOperator(opType string, name string) (PigOp, error) {
+func MakeOperator(opType string, name string) (Operator, error) {
 	var err error
-	var op PigOp
+	var op Operator
 	switch opType {
 	case "Dummy":
 		op = makeDummyOperator(name)
@@ -135,8 +135,8 @@ func ClearRegistry() {  // TODO: May want to add op cleanup code?
 // An error is returned as the second value and is non nil if no such
 // operator exists.
 //
-func GetOperator(name string) (PigOp, error) {
-	var op PigOp
+func GetOperator(name string) (Operator, error) {
+	var op Operator
 	var err error
 	if OperatorExists(name) {
 		op = registry[name]
@@ -151,8 +151,8 @@ func GetOperator(name string) (PigOp, error) {
 
 // Operators() returns unordered slice of all current operators.
 // 
-func Operators() []PigOp {
-	var acc = make([]PigOp, 0, len(registry))
+func Operators() []Operator {
+	var acc = make([]Operator, 0, len(registry))
 	for _, op := range(registry) {
 		acc = append(acc, op)
 	}
@@ -168,8 +168,8 @@ func Operators() []PigOp {
 
 // RootOperators() returns slice of all root operators.
 //
-func RootOperators() []PigOp {
-	var acc = make([]PigOp, 0, len(registry))
+func RootOperators() []Operator {
+	var acc = make([]Operator, 0, len(registry))
 	for _, op := range Operators() {
 		if op.IsRoot() {
 			acc = append(acc, op)

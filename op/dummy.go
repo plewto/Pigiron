@@ -9,12 +9,12 @@ import midi "github.com/plewto/pigiron/midi"
 // MakeOperator factory function.
 //
 type DummyOperator struct {
-	Operator
+	baseOperator
 }
 
 func makeDummyOperator(name string) *DummyOperator {
 	op := new(DummyOperator)
-	initOperator(&op.Operator, "Dummy", name, midi.NoChannel)
+	initOperator(&op.baseOperator, "Dummy", name, midi.NoChannel)
 	return op
 }
 	

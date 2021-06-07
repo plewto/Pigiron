@@ -3,17 +3,13 @@ package op
 import "github.com/rakyll/portmidi"
 
 type DeviceWrapper interface {
-	PigOp
+	Operator
 	DeviceID() portmidi.DeviceID
-	Stream() portmidi.Stream
+	Stream() *portmidi.Stream
 	DeviceName() string
-	IsInput() bool
-	IsOutput() bool
 	IsOpen() bool
 	Close() error
 }
 
-	
 func Foo() {
-	//fmt.Println("op.Foo()   GET RID OF THIS")
 }

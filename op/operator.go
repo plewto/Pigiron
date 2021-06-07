@@ -18,6 +18,7 @@ type Operator interface {
 	Info() string
 	Panic()
 	Reset()
+	Close()
 
 	// Node
 	IsRoot() bool
@@ -132,6 +133,7 @@ func (op *baseOperator) Panic() {
 
 func (op *baseOperator) Reset() {}
 
+func (op *baseOperator) Close() {}
 
 func (op *baseOperator) IsRoot() bool {
 	return len(op.parentMap) == 0

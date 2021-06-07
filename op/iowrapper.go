@@ -2,7 +2,7 @@ package op
 
 import "github.com/rakyll/portmidi"
 
-type DeviceWrapper interface {
+type IOWrapper interface {
 	Operator
 	DeviceID() portmidi.DeviceID
 	Stream() *portmidi.Stream
@@ -11,5 +11,3 @@ type DeviceWrapper interface {
 	Close() error
 }
 
-func Foo() {
-}

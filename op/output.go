@@ -1,0 +1,137 @@
+package op
+
+import (
+	"fmt"
+	
+	portmidi "github.com/rakyll/portmidi"
+	midi "github.com/plewto/pigiron/midi"
+	config "github.com/plewto/pigiron/config"
+)
+
+// MIDIOutput is an Operator wrapper for MIDI output devices.
+// MIDIOutput implements the PigOp and DeviceWrapper interfaces.
+//
+// There may only be a single MIDIOutput for any one MIDI output device.
+// Upon construct new MIDIutputs are cached.  Attempts to create another
+// MIDIOutput for the same output device returns the cached object.
+//
+type MIDIOutput struct {
+	baseOperator
+	devID portmidi.DeviceID
+	devInfo *portmidi.DeviceInfo
+	stream *portmidi.Stream
+}
+
+var outputCache = make(map[portmidi.DeviceID]*MIDIOutput)
+
+func outputCached(devID portmidi.DeviceID) bool {
+	_, flag := outputCache[devID]
+	return flag
+}
+
+func newMIDIOutput(name string,  devID portmidi.DeviceID) (*MIDIOutput, error) {
+	var op *MIDIOutput
+	var stream *portmidi.Stream
+	var err error
+	op = new(MIDIOutput)
+	initOperator(&op.baseOperator, "MIDIOutput", name, midi.NoChannel)
+	op.devID = devID
+	op.devInfo = portmidi.Info(devID)
+	bufferSize := config.MIDIOutputBufferSize
+	latency := config.MIDIOutputLatency
+	stream, err = portmidi.NewOutputStream(devID, bufferSize, latency)
+	if err != nil {
+		return op, err
+	}
+	op.stream = stream
+	return op, err
+}
+	
+// func NewMIDIOutput(name string, deviceSpec string) (*MIDIOutput, error) {
+// 	var op *MIDIOutput
+// 	var err error
+// 	var devID portmidi.DeviceID
+// 	devID, err = midi.GetOutputID(deviceSpec)
+// 	if err != nil {
+// 		return op, err
+// 	}
+// 	if outputCached(devID) {
+// 		op, _ = outputCache[devID]
+// 	} else {
+// 		op, err = newMIDIOutput(name, devID)
+// 		if err == nil {
+// 			outputCache[devID] = op
+// 		}
+// 	}
+// 	return op, err
+// }
+
+
+func NewMIDIOutput(name string, deviceSpec string) (*MIDIOutput, error) {
+	var op *MIDIOutput
+	var err error
+	var devID portmidi.DeviceID
+	var cached bool
+	devID, err = midi.GetOutputID(deviceSpec)
+	if err != nil {
+		return op, err
+	}
+	// if outputCached(devID) {
+	// 	op, _ = outputCache[devID]
+	// } else {
+	// 	op, err = newMIDIOutput(name, devID)
+	// 	if err == nil {
+	// 		outputCache[devID] = op
+	// 	}
+	// }
+	if op, cached = outputCache[devID]; !cached {
+		op, err = newMIDIOutput(name, devID)
+		if err == nil {
+			outputCache[devID] = op
+		}
+	}
+	return op, err
+}
+			
+func (op *MIDIOutput) DeviceID() portmidi.DeviceID {
+	return op.devID
+}
+
+func (op *MIDIOutput) Stream() *portmidi.Stream {
+	return op.stream
+}
+
+func (op *MIDIOutput) DeviceName() string {
+	return op.devInfo.Name
+}
+
+func (op *MIDIOutput) IsOpen() bool {
+	return op.devInfo.IsOpened
+}
+
+
+func (op *MIDIOutput) IsInput() bool {
+	return false
+}
+
+func (op *MIDIOutput) IsOutput() bool {
+	return true
+}
+
+func (op *MIDIOutput) Close() {
+	op.Stream().Close()
+}
+
+func (op *MIDIOutput) Info() string {
+	s := op.commonInfo()
+	s += fmt.Sprintf("\tDevice ID   : %d\n", op.DeviceID())
+	s += fmt.Sprintf("\tDevice Name : %s\n", op.DeviceName())
+	return s
+}
+
+// TODO Implement MIDIOutput send
+
+
+
+
+

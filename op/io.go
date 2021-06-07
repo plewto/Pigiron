@@ -12,12 +12,3 @@ type IOWrapper interface {
 	IsOutput() bool
 }
 
-
-var ioCache map[portmidi.DeviceID]*IOWrapper = make(map[portmidi.DeviceID]*IOWrapper)
-
-
-func ioDeviceCached(id portmidi.DeviceID) bool {
-	_, flag := ioCache[id]
-	return flag
-}
-

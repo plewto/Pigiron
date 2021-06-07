@@ -7,8 +7,6 @@ type IOWrapper interface {
 	DeviceID() portmidi.DeviceID
 	Stream() *portmidi.Stream
 	DeviceName() string
-	IsOpen() bool
-	IsInput() bool
 	IsOutput() bool
 }
 

@@ -3,9 +3,9 @@ package op
 import (
 	"fmt"
 	
-	portmidi "github.com/rakyll/portmidi"
-	midi "github.com/plewto/pigiron/midi"
-	config "github.com/plewto/pigiron/config"
+	"github.com/rakyll/portmidi"
+	"github.com/plewto/pigiron/midi"
+	"github.com/plewto/pigiron/config"
 )
 
 // MIDIOutput is an Operator wrapper for MIDI output devices.
@@ -24,11 +24,10 @@ type MIDIOutput struct {
 
 var outputCache = make(map[portmidi.DeviceID]*MIDIOutput)
 
-func outputCached(devID portmidi.DeviceID) bool {
-	_, flag := outputCache[devID]
-	return flag
-}
 
+// ** Creates new MIDIOutput, does not cache it.
+// ** Only called when cached version does not exists.
+// **
 func newMIDIOutput(name string,  devID portmidi.DeviceID) (*MIDIOutput, error) {
 	var op *MIDIOutput
 	var stream *portmidi.Stream
@@ -46,27 +45,9 @@ func newMIDIOutput(name string,  devID portmidi.DeviceID) (*MIDIOutput, error) {
 	op.stream = stream
 	return op, err
 }
-	
-// func NewMIDIOutput(name string, deviceSpec string) (*MIDIOutput, error) {
-// 	var op *MIDIOutput
-// 	var err error
-// 	var devID portmidi.DeviceID
-// 	devID, err = midi.GetOutputID(deviceSpec)
-// 	if err != nil {
-// 		return op, err
-// 	}
-// 	if outputCached(devID) {
-// 		op, _ = outputCache[devID]
-// 	} else {
-// 		op, err = newMIDIOutput(name, devID)
-// 		if err == nil {
-// 			outputCache[devID] = op
-// 		}
-// 	}
-// 	return op, err
-// }
 
-
+// ** Factory creates new MIDIOutput or grabs it from the cache.
+//
 func NewMIDIOutput(name string, deviceSpec string) (*MIDIOutput, error) {
 	var op *MIDIOutput
 	var err error
@@ -76,14 +57,6 @@ func NewMIDIOutput(name string, deviceSpec string) (*MIDIOutput, error) {
 	if err != nil {
 		return op, err
 	}
-	// if outputCached(devID) {
-	// 	op, _ = outputCache[devID]
-	// } else {
-	// 	op, err = newMIDIOutput(name, devID)
-	// 	if err == nil {
-	// 		outputCache[devID] = op
-	// 	}
-	// }
 	if op, cached = outputCache[devID]; !cached {
 		op, err = newMIDIOutput(name, devID)
 		if err == nil {
@@ -107,15 +80,6 @@ func (op *MIDIOutput) DeviceName() string {
 
 func (op *MIDIOutput) IsOpen() bool {
 	return op.devInfo.IsOpened
-}
-
-
-func (op *MIDIOutput) IsInput() bool {
-	return false
-}
-
-func (op *MIDIOutput) IsOutput() bool {
-	return true
 }
 
 func (op *MIDIOutput) Close() {

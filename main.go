@@ -4,17 +4,14 @@ import (
 	"fmt"
 
 	"github.com/plewto/pigiron/midi"
+	"github.com/plewto/pigiron/op"
 )
 
 func main() {
 	fmt.Println("Pigiron.main()")
 	midi.DumpDevices()
-	id, err := midi.GetOutputID("MIDI 2")
 
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(id)
+	op.Foo()
 	Cleanup()
 
 }

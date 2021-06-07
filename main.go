@@ -11,7 +11,9 @@ func main() {
 	fmt.Println("Pigiron.main()")
 	midi.DumpDevices()
 
-	op.Foo()
+	dummy := op.NewOperator("Dummy", "Alpha")
+
+	fmt.Println(dummy.Info())
 	Cleanup()
 
 }

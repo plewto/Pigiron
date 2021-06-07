@@ -81,8 +81,8 @@ func DumpRegistry() {
 }
 
 
-// MakeOperator(opType, name) creates a new Operator and adds it to the registry.
-// All operators should be created by MakeOperator.
+// NewOperator(opType, name) creates a new Operator and adds it to the registry.
+// All operators should be created by NewOperator.
 //
 // opType indicates the type of Operator, valid options are: 
 //    Null
@@ -93,7 +93,7 @@ func DumpRegistry() {
 // Returns the new Operator and an error.
 // The error is non nil if opType was invalid.
 //
-func MakeOperator(opType string, name string) (Operator, error) {
+func NewOperator(opType string, name string) (Operator, error) {
 	var err error
 	var op Operator
 	switch opType {

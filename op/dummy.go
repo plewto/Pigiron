@@ -12,7 +12,7 @@ type DummyOperator struct {
 	baseOperator
 }
 
-func makeDummyOperator(name string) *DummyOperator {
+func newDummyOperator(name string) *DummyOperator {
 	op := new(DummyOperator)
 	initOperator(&op.baseOperator, "Dummy", name, midi.NoChannel)
 	return op

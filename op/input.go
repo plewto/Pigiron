@@ -48,9 +48,38 @@ func NewMIDIInput(name string, deviceSpec string) (*MIDIInput, error) {
 		op, err = newMIDIInput(name, devID)
 		if err == nil {
 			inputCache[devID] = op
+			register(op)
 		}
 	}
 	return op, err
+}
+
+
+
+func notInputError(op *MIDIInput, err error) bool {
+	if err != nil {
+		fmt.Println("%s %s\n", op, err)
+		return false
+	}
+	return true
+}
+
+
+//* Read all MIDIInput and process events.
+func ProcessInputs() {
+	for _, op :=range inputCache {
+		flag, err := op.stream.Poll()
+		if notInputError(op, err) {
+			if flag {
+				events, err := op.stream.Read(int(config.MIDIInputBufferSize))
+				if notInputError(op, err) {
+					for _, event := range events {
+						op.Send(event)
+					}
+				}
+			}
+		}
+	}
 }
 
 func (op *MIDIInput) DeviceID() portmidi.DeviceID {

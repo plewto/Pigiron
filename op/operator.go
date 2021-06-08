@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"errors"
 
-	midi "github.com/plewto/pigiron/midi"
+	"github.com/rakyll/portmidi"
+	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
 )
 
@@ -44,9 +45,9 @@ type Operator interface {
 	// MIDI
 	MIDIEnabled() bool
 	SetMIDIEnabled(flag bool)
-	// Accept(message gomidi.Message) bool
-	// distribute(message gomidi.Message)
-	// Send(message gomidi.Message)
+	Accept(event portmidi.Event) bool
+	distribute(event portmidi.Event)
+	Send(event portmidi.Event)
 }
 
 
@@ -294,34 +295,25 @@ func (op *baseOperator) SetMIDIEnabled(flag bool) {
 }
 
 
-/* ******
-// The Default behavior is to return true for all messages.
-// Extending Operators should override for specific behavior.
-//
-func (op *baseOperator) Accept(msg gomidi.Message) bool {
+
+func (op *baseOperator) Accept(event portmidi.Event) bool {
 	return true
 }
 
 
-// distribute ends a MIDI message to all child Operators.
-//
-func (op *baseOperator) distribute(msg gomidi.Message) {
+func (op *baseOperator) distribute(event portmidi.Event) {
 	for _, child := range op.children() {
-		child.Send(msg)
+		child.Send(event)
 	}
 }
 
 
-// Send receives MIDI messages form parent Operators and transmits to all child Operators.
-// Only messages for which Accept returns true are processed.
-// The transmitted message need not be the same as the received message.
-// Extending Operators should override.
-//
-func (op *baseOperator) Send(msg gomidi.Message) {
-	if op.Accept(msg) && op.MIDIEnabled() {
-		op.distribute(msg)
+
+func (op *baseOperator) Send(event portmidi.Event) {
+	if op.Accept(event) && op.MIDIEnabled() {
+		op.distribute(event)
 	}
 }
-***** */
+
 
 

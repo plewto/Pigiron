@@ -61,6 +61,7 @@ func NewMIDIOutput(name string, deviceSpec string) (*MIDIOutput, error) {
 		op, err = newMIDIOutput(name, devID)
 		if err == nil {
 			outputCache[devID] = op
+			register(op)
 		}
 	}
 	return op, err
@@ -93,7 +94,17 @@ func (op *MIDIOutput) Info() string {
 	return s
 }
 
-// TODO Implement MIDIOutput send
+
+func (op *MIDIOutput) Send(event portmidi.Event) {
+	if op.MIDIEnabled() {
+		if len(event.SysEx) > 0 {
+			op.stream.WriteSysExBytes(portmidi.Time(), event.SysEx)
+		} else {
+			op.stream.WriteShort(event.Status, event.Data1, event.Data2)
+		}
+		op.distribute(event)
+	}
+}
 
 
 

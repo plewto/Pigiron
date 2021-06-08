@@ -98,9 +98,9 @@ func NewOperator(opType string, name string) (Operator, error) {
 	var op Operator
 	switch opType {
 	case "Dummy":
-		op = makeDummyOperator(name)
-	// case "Monitor":
-	// 	op  = makeMonitor(name)
+		op = newDummyOperator(name)
+	case "Monitor":
+		op  = newMonitor(name)
 	// case "ChannelFilter":
 	// 	op = makeChannelFilter(name)
 	default:
@@ -156,13 +156,6 @@ func Operators() []Operator {
 	for _, op := range(registry) {
 		acc = append(acc, op)
 	}
-	// TODO: Restore
-	// for _, op := range inputCache {
-	// 	acc = append(acc, op)
-	// }
-	// for _, op := range outputCache {
-	// 	acc = append(acc, op)
-	// }
 	return acc
 }
 
@@ -180,5 +173,7 @@ func RootOperators() []Operator {
 
 
 func Cleanup() {
-
+	for _, op := range registry {
+		op.Close()
+	}
 }

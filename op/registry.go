@@ -101,8 +101,8 @@ func NewOperator(opType string, name string) (Operator, error) {
 		op = newDummyOperator(name)
 	case "Monitor":
 		op  = newMonitor(name)
-	// case "ChannelFilter":
-	// 	op = makeChannelFilter(name)
+	case "ChannelFilter":
+		op = newChannelFilter(name)
 	default:
 		sfmt := "Invalid Operator type: '%s'"
 		msg := fmt.Sprintf(sfmt, opType)

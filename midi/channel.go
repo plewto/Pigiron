@@ -23,7 +23,6 @@ const (
 	MultiChannel
 )
 
-
 func (m ChannelMode) String() string {
 	return [...]string{"NoChannel", "SingleChannel", "MultiChannel"}[m]
 }

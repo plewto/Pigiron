@@ -42,7 +42,7 @@ func (op *ChannelFilter) Send(event portmidi.Event) {
 		}
 	}
 }
-	
+
 func (op *ChannelFilter) Info() string {
 	s := op.commonInfo()
 	s += fmt.Sprintf("\tenable system events: %v\n", op.enableSystemEvents)

@@ -1,7 +1,9 @@
 package op
 
 import (
+	"C"
 	"fmt"
+	"time"
 	
 	"github.com/rakyll/portmidi"
 	"github.com/plewto/pigiron/midi"
@@ -104,7 +106,29 @@ func (op *MIDIOutput) Send(event portmidi.Event) {
 	op.distribute(event)
 }
 
-
+func (op *MIDIOutput) Panic() {
+	var event portmidi.Event
+	tstamp := portmidi.Timestamp(0)
+	for ci:=0; ci<16; ci++ {
+		time.Sleep(1 * time.Millisecond)
+		st := int64(0x80 | ci)
+		velocity := int64(0)
+		for key := int64(0); key<128; key++ {
+			if key % 16 == 0 {
+				time.Sleep(1 * time.Millisecond)
+			}
+			event = portmidi.Event{
+				Timestamp: tstamp,
+				Status: st,
+				Data1: key,
+				Data2: velocity}
+			op.Send(event)
+		}
+	}
+	for _, child := range op.children() {
+		child.Panic()
+	}
+}
 
 
 

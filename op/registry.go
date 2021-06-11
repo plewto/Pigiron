@@ -173,3 +173,10 @@ func Cleanup() {
 		op.Close()
 	}
 }
+
+
+func ResetAll() {
+	for _, op := range Operators() {
+		op.Reset()
+	}
+}

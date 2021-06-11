@@ -20,6 +20,8 @@ func newDistributor(name string) *Distributor {
 func (op *Distributor) Reset() {
 	op.DeselectAllChannels()
 	op.EnableChannel(midi.MIDIChannel(1), true)
+	base := &op.baseOperator
+	base.Reset()
 }
 
 func (op *Distributor) Send(event portmidi.Event) {

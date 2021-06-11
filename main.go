@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"time"
+	//"time"
 
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/op"
@@ -24,10 +24,12 @@ func main() {
 
 	in.PrintTree()
 	
-	for {
-		op.ProcessInputs()
-		time.Sleep(1 * time.Millisecond)
-	}
+	// for {
+	// 	op.ProcessInputs()
+	// 	time.Sleep(1 * time.Millisecond)
+	// }
+
+	fmt.Println(dist.Info())
 	
 	Cleanup()
 

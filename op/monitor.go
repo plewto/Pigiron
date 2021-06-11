@@ -2,8 +2,7 @@ package op
 
 import (
 	"fmt"
-	//"math"
-	
+
 	"github.com/rakyll/portmidi"
 	"github.com/plewto/pigiron/midi"
 )

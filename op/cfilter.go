@@ -24,6 +24,8 @@ func (op *ChannelFilter) Reset() {
 	for c := 1; c < 17; c++ {
 		op.EnableChannel(midi.MIDIChannel(c), true)
 	}
+	base := &op.baseOperator
+	base.Reset()
 }
 
 func (op *ChannelFilter) Send(event portmidi.Event) {

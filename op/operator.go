@@ -133,7 +133,9 @@ func (op *baseOperator) Panic() {
 	}
 }
 
-func (op *baseOperator) Reset() {}
+func (op *baseOperator) Reset() {
+	op.SetMIDIOutputEnabled(true)
+}
 
 func (op *baseOperator) Close() {}
 
@@ -282,8 +284,8 @@ func (op *baseOperator) SelectAllChannels() {
 }
 
 func (op *baseOperator) OSCAddress() string {
-	sfmt := "/%s/op/%s/"
-	return fmt.Sprintf(sfmt, config.ApplicationOSCPrefix, op.Name())
+	sfmt := "/%s/op/%s/%s"
+	return fmt.Sprintf(sfmt, config.ApplicationOSCPrefix, op.OperatorType(), op.Name())
 }
 
 

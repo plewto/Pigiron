@@ -65,11 +65,11 @@ func initOperator(op *baseOperator, opType string, name string, mode midi.Channe
 	op.name = name
 	switch mode {
 	case midi.SingleChannel:
-		op.channelSelector = midi.MakeSingleChannelSelector()
+		op.channelSelector = midi.NewSingleChannelSelector()
 	case midi.MultiChannel:
-		op.channelSelector = midi.MakeMultiChannelSelector()
+		op.channelSelector = midi.NewMultiChannelSelector()
 	default:
-		op.channelSelector = midi.MakeNullChannelSelector()
+		op.channelSelector = midi.NewNullChannelSelector()
 	}
 	op.parentMap = make(map[string]Operator)
 	op.childrenMap = make(map[string]Operator)
@@ -250,29 +250,34 @@ func (op *baseOperator) Disjoin() {
 	}
 }
 
+
 func (op *baseOperator) ChannelMode() midi.ChannelMode {
 	return op.channelSelector.ChannelMode()
 }
 
-func (op *baseOperator) EnableChannel(channel int, flag bool) error {
+func (op *baseOperator) EnableChannel(channel midi.MIDIChannel, flag bool) error {
 	return op.channelSelector.EnableChannel(channel, flag)
 }
 
-func (op *baseOperator) SelectChannel(channel int) error {
+func (op *baseOperator) SelectChannel(channel midi.MIDIChannel) error {
 	return op.channelSelector.SelectChannel(channel)
 }
 
-func (op *baseOperator) SelectedChannels() []int {
-	return op.channelSelector.SelectedChannels()
+func (op *baseOperator) SelectedChannelIndexes() []midi.MIDIChannelIndex {
+	return op.channelSelector.SelectedChannelIndexes()
 }
 
 
-func (op *baseOperator) ChannelSelected(channel int) bool {
-	return op.channelSelector.ChannelSelected(channel)
+func (op *baseOperator) ChannelIndexSelected(ci midi.MIDIChannelIndex ) bool {
+	return op.channelSelector.ChannelIndexSelected(ci)
 }
 
 func (op *baseOperator) DeselectAllChannels() {
 	op.channelSelector.DeselectAllChannels()
+}
+
+func (op *baseOperator) SelectAllChannels() {
+	op.channelSelector.SelectAllChannels()
 }
 
 func (op *baseOperator) OSCAddress() string {

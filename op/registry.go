@@ -1,7 +1,5 @@
 package op
 
-
-
 import (
 	"fmt"
 	"strings"
@@ -17,10 +15,6 @@ var registry map[string]Operator = make(map[string]Operator)
 //
 func OperatorExists(name string) bool {
 	_, flag := registry[name]
-	// TODO: Restore
-	// _, iflag := inputCache[name]
-	// _, oflag := outputCache[name]
-	// return flag || iflag || oflag
 	return flag
 }
 

@@ -18,9 +18,8 @@ func newDistributor(name string) *Distributor {
 }
 
 func (op *Distributor) Reset() {
-	for c := 1; c < 17; c++ {
-		op.EnableChannel(c, true)
-	}
+	op.DeselectAllChannels()
+	op.EnableChannel(midi.MIDIChannel(1), true)
 }
 
 func (op *Distributor) Send(event portmidi.Event) {
@@ -28,9 +27,8 @@ func (op *Distributor) Send(event portmidi.Event) {
 		s := event.Status
 		if midi.IsChannelStatus(s) {
 			cmd := midi.StatusChannelCommand(s)
-			for _, c := range op.SelectedChannels() {
-				ci := int64(c - 1)
-				s2 := cmd | ci
+			for _, ci := range op.SelectedChannelIndexes() {
+				s2 := cmd | int64(ci)
 				event.Status = s2
 				op.distribute(event)
 			}
@@ -39,4 +37,4 @@ func (op *Distributor) Send(event portmidi.Event) {
 		}
 	}
 }
-	
+				

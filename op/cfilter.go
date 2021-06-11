@@ -22,17 +22,16 @@ func newChannelFilter(name string) *ChannelFilter {
 func (op *ChannelFilter) Reset() {
 	op.enableSystemEvents = true
 	for c := 1; c < 17; c++ {
-		op.EnableChannel(c, true)
+		op.EnableChannel(midi.MIDIChannel(c), true)
 	}
 }
-
 
 func (op *ChannelFilter) Send(event portmidi.Event) {
 	if op.MIDIEnabled() {
 		s := event.Status
 		if midi.IsChannelStatus(s) {
-			c := midi.StatusChannelIndex(s) + 1
-			if op.ChannelSelected(int(c)) {
+			ci := midi.StatusChannelIndex(s)
+			if op.ChannelIndexSelected(ci) {
 				op.distribute(event)
 			}
 		} else {

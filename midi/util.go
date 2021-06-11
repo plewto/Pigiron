@@ -47,12 +47,12 @@ func StatusChannelCommand(s int64) int64 {
 	return s & CHANNEL_MASK
 }
 
-func StatusChannelIndex(s int64) int64 {
-	return s & STATUS_MASK
+func StatusChannelIndex(s int64) MIDIChannelIndex {
+	return MIDIChannelIndex(s & STATUS_MASK)
 }
 
-func SetStatusChannelIndex(s int64, ci int64) int64 {
-	return StatusChannelCommand(s) | ci
+func SetStatusChannelIndex(s int64, ci MIDIChannelIndex) int64 {
+	return StatusChannelCommand(s) | int64(ci)
 }
 
 func ChannelEventToString(event portmidi.Event) string {

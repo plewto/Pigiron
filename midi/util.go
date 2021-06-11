@@ -9,6 +9,7 @@ import (
 const (
 	CHANNEL_MASK (int64) = 0xF0
 	STATUS_MASK (int64) = 0x0F
+	SYSEX (int64) = 0xF0
 )
 
 var mnemonics = make(map[int64]string)
@@ -34,6 +35,16 @@ func init() {
 	mnemonics[0xFF] = "RESET   "  
 }
 	
+
+func StatusMnemonic(n int64) string {
+	var mn string
+	if n >= 0xF0 {
+		mn, _  = mnemonics[n]
+	} else {
+		mn, _  = mnemonics[n & CHANNEL_MASK]
+	}
+	return mn
+}
 
 func IsChannelStatus(s int64) bool {
 	return s & CHANNEL_MASK != 0xF0
@@ -66,7 +77,21 @@ func ChannelEventToString(event portmidi.Event) string {
 
 
 func SystemEventToString(event portmidi.Event) string {
-	return "<system-event>"
+	s := event.Status
+	acc := fmt.Sprintf("%s ", mnemonics[s])
+	if s == SYSEX {
+		bytes := event.SysEx
+		for i:=0; i<len(bytes) && i<10; i++ {
+			acc += fmt.Sprintf("%02x ", bytes[i])
+		}
+		if len(bytes) > 10 {
+			acc += "..."
+		}
+	} else {
+		acc += fmt.Sprintf("%02x, %02x", event.Data1, event.Data2)
+	}
+	return acc
+		
 }
 
 func EventToString(event portmidi.Event) string {

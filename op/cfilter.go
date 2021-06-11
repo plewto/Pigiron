@@ -27,17 +27,15 @@ func (op *ChannelFilter) Reset() {
 }
 
 func (op *ChannelFilter) Send(event portmidi.Event) {
-	if op.MIDIEnabled() {
-		s := event.Status
-		if midi.IsChannelStatus(s) {
-			ci := midi.StatusChannelIndex(s)
-			if op.ChannelIndexSelected(ci) {
-				op.distribute(event)
-			}
-		} else {
-			if op.enableSystemEvents {
-				op.distribute(event)
-			}
+	s := event.Status
+	if midi.IsChannelStatus(s) {
+		ci := midi.StatusChannelIndex(s)
+		if op.ChannelIndexSelected(ci) {
+			op.distribute(event)
+		}
+	} else {
+		if op.enableSystemEvents {
+			op.distribute(event)
 		}
 	}
 }

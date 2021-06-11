@@ -43,8 +43,9 @@ type Operator interface {
 	FormatOSCAddress(command string) string
 
 	// MIDI
-	MIDIEnabled() bool
-	SetMIDIEnabled(flag bool)
+	MIDIOutputEnabled() bool
+	SetMIDIOutputEnabled(flag bool)
+	
 	Accept(event portmidi.Event) bool
 	distribute(event portmidi.Event)
 	Send(event portmidi.Event)
@@ -57,7 +58,7 @@ type baseOperator struct {
 	channelSelector midi.ChannelSelector
 	parentMap map[string]Operator
 	childrenMap map[string]Operator
-	midiEnabled bool
+	midiOutputEnabled bool
 }
 
 func initOperator(op *baseOperator, opType string, name string, mode midi.ChannelMode) {
@@ -73,7 +74,7 @@ func initOperator(op *baseOperator, opType string, name string, mode midi.Channe
 	}
 	op.parentMap = make(map[string]Operator)
 	op.childrenMap = make(map[string]Operator)
-	op.midiEnabled = true
+	op.midiOutputEnabled = true
 }
 
 func (op *baseOperator) OperatorType() string {
@@ -97,7 +98,7 @@ func (op *baseOperator) String() string {
 
 func (op *baseOperator) commonInfo() string {
 	s := fmt.Sprintf("%s  name: \"%s\"    %s\n", op.opType, op.name, op.channelSelector)
-	s += fmt.Sprintf("\tMIDI enabled: %v\n", op.MIDIEnabled())
+	//s += fmt.Sprintf("\tMIDI enabled: %v\n", op.MIDIEnabled())
 	s += fmt.Sprintf("\tOSC address: '%s'\n", op.OSCAddress())
 	s += "\tparents: "
 	if op.IsRoot() {
@@ -290,15 +291,13 @@ func (op *baseOperator) FormatOSCAddress(command string) string {
 	return fmt.Sprintf("%s%s", op.OSCAddress(), command)
 }
 
-
-func (op *baseOperator) MIDIEnabled() bool {
-	return op.midiEnabled
+func (op *baseOperator) MIDIOutputEnabled() bool {
+	return op.midiOutputEnabled
 }
 
-func (op *baseOperator) SetMIDIEnabled(flag bool) {
-	op.midiEnabled = flag
+func (op *baseOperator) SetMIDIOutputEnabled(flag bool) {
+	op.midiOutputEnabled = flag
 }
-
 
 
 func (op *baseOperator) Accept(event portmidi.Event) bool {
@@ -307,15 +306,15 @@ func (op *baseOperator) Accept(event portmidi.Event) bool {
 
 
 func (op *baseOperator) distribute(event portmidi.Event) {
-	for _, child := range op.children() {
-		child.Send(event)
+	if op.MIDIOutputEnabled() {
+		for _, child := range op.children() {
+			child.Send(event)
+		}
 	}
 }
 
-
-
 func (op *baseOperator) Send(event portmidi.Event) {
-	if op.Accept(event) && op.MIDIEnabled() {
+	if op.Accept(event) {
 		op.distribute(event)
 	}
 }

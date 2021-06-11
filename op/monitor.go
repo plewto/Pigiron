@@ -18,9 +18,7 @@ func newMonitor(name string) *Monitor {
 }
 
 func (op *Monitor) Send(event portmidi.Event) {
-	if op.MIDIEnabled() {
-		op.distribute(event)
-		fmt.Printf(midi.EventToString(event))
-		fmt.Println()
-	}
+	op.distribute(event)
+	fmt.Printf(midi.EventToString(event))
+	fmt.Println()
 }

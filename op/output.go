@@ -96,14 +96,12 @@ func (op *MIDIOutput) Info() string {
 
 
 func (op *MIDIOutput) Send(event portmidi.Event) {
-	if op.MIDIEnabled() {
-		if len(event.SysEx) > 0 {
-			op.stream.WriteSysExBytes(portmidi.Time(), event.SysEx)
-		} else {
-			op.stream.WriteShort(event.Status, event.Data1, event.Data2)
-		}
-		op.distribute(event)
+	if len(event.SysEx) > 0 {
+		op.stream.WriteSysExBytes(portmidi.Time(), event.SysEx)
+	} else {
+		op.stream.WriteShort(event.Status, event.Data1, event.Data2)
 	}
+	op.distribute(event)
 }
 
 

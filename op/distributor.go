@@ -23,18 +23,16 @@ func (op *Distributor) Reset() {
 }
 
 func (op *Distributor) Send(event portmidi.Event) {
-	if op.MIDIEnabled() {
-		s := event.Status
-		if midi.IsChannelStatus(s) {
-			cmd := midi.StatusChannelCommand(s)
-			for _, ci := range op.SelectedChannelIndexes() {
-				s2 := cmd | int64(ci)
-				event.Status = s2
-				op.distribute(event)
-			}
-		} else {
+	s := event.Status
+	if midi.IsChannelStatus(s) {
+		cmd := midi.StatusChannelCommand(s)
+		for _, ci := range op.SelectedChannelIndexes() {
+			s2 := cmd | int64(ci)
+			event.Status = s2
 			op.distribute(event)
 		}
+	} else {
+		op.distribute(event)
 	}
 }
 				

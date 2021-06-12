@@ -99,6 +99,8 @@ func NewOperator(opType string, name string) (Operator, error) {
 		op = newChannelFilter(name)
 	case "Distributor":
 		op = newDistributor(name)
+	case "MIDIPlayer":
+		op = newMIDIPlayer(name)
 	default:
 		sfmt := "Invalid Operator type: '%s'"
 		msg := fmt.Sprintf(sfmt, opType)
@@ -178,5 +180,11 @@ func Cleanup() {
 func ResetAll() {
 	for _, op := range Operators() {
 		op.Reset()
+	}
+}
+
+func PanicAll() {
+	for _, op := range RootOperators() {
+		op.Panic()
 	}
 }

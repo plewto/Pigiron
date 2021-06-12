@@ -16,13 +16,16 @@ func main() {
 	dist, _ := op.NewOperator("Distributor", "dist")
 	mon, _ := op.NewOperator("Monitor", "mon")
 	out, _ := op.NewMIDIOutput("out", "MIDI 1")
+	player, _ := op.NewOperator("MIDIPlayer", "player")
 
 	in.Connect(filter)
 	filter.Connect(dist)
 	dist.Connect(mon)
+	player.Connect(mon)
 	mon.Connect(out)
 
 	in.PrintTree()
+	op.PanicAll()
 	
 	// for {
 	// 	op.ProcessInputs()

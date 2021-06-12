@@ -108,7 +108,6 @@ func (op *MIDIOutput) Send(event portmidi.Event) {
 
 func (op *MIDIOutput) Panic() {
 	var event portmidi.Event
-	tstamp := portmidi.Timestamp(0)
 	for ci:=0; ci<16; ci++ {
 		time.Sleep(1 * time.Millisecond)
 		st := int64(0x80 | ci)
@@ -118,7 +117,7 @@ func (op *MIDIOutput) Panic() {
 				time.Sleep(1 * time.Millisecond)
 			}
 			event = portmidi.Event{
-				Timestamp: tstamp,
+				Timestamp: 0,
 				Status: st,
 				Data1: key,
 				Data2: velocity}

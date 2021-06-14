@@ -12,7 +12,7 @@ import (
 var (
 	GlobalParameters = globalParameters {}
 	configFilename string
-	config *toml.Tree
+	tomlTree *toml.Tree
 )
 	
 type globalParameters struct {
@@ -68,12 +68,12 @@ func splitPath(path string) []string {
 }
 
 func hasPath(path string) bool {
-	return config.HasPath(splitPath(path))
+	return tomlTree.HasPath(splitPath(path))
 }
 
 func readInt(path string, fallback int64) int64 {
 	if hasPath(path) {
-		raw := fmt.Sprintf("%v", config.Get(path))
+		raw := fmt.Sprintf("%v", tomlTree.Get(path))
 		value, err := strconv.Atoi(raw)
 		if err != nil {
 			msg := "ERROR: Config '%s' expected int, found '%s'. Using default %v\n"
@@ -91,7 +91,7 @@ func readInt(path string, fallback int64) int64 {
 		
 func readFloat(path string, fallback float64) float64 {
 	if hasPath(path) {
-		raw := fmt.Sprintf("%v", config.Get(path))
+		raw := fmt.Sprintf("%v", tomlTree.Get(path))
 		value, err := strconv.ParseFloat(raw, 64)
 		if err != nil {
 			msg := "ERROR: Config '%s' expected float, found '%s'. Using default %v\n"
@@ -110,7 +110,7 @@ func readFloat(path string, fallback float64) float64 {
 
 func readString(path string, fallback string) string {
 	if hasPath(path) {
-		return fmt.Sprintf("%v", config.Get(path))
+		return fmt.Sprintf("%v", tomlTree.Get(path))
 	} else {
 		msg :="ERROR: Config path '%s' missing, using default %v\n"
 		fmt.Printf(msg, path, fallback)
@@ -123,7 +123,7 @@ func init() {
 	ResetGlobalParameters()
 	var err error
 	configFilename = determineConfigFilename()
-	config, err = toml.LoadFile(configFilename)
+	tomlTree, err = toml.LoadFile(configFilename)
 	if err != nil {
 		fmt.Printf("ERROR: Can not load configuration file \"%s\"\n", configFilename)
 		fmt.Println("ERROR:", err.Error())

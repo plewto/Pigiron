@@ -10,12 +10,8 @@ import (
 
 func main() {
 	fmt.Println("Pigiron.main()")
-
-
 	config.DumpGlobalParameters()
-	
 	Cleanup()
-
 }
 
 func Ignore(values ...interface{}) {}

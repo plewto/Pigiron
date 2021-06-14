@@ -17,7 +17,7 @@ type globalParameters struct {
 	OSCClientPort int64
 	OSCClientFilename string
 	MaxTreeDepth int64
-	MIDIInputBuffSize int64
+	MIDIInputBufferSize int64
 	MIDIInputPollInterval int64 // ms
 	MIDIOutputBufferSize int64
 	MIDIOutputLatency int64
@@ -34,7 +34,7 @@ func ResetGlobalParameters() {
 	GlobalParameters.OSCClientPort = 8001
 	GlobalParameters.OSCClientFilename = ""
 	GlobalParameters.MaxTreeDepth = 12
-	GlobalParameters.MIDIInputBuffSize = 1024
+	GlobalParameters.MIDIInputBufferSize = 1024
 	GlobalParameters.MIDIInputPollInterval = 0
 	GlobalParameters.MIDIOutputBufferSize = 1024
 	GlobalParameters.MIDIOutputLatency = 0
@@ -118,7 +118,7 @@ func init() {
 		GlobalParameters.OSCClientPort = readInt("osc-client.port", 8001)
 		GlobalParameters.OSCClientFilename = readString("osc-client.file", "")
 		GlobalParameters.MaxTreeDepth = readInt("tree.max-depth", 12)
-		GlobalParameters.MIDIInputBuffSize = readInt("midi-input.buffer-size", 1024)
+		GlobalParameters.MIDIInputBufferSize = readInt("midi-input.buffer-size", 1024)
 		GlobalParameters.MIDIInputPollInterval = readInt("midi-input.poll-interval", 0)
 		GlobalParameters.MIDIOutputBufferSize = readInt("midi-output.buffer-size", 1024)
 		GlobalParameters.MIDIOutputLatency = readInt("midi-output.latency", 0)

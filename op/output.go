@@ -38,8 +38,8 @@ func newMIDIOutput(name string,  devID portmidi.DeviceID) (*MIDIOutput, error) {
 	initOperator(&op.baseOperator, "MIDIOutput", name, midi.NoChannel)
 	op.devID = devID
 	op.devInfo = portmidi.Info(devID)
-	bufferSize := config.MIDIOutputBufferSize
-	latency := config.MIDIOutputLatency
+	bufferSize := config.GlobalParameters.MIDIOutputBufferSize
+	latency := config.GlobalParameters.MIDIOutputLatency
 	stream, err = portmidi.NewOutputStream(devID, bufferSize, latency)
 	if err != nil {
 		return op, err

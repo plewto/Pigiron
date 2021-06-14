@@ -150,8 +150,8 @@ func (op *baseOperator) IsLeaf() bool {
 
 func (op *baseOperator) printTree(depth int) {
 	switch {
-	case depth > config.MaxTreeDepth:
-		fmt.Printf("ERROR: MaxTreeDepth exceeded: %d\n", config.MaxTreeDepth)
+		case depth > int(config.GlobalParameters.MaxTreeDepth):
+		fmt.Printf("ERROR: MaxTreeDepth exceeded: %d\n", config.GlobalParameters.MaxTreeDepth)
 		return 
 	case depth == 0:
 		fmt.Printf("%s\n", op.Name())
@@ -215,7 +215,7 @@ func (op *baseOperator) IsChildOf(parent Operator) bool {
 
 
 func (op *baseOperator) circularTreeTest(depth int) bool {
-	if depth > config.MaxTreeDepth {
+	if depth > int(config.GlobalParameters.MaxTreeDepth) {
 		return true
 	} else {
 		for _, c := range op.children() {
@@ -233,7 +233,7 @@ func (op *baseOperator) Connect(child Operator) error {
 	var err error
 	if op.circularTreeTest(0) {
 		fstr := "Maximum tree depth exceeded at %s -> %s, MaxTreeDepth = %d"
-		msg := fmt.Sprintf(fstr, op.Name(), child.Name(), config.MaxTreeDepth)
+		msg := fmt.Sprintf(fstr, op.Name(), child.Name(), config.GlobalParameters.MaxTreeDepth)
 		err = errors.New(msg)
 		op.Disconnect(child)
 	}
@@ -285,7 +285,8 @@ func (op *baseOperator) SelectAllChannels() {
 
 func (op *baseOperator) OSCAddress() string {
 	sfmt := "/%s/op/%s/%s"
-	return fmt.Sprintf(sfmt, config.ApplicationOSCPrefix, op.OperatorType(), op.Name())
+	root := config.GlobalParameters.OSCClientRoot
+	return fmt.Sprintf(sfmt, root, op.OperatorType(), op.Name())
 }
 
 

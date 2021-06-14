@@ -26,7 +26,7 @@ func newMIDIInput(name string,  devID portmidi.DeviceID) (*MIDIInput, error) {
 	initOperator(&op.baseOperator, "MIDIInput", name, midi.NoChannel)
 	op.devID = devID
 	op.devInfo = portmidi.Info(devID)
-	bufferSize := config.MIDIInputBufferSize
+	bufferSize := config.GlobalParameters.MIDIInputBufferSize
 	stream, err = portmidi.NewInputStream(devID, bufferSize)
 	if err != nil {
 		return op, err
@@ -71,7 +71,8 @@ func ProcessInputs() {
 		flag, err := op.stream.Poll()
 		if notInputError(op, err) {
 			if flag {
-				events, err := op.stream.Read(int(config.MIDIInputBufferSize))
+				bufsize := int(config.GlobalParameters.MIDIInputBufferSize)
+				events, err := op.stream.Read(bufsize)
 				if notInputError(op, err) {
 					for _, event := range events {
 						op.Send(event)

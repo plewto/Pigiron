@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	//"time"
-	_ "github.com/plewto/pigiron/config"
+	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/op"
 )
@@ -12,7 +12,7 @@ func main() {
 	fmt.Println("Pigiron.main()")
 
 
-	
+	config.DumpGlobalParameters()
 	
 	Cleanup()
 

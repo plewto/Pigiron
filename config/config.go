@@ -4,10 +4,17 @@ import (
 	"fmt"
 	"strings"
 	"strconv"
+	"os"
+	"path/filepath"
 	toml "github.com/pelletier/go-toml"
 )
 
-
+var (
+	GlobalParameters = globalParameters {}
+	configFilename string
+	config *toml.Tree
+)
+	
 type globalParameters struct {
 	OSCServerRoot string
 	OSCServerHost string
@@ -22,8 +29,6 @@ type globalParameters struct {
 	MIDIOutputBufferSize int64
 	MIDIOutputLatency int64
 }
-
-var GlobalParameters = globalParameters {}
 
 func ResetGlobalParameters() {
 	GlobalParameters.OSCServerRoot = "pig"
@@ -40,7 +45,23 @@ func ResetGlobalParameters() {
 	GlobalParameters.MIDIOutputLatency = 0
 }
 
-var config *toml.Tree
+func determineConfigFilename() string {
+	if len(os.Args) < 2 {
+		base, err := os.UserConfigDir()
+		if err == nil {
+			home, _ := os.UserHomeDir()
+			base = filepath.Join(home, ".config")
+		}
+		return filepath.Join(base, "pigiron", "config.toml")
+	} else {
+		filename := os.Args[1]
+		if len(filename) > 2 && filename[0:1] == "~/" {
+			home, _ := os.UserHomeDir()
+			filename = filepath.Join(home, filename[2:])
+		}
+		return filename
+	}
+}
 
 func splitPath(path string) []string {
 	return strings.Split(path, ".")
@@ -101,15 +122,15 @@ func readString(path string, fallback string) string {
 func init() {
 	ResetGlobalParameters()
 	var err error
-	filename := "/home/sj/.config/pigiron/config.toml"  // TODO: hardcoded filename!
-	config, err = toml.LoadFile(filename)
+	configFilename = determineConfigFilename()
+	config, err = toml.LoadFile(configFilename)
 	if err != nil {
-		fmt.Printf("ERROR: Can not load configuration file \"%s\"\n", filename)
+		fmt.Printf("ERROR: Can not load configuration file \"%s\"\n", configFilename)
 		fmt.Println("ERROR:", err.Error())
 		fmt.Println()
 		return
 	} else {
-		fmt.Printf("Using config file: \"%s\"\n", filename)
+		fmt.Printf("Using config file: \"%s\"\n", configFilename)
 		GlobalParameters.OSCServerRoot = readString("osc-server.root", "pig")
 		GlobalParameters.OSCServerHost = readString("osc-server.host", "127.0.0.1")
 		GlobalParameters.OSCServerPort = readInt("osc-server.port", 8000)
@@ -124,3 +145,21 @@ func init() {
 		GlobalParameters.MIDIOutputLatency = readInt("midi-output.latency", 0)
 	}
 }
+
+func DumpGlobalParameters() {
+	fmt.Println("Global Parameters:")
+	fmt.Printf("\tconfig file was \"%s\"\n", configFilename)
+	fmt.Printf("\tOSCServerRoot         : %v\n", GlobalParameters.OSCServerRoot)
+	fmt.Printf("\tOSCServerHost         : %v\n", GlobalParameters.OSCServerHost)
+	fmt.Printf("\tOSCServerPort         : %v\n", GlobalParameters.OSCServerPort)
+	fmt.Printf("\tOSCClientRoot         : %v\n", GlobalParameters.OSCClientRoot)
+	fmt.Printf("\tOSCClientHost         : %v\n", GlobalParameters.OSCClientHost)
+	fmt.Printf("\tOSCClientPort         : %v\n", GlobalParameters.OSCClientPort)
+	fmt.Printf("\tOSCClientFilename     : %v\n", GlobalParameters.OSCClientFilename)
+	fmt.Printf("\tMaxTreeDepth          : %v\n", GlobalParameters.MaxTreeDepth)
+	fmt.Printf("\tMIDIInputBufferSize   : %v\n", GlobalParameters.MIDIInputBufferSize)
+	fmt.Printf("\tMIDIInputPollInterval : %v\n", GlobalParameters.MIDIInputPollInterval)
+	fmt.Printf("\tMIDIOutputBufferSize  : %v\n", GlobalParameters.MIDIOutputBufferSize)
+	fmt.Printf("\tMIDIOutputLatency     : %v\n", GlobalParameters.MIDIOutputLatency)
+}
+	

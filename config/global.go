@@ -1,5 +1,8 @@
 package config
 
+
+// DEPRECIATED
+var InputPollInterval = 1  // milliseconds
 var MaxTreeDepth int = 12
 var ApplicationOSCPrefix string = "pig"
 var MIDIOutputBufferSize = int64(1024)

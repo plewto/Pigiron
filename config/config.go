@@ -1,3 +1,11 @@
+// config package sets global parameters via a configuration file.
+//
+// On application startup configuration values are read from the file
+// ~/.config/pigiron/config.toml and stored to the GlobalParameters
+// struct.  An alternate config file may be specified on the command line 
+//    pigiron alternate-config.toml
+//
+
 package config
 
 import (
@@ -14,7 +22,9 @@ var (
 	configFilename string
 	tomlTree *toml.Tree
 )
-	
+
+// globalParameters struct holds application wide configuration values.
+//
 type globalParameters struct {
 	OSCServerRoot string
 	OSCServerHost string
@@ -30,6 +40,8 @@ type globalParameters struct {
 	MIDIOutputLatency int64
 }
 
+// ResetGlobalParameters sets all global configuration parameter to default values."
+//
 func ResetGlobalParameters() {
 	GlobalParameters.OSCServerRoot = "pig"
 	GlobalParameters.OSCServerHost = "127.0.0.1"
@@ -45,6 +57,15 @@ func ResetGlobalParameters() {
 	GlobalParameters.MIDIOutputLatency = 0
 }
 
+
+// determinConfigFilename returns the configuration filename.
+// The default filename is <config>/pigiron/config.toml
+// where <config> is the User's configuration directory.
+// Typically on ~/.config/ on Linux.
+//
+// An alternate configuration file may be specified on the
+// command line.  
+// 
 func determineConfigFilename() string {
 	if len(os.Args) < 2 {
 		base, err := os.UserConfigDir()
@@ -67,10 +88,17 @@ func splitPath(path string) []string {
 	return strings.Split(path, ".")
 }
 
+
+// hasPath returns true if the config file contains path.
+//
 func hasPath(path string) bool {
 	return tomlTree.HasPath(splitPath(path))
 }
 
+
+// readInt reads an int from the config file.
+// Returns fallback if path does not exists or its value is invalid.
+//
 func readInt(path string, fallback int64) int64 {
 	if hasPath(path) {
 		raw := fmt.Sprintf("%v", tomlTree.Get(path))
@@ -88,7 +116,11 @@ func readInt(path string, fallback int64) int64 {
 		return fallback
 	}
 }
-		
+
+
+// readFloat reads float from config file.
+// Returns fallback if path does not exists or its value is invalid.
+//
 func readFloat(path string, fallback float64) float64 {
 	if hasPath(path) {
 		raw := fmt.Sprintf("%v", tomlTree.Get(path))
@@ -107,7 +139,9 @@ func readFloat(path string, fallback float64) float64 {
 	}
 }
 
-
+// readString reads a string value from config file.
+// Returns fallback if the path dose not exists.
+//
 func readString(path string, fallback string) string {
 	if hasPath(path) {
 		return fmt.Sprintf("%v", tomlTree.Get(path))
@@ -146,6 +180,9 @@ func init() {
 	}
 }
 
+
+// DumpGlobalParameters prints the global configuration values.
+//
 func DumpGlobalParameters() {
 	fmt.Println("Global Parameters:")
 	fmt.Printf("\tconfig file was \"%s\"\n", configFilename)

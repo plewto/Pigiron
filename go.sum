@@ -1,3 +1,5 @@
+github.com/hypebeast/go-osc v0.0.0-20210408213458-3287e1838f40 h1:w+HdpjIfD+5Kb8aJ1KK9ROuqS9No/p0mSYTx/0XCASc=
+github.com/hypebeast/go-osc v0.0.0-20210408213458-3287e1838f40/go.mod h1:lqMjoCs0y0GoRRujSPZRBaGb4c5ER6TfkFKSClxkMbY=
 github.com/pelletier/go-toml v1.9.2 h1:7NiByeVF4jKSG1lDF3X8LTIkq2/bu+1uYbIm1eS5tzk=
 github.com/pelletier/go-toml v1.9.2/go.mod h1:u1nR/EPcESfeI/szUZKdtJ0xRNbUoANCkoOuaOx1Y+c=
 github.com/rakyll/portmidi v0.0.0-20201020180702-d436ceaa537a h1:+qeh9b4LlO8AYVvm+TG4OXDRwBynTLk82t0HDBBBOQ8=

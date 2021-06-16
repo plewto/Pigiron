@@ -20,22 +20,22 @@ import (
 	"strings"
 	"os"
 	goosc "github.com/hypebeast/go-osc/osc"
-	"github.com/plewto/pigiron/config"
+	//"github.com/plewto/pigiron/config"
 )
 
-var (
-	globalClient *PigClient
-)
+// var (
+// 	globalClient *PigClient
+// )
 
 
-func init() { 
-	host := config.GlobalParameters.OSCClientHost
-	port := int(config.GlobalParameters.OSCClientPort)
-	root := config.GlobalParameters.OSCClientRoot
-	filename := config.GlobalParameters.OSCClientFilename
-	globalClient = NewClient(host, port, root, filename)
+// func init() { 
+// 	host := config.GlobalParameters.OSCClientHost
+// 	port := int(config.GlobalParameters.OSCClientPort)
+// 	root := config.GlobalParameters.OSCClientRoot
+// 	filename := config.GlobalParameters.OSCClientFilename
+// 	globalClient = NewClient(host, port, root, filename)
 	
-}
+// }
 
 // PigClient provides an OSC callback client.
 //

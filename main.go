@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
-	//"time"
+	// "time"
+	"os"
+	
 	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/osc"
 	"github.com/plewto/pigiron/midi"
@@ -14,16 +16,30 @@ func main() {
 	fmt.Println("Pigiron.main()")
 	config.DumpGlobalParameters()
 
-	osc.AckGlobal("/pig/foo", []string{"Alpha", "Beta", "Gamma"})
+	osc.Listen()
+
+	fmt.Println("Starting main loop")
+
+	// main loop
+	for {
+		if osc.Exit {
+			Exit()
+		}
+	}
 	
-	Cleanup()
+	
 }
 
-func Ignore(values ...interface{}) {}
+
+func Exit() {
+	fmt.Println("Pigiron exit.")
+	Cleanup()
+	os.Exit(0)
+}
+
 
 
 func Cleanup() {
-	fmt.Println("pigiron.Cleanup()")
 	midi.Cleanup()
 	op.Cleanup()
 	

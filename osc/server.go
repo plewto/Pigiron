@@ -49,6 +49,12 @@ func NewServer(ip string, port int, root string) *PigServer {
 	server.AddMsgHandler("ping", server.ping)
 	server.AddMsgHandler("exit", server.exit)
 	server.AddMsgHandler("new-op", server.newOperator)
+	server.AddMsgHandler("new-midi-input", server.newMIDIInput)
+	server.AddMsgHandler("new-midi-output", server.newMIDIOutput)
+	
+	server.AddMsgHandler("q-midi-inputs", server.queryMIDIInputs)
+	server.AddMsgHandler("q-midi-outputs", server.queryMIDIOutputs)
+
 	return server
 }
 

@@ -36,9 +36,9 @@ func Cleanup() {
 }
 
 
-// inputIDs returns list of portmidi.DeviceID for all MIDI inputs.
+// InputIDs returns list of portmidi.DeviceID for all MIDI inputs.
 //
-func inputIDs() []portmidi.DeviceID {
+func InputIDs() []portmidi.DeviceID {
 	maxCount := portmidi.CountDevices()
 	acc := make([]portmidi.DeviceID, 0, maxCount)
 	for i := 0; i < maxCount; i++ {
@@ -52,9 +52,9 @@ func inputIDs() []portmidi.DeviceID {
 }
 
 
-// outputIDs returns list of portmidi.DevicveID for all MIDI outputs
+// OutputIDs returns list of portmidi.DevicveID for all MIDI outputs
 //
-func outputIDs() []portmidi.DeviceID {
+func OutputIDs() []portmidi.DeviceID {
 	maxCount := portmidi.CountDevices()
 	acc := make([]portmidi.DeviceID, 0, maxCount)
 	for i := 0; i < maxCount; i++ {
@@ -102,7 +102,7 @@ func ReprDeviceInfo(info *portmidi.DeviceInfo) string {
 
 func dumpInputs() {
 	fmt.Println("Portmidi Inputs:")
-	for _, id := range inputIDs() {
+	for _, id := range InputIDs() {
 		info := portmidi.Info(id)
 		fmt.Printf("\t[id = %2d] %s\n", id, ReprDeviceInfo(info))
 	}
@@ -111,7 +111,7 @@ func dumpInputs() {
 
 func dumpOutputs() {
 	fmt.Println("Portmidi Outputs:")
-	for _, id := range outputIDs() {
+	for _, id := range OutputIDs() {
 		info := portmidi.Info(id)
 		fmt.Printf("\t[id = %2d] %s\n", id, ReprDeviceInfo(info))
 	}
@@ -136,7 +136,7 @@ func DumpDevices() {
 func GetInputID(pattern string) (portmidi.DeviceID, error) {
 	var result portmidi.DeviceID
 	var err error
-	for _, id := range inputIDs() {
+	for _, id := range InputIDs() {
 		info := portmidi.Info(id)
 		name := info.Name
 		if strings.Contains(name, pattern) {
@@ -161,7 +161,7 @@ func GetInputID(pattern string) (portmidi.DeviceID, error) {
 func GetOutputID(pattern string) (portmidi.DeviceID, error) {
 	var result portmidi.DeviceID
 	var err error
-	for _, id := range outputIDs() {
+	for _, id := range OutputIDs() {
 		info := portmidi.Info(id)
 		name := info.Name
 		if strings.Contains(name, pattern) {

@@ -48,6 +48,7 @@ func NewServer(ip string, port int, root string) *PigServer {
 	}
 	server.AddMsgHandler("ping", server.ping)
 	server.AddMsgHandler("exit", server.exit)
+	server.AddMsgHandler("new-op", server.newOperator)
 	return server
 }
 

@@ -170,6 +170,12 @@ func RootOperators() []Operator {
 }
 
 
+func DestroyForest() {
+	for _, root := range RootOperators() {
+		root.DisconnectTree()
+	}
+}
+
 func Cleanup() {
 	for _, op := range registry {
 		op.Close()

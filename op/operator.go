@@ -33,9 +33,10 @@ type Operator interface {
 	IsParentOf(child Operator) bool
 	IsChildOf(parent Operator) bool
 	circularTreeTest(depth int) bool
-	Disconnect(child Operator) Operator
 	Connect(child Operator) error
+	Disconnect(child Operator) Operator
 	DisconnectAll()
+	DisconnectTree()
 	Disjoin()
 
 	// OSC
@@ -240,6 +241,9 @@ func (op *baseOperator) Connect(child Operator) error {
 	return err
 }
 
+
+// Disconnets all child operators from op
+//
 func (op *baseOperator) DisconnectAll() {
 	op.Panic()
 	for _, child := range op.Children() {
@@ -247,6 +251,18 @@ func (op *baseOperator) DisconnectAll() {
 	}
 }
 
+// Disconnects all child operators from op
+// then recursivly call on child operators.
+//
+func (op *baseOperator) DisconnectTree() {
+	op.Panic()
+	children := op.Children()
+	for _, child := range children {
+		op.Disconnect(child)
+		child.DisconnectTree()
+	}
+}
+	
 func (op *baseOperator) Disjoin() {
 	for _, parent := range op.Parents() {
 		parent.Disconnect(op)

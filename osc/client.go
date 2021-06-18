@@ -23,19 +23,7 @@ import (
 	//"github.com/plewto/pigiron/config"
 )
 
-// var (
-// 	globalClient *PigClient
-// )
 
-
-// func init() { 
-// 	host := config.GlobalParameters.OSCClientHost
-// 	port := int(config.GlobalParameters.OSCClientPort)
-// 	root := config.GlobalParameters.OSCClientRoot
-// 	filename := config.GlobalParameters.OSCClientFilename
-// 	globalClient = NewClient(host, port, root, filename)
-	
-// }
 
 // PigClient provides an OSC callback client.
 //
@@ -85,8 +73,7 @@ func (c *PigClient) Port() int {
 //
 func (c *PigClient) echo(address string, payload string) {
 	if c.verbose {
-		fmt.Printf("OSC Client  : %s\n", c.root)
-		fmt.Printf("response to : %s\n", address)
+		fmt.Printf("\nResponse to : %s\n", address)
 		for _, s := range strings.Split(payload, "\n") {
 			fmt.Printf("            : %s\n", s)
 		}

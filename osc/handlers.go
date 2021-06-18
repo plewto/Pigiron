@@ -316,4 +316,13 @@ func (s *PigServer) queryParents(msg *goosc.Message) {
 }
 			
 
+func (s *PigServer) panic(msg *goosc.Message) {
+	op.PanicAll()
+	s.client.Ack(msg.Address, empty)
+}
+
+func (s *PigServer) reset(msg *goosc.Message) {
+	op.ResetAll()
+	s.client.Ack(msg.Address, empty)
+}
 

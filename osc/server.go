@@ -57,8 +57,6 @@ func NewServer(ip string, port int, root string) *PigServer {
 	server.AddMsgHandler("disconnect-all", server.disconnectAll)
 	server.AddMsgHandler("destroy-forest", server.destroyForest)
 	server.AddMsgHandler("print-forest", server.printForest)
-	
-	
 	server.AddMsgHandler("q-is-parent", server.queryIsParent)
 	server.AddMsgHandler("q-midi-inputs", server.queryMIDIInputs)
 	server.AddMsgHandler("q-midi-outputs", server.queryMIDIOutputs)
@@ -66,9 +64,8 @@ func NewServer(ip string, port int, root string) *PigServer {
 	server.AddMsgHandler("q-roots", server.queryRoots)
 	server.AddMsgHandler("q-children", server.queryChildren)
 	server.AddMsgHandler("q-parents", server.queryParents)
-	
-	
-
+	server.AddMsgHandler("panic", server.panic)
+	server.AddMsgHandler("reset", server.panic)
 	return server
 }
 

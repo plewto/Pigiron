@@ -77,6 +77,7 @@ func (c *PigClient) echo(address string, payload string) {
 		for _, s := range strings.Split(payload, "\n") {
 			fmt.Printf("            : %s\n", s)
 		}
+		fmt.Print("PIG: ")
 	}
 }
 

@@ -21,6 +21,8 @@ func main() {
 	fmt.Println("Starting main loop")
 
 	// main loop
+	go repl()
+	
 	for {
 		if osc.Exit {
 			Exit()

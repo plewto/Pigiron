@@ -24,7 +24,19 @@ func parseAddress(s string) (command string, args string) {
 	return command, args
 }
 	
-	
+
+// repl provides local interactive control.
+//
+// At the PIG: prompt the user may directly enter OSC commands.
+// The format is almost identical to remote commands with the following
+// exceptions:
+//
+//   1) The osc address root is not required, it is automatically supplied
+//      i.e.  enter 'exit'  not /pig/exit
+//
+//   2) Arguments to the command are separated by commas.
+//      i.e.  new-operator Monitor, alpha
+//
 func repl() {
 	reader := bufio.NewReader(os.Stdin)
 	ip := config.GlobalParameters.OSCServerHost
@@ -44,6 +56,3 @@ func repl() {
 		client.Send(msg)
 	}
 }
-		
-		
-		

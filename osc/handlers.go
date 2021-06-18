@@ -326,3 +326,22 @@ func (s *PigServer) reset(msg *goosc.Message) {
 	s.client.Ack(msg.Address, empty)
 }
 
+func (s *PigServer) help(msg *goosc.Message) {
+	template := []expectType{xpString}
+	args, err := expect(template, msg.Arguments)
+	topic := ""
+	if err != nil {
+		topic = "help"
+	} else {
+		topic = args[0]
+	}
+	fn, flag := oscHelp[topic]
+	if flag {
+		fn()
+	} else {
+		fmt.Println("Invalid help topic: %s", topic)
+		fmt.Println("Try  'help help'")
+	}
+}
+	
+

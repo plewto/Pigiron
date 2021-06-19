@@ -36,7 +36,7 @@ func init() {
 	oscHelp["q-parents"] = queryParentsHelp
 	oscHelp["panic"] = panicHelp
 	oscHelp["reset"] = resetHelp
-	
+	oscHelp["load"] = loadHelp
 }
 
 func helpHelp() {
@@ -193,3 +193,17 @@ func resetHelp() {
 	fmt.Println("\tResets named operator")
 	helpReturn("ACK")
 }
+
+
+func loadHelp() {
+	fmt.Printf("\nload help\n")
+	fmt.Printf("\tSpecial command:  load filename\n")
+	fmt.Printf("\tReads commands from file.\n")
+	fmt.Printf("\tThe contents of the file is read line-by-line and treated\n")
+	fmt.Printf("\tas if each line was enterd interactivly.\n")
+	fmt.Printf("\tLine which begin with # are ignored, there must be a space after #.\n")
+	fmt.Printf("\tfilename may being with '~/' to indicate the User's home directory.\n")
+	prompt()
+}
+
+		

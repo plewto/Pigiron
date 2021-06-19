@@ -5,6 +5,10 @@ import (
 	"bufio"
 	"os"
 	"strings"
+	"path/filepath"
+	"io/ioutil"
+	"time"
+	
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/config"
 )
@@ -41,18 +45,68 @@ func repl() {
 	reader := bufio.NewReader(os.Stdin)
 	ip := config.GlobalParameters.OSCServerHost
 	port := int(config.GlobalParameters.OSCServerPort)
-	root := config.GlobalParameters.OSCServerRoot
 	client := goosc.NewClient(ip, port)
 	for {
 		fmt.Print(prompt)
-		raw, _ := reader.ReadString('\n')
-		raw = strings.TrimSpace(raw)
-		command, args := parseAddress(raw)
+		s := read(reader)
+		eval(s, client)
+	}
+}
+
+
+func read(reader *bufio.Reader) string {
+	s, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Printf("ERROR: %s\n", err)
+		s = ""
+	}
+	return s
+}
+
+
+func dispatch(command string, args string, client *goosc.Client) {
+	//fmt.Printf("DEBUG command = '%s'\n", command)
+	switch command {
+	case "":
+		// ignore
+	case "#" :
+		// ignore comment
+	case "load": 
+		readOSCFile(args, client)
+	default: // transmit OSC
+		root := config.GlobalParameters.OSCServerRoot
 		address := fmt.Sprintf("/%s/%s", root, command)
 		msg := goosc.NewMessage(address)
 		for _, arg := range strings.Split(args, ",") {
 			msg.Append(strings.TrimSpace(arg))
 		}
 		client.Send(msg)
+	}
+}
+
+		
+func eval(s string, client *goosc.Client) {
+	raw := strings.TrimSpace(s)
+	command, args := parseAddress(raw)
+	// fmt.Printf("DEBUG command = '%s', args --> %v\n", command, args)
+	dispatch(command, args, client)
+}
+
+func readOSCFile(filename string, client *goosc.Client) {
+	delay := 100*time.Millisecond
+	if len(filename) > 1 && filename[0:2] == "~/" {
+		home, _ := os.UserHomeDir()
+		filename = filepath.Join(home, filename[2:])
+		
+	}
+	lines, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Printf("ERROR: Can not load file '%s'\n", filename)
+		fmt.Printf("ERROR: %s\n", err)
+	} else {
+		for _, line := range strings.Split(string(lines), "\n") {
+			eval(line, client)
+			time.Sleep(delay)
+		}
 	}
 }

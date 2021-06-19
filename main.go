@@ -12,8 +12,9 @@ import (
 
 )
 
+
 func main() {
-	fmt.Println("Pigiron.main()")
+	fmt.Println("Pigiron")
 	config.DumpGlobalParameters()
 
 	osc.Listen()

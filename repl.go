@@ -71,7 +71,7 @@ func dispatch(command string, args string, client *goosc.Client) {
 	case "#" :
 		// ignore comment
 	case "batch": 
-		readBatchFile(args, client)
+		ReadBatchFile(args, client)
 	default: // transmit OSC
 		root := config.GlobalParameters.OSCServerRoot
 		address := fmt.Sprintf("/%s/%s", root, command)
@@ -90,7 +90,7 @@ func eval(s string, client *goosc.Client) {
 	dispatch(command, args, client)
 }
 
-func readBatchFile(filename string, client *goosc.Client) {
+func ReadBatchFile(filename string, client *goosc.Client) {
 	delay := 100*time.Millisecond
 	if len(filename) > 1 && filename[0:2] == "~/" {
 		home, _ := os.UserHomeDir()

@@ -65,14 +65,13 @@ func read(reader *bufio.Reader) string {
 
 
 func dispatch(command string, args string, client *goosc.Client) {
-	//fmt.Printf("DEBUG command = '%s'\n", command)
 	switch command {
 	case "":
-		// ignore
+		// ignore blank line
 	case "#" :
 		// ignore comment
-	case "load": 
-		readOSCFile(args, client)
+	case "batch": 
+		readBatchFile(args, client)
 	default: // transmit OSC
 		root := config.GlobalParameters.OSCServerRoot
 		address := fmt.Sprintf("/%s/%s", root, command)
@@ -88,11 +87,10 @@ func dispatch(command string, args string, client *goosc.Client) {
 func eval(s string, client *goosc.Client) {
 	raw := strings.TrimSpace(s)
 	command, args := parseAddress(raw)
-	// fmt.Printf("DEBUG command = '%s', args --> %v\n", command, args)
 	dispatch(command, args, client)
 }
 
-func readOSCFile(filename string, client *goosc.Client) {
+func readBatchFile(filename string, client *goosc.Client) {
 	delay := 100*time.Millisecond
 	if len(filename) > 1 && filename[0:2] == "~/" {
 		home, _ := os.UserHomeDir()
@@ -101,7 +99,7 @@ func readOSCFile(filename string, client *goosc.Client) {
 	}
 	lines, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("ERROR: Can not load file '%s'\n", filename)
+		fmt.Printf("ERROR: Can not load batch file '%s'\n", filename)
 		fmt.Printf("ERROR: %s\n", err)
 	} else {
 		for _, line := range strings.Split(string(lines), "\n") {

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
+	//"time"
 	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/osc"
 	"github.com/plewto/pigiron/midi"
@@ -16,8 +16,9 @@ func main() {
 	config.DumpGlobalParameters()
 	osc.Init()
 	osc.Listen()
-	if config.BatchFilename != "" {
-		LoadBatchFile(config.BatchFilename)
+	if config.BatchFilename != "" {  
+		// LoadBatchFile(config.BatchFilename) // BUG 003 -- do not use --
+		fmt.Println("BUG 003, command line batch file is disabled.")
 	}
 	go repl()
 	fmt.Println()

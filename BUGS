@@ -1,0 +1,3 @@
+BUG 001 21-june-2021 Open
+OSC command /pig/q-children without arguments and when there are no Operators
+causes a segmentation fault.

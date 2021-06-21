@@ -27,6 +27,7 @@ import (
 // PigClient interface defines OSC server return messages.
 //
 type PigClient interface {
+	Send(*goosc.Message)
 	Ack(address string, data []string)
 	Error(address string, data []string)
 	Info() string
@@ -107,6 +108,10 @@ func (c *BasicClient) writeResponseFile(address string, payload string) {
 }
 
 
+func (c *BasicClient) Send(msg *goosc.Message) {
+	c.backing.Send(msg)
+}
+
 // Ack transmits an 'Acknowledgment' message.
 // The message is transmitted via OSC and saved to a temporary response
 // file.
@@ -160,7 +165,7 @@ func (c *BasicClient) Info() string {
 type REPLClient struct {}
 
 func (c REPLClient) Ack(address string, data []string) {
-	fmt.Println("----------------------------  ACK")
+	fmt.Println("----------------------------  OK")
 	fmt.Printf("%s\n", address)
 	for i, d := range data {
 		fmt.Printf("\t[%2d] %s\n", i, d)
@@ -169,7 +174,7 @@ func (c REPLClient) Ack(address string, data []string) {
 }
 
 func (c REPLClient) Error(address string, data []string) {
-	fmt.Println("----------------------------  Error")
+	fmt.Println(":----------------------------  ERROR")
 	fmt.Printf("%s\n", address)
 	for i, d := range data {
 		fmt.Printf("\t[%2d] %s\n", i, d)
@@ -184,4 +189,6 @@ func (c REPLClient) Info() string {
 }	
 
 
-	
+func (c REPLClient) Send(msg *goosc.Message) {
+	// ignore
+}

@@ -20,12 +20,12 @@ func main() {
 	config.DumpGlobalParameters()
 	osc.Init()
 	osc.Listen()
-	//go repl()
+	go repl()
 	
 	for { // main loop
-		// if osc.Exit {
-		// 	Exit()
-		// }
+		if osc.Exit {
+			Exit()
+		}
 	}
 }
 

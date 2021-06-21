@@ -10,3 +10,9 @@ BUG 001 21-june-2021 Closed
 ---------------------------------------------------------------------- 002
 BUG 002 21-june-2021 Open
     Configuration color specifications use illegal escape charter.
+
+
+---------------------------------------------------------------------- 003
+BUG 003 21-June-2021 Open
+     Reading batch file from command line causes segmentation fault.
+     

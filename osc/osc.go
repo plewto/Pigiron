@@ -14,9 +14,22 @@ var (
 	// Exit application if true.
 	// This should proabbly be replaced with a go channel message.
 	Exit bool = false
+
+	errorFlag bool = false
 )
 
 
+func ClearError() {
+	errorFlag = false
+}
+
+func signalError() {
+	errorFlag = true
+}
+
+func OSCError() bool {
+	return errorFlag
+}
 
 
 // Must execute after config init()

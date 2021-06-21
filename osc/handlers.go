@@ -16,6 +16,7 @@ import (
 )
 
 func (s *OSCServer) sendError(err error, msg *goosc.Message) {
+	signalError()
 	fmt.Printf("OSC ERROR: %s\n", msg.Address)
 	fmt.Printf("%v\n", err)
 	errmsg := toSlice(err)
@@ -24,12 +25,14 @@ func (s *OSCServer) sendError(err error, msg *goosc.Message) {
 
 
 func (s *OSCServer) ping(msg *goosc.Message) {
+	ClearError()
 	fmt.Printf("%s\n", msg.Address)
 	s.client.Ack(msg.Address, empty)
 }
 
 
 func (s *OSCServer) exit(msg *goosc.Message) {
+	ClearError()
 	s.client.Ack(msg.Address, empty)
 	Exit = true
 }
@@ -39,6 +42,7 @@ func (s *OSCServer) exit(msg *goosc.Message) {
 // --> actual name
 //
 func (s *OSCServer) newOperator(msg *goosc.Message) {
+	ClearError()
 	template := []expectType{xpString, xpString}
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -61,6 +65,7 @@ func (s *OSCServer) newOperator(msg *goosc.Message) {
 // --> actual name
 //
 func (s *OSCServer) newMIDIOutput(msg *goosc.Message) {
+	ClearError()
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -82,6 +87,7 @@ func (s *OSCServer) newMIDIOutput(msg *goosc.Message) {
 // --> actual name
 //
 func (s *OSCServer) newMIDIInput(msg *goosc.Message) {
+	ClearError()
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -100,6 +106,7 @@ func (s *OSCServer) newMIDIInput(msg *goosc.Message) {
 }		
 
 func (s *OSCServer) deleteOperator(msg *goosc.Message) {
+	ClearError()
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -114,6 +121,7 @@ func (s *OSCServer) deleteOperator(msg *goosc.Message) {
 // /pig/connect <parent-name> <child-name>
 //
 func (s *OSCServer) connect(msg *goosc.Message) {
+	ClearError()
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -141,6 +149,7 @@ func (s *OSCServer) connect(msg *goosc.Message) {
 // /pig/disconnect <parent> <child>
 //
 func (s *OSCServer) disconnect(msg *goosc.Message) {
+	ClearError()
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -165,6 +174,7 @@ func (s *OSCServer) disconnect(msg *goosc.Message) {
 // --> Ack | Error
 //
 func (s *OSCServer) disconnectAll(msg *goosc.Message) {
+	ClearError()
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -180,11 +190,13 @@ func (s *OSCServer) disconnectAll(msg *goosc.Message) {
 }
 
 func (s *OSCServer) destroyForest(msg *goosc.Message) {
+	ClearError()
 	op.DestroyForest()
 	s.client.Ack(msg.Address, empty)
 }
 
 func (s *OSCServer) printForest(msg *goosc.Message) {
+	ClearError()
 	for _, root := range op.RootOperators() {
 		fmt.Println("\nOperator tree:")
 		root.PrintTree()
@@ -198,6 +210,7 @@ func (s *OSCServer) printForest(msg *goosc.Message) {
 // --> bool
 //
 func (s *OSCServer) queryIsParent(msg *goosc.Message) {
+	ClearError()
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -220,6 +233,7 @@ func (s *OSCServer) queryIsParent(msg *goosc.Message) {
 		
 
 func (s *OSCServer) queryMIDIInputs(msg *goosc.Message) {
+	ClearError()
 	ids := midi.InputIDs()
 	acc := make([]string, len(ids))
 	fmt.Println("MIDI Input devices:")
@@ -232,6 +246,7 @@ func (s *OSCServer) queryMIDIInputs(msg *goosc.Message) {
 }
 
 func (s *OSCServer) queryMIDIOutputs(msg *goosc.Message) {
+	ClearError()
 	ids := midi.OutputIDs()
 	acc := make([]string, len(ids))
 	fmt.Println("MIDI Output devices:")
@@ -247,6 +262,7 @@ func (s *OSCServer) queryMIDIOutputs(msg *goosc.Message) {
 // --> ACK <list-of-operators>
 //
 func (s *OSCServer) queryOperators(msg *goosc.Message) {
+	ClearError()
 	oplist := op.Operators()
 	acc := make([]string, len(oplist))
 	for i, p := range oplist {
@@ -259,6 +275,7 @@ func (s *OSCServer) queryOperators(msg *goosc.Message) {
 // --> ACK <list-of-operators>
 //
 func (s *OSCServer) queryRoots(msg *goosc.Message) {
+	ClearError()
 	oplist := op.RootOperators()
 	acc := make([]string, len(oplist))
 	for i, p := range oplist {
@@ -271,10 +288,9 @@ func (s *OSCServer) queryRoots(msg *goosc.Message) {
 // --> Ack <list-of-operators>
 //
 func (s *OSCServer) queryChildren(msg *goosc.Message) {
+	ClearError()
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
-	fmt.Printf("\n\nDEBUG queryChildren() args == %v\n", args)
-	fmt.Printf("DEBUG err = %v\n\n", err)
 	if err != nil {
 		s.sendError(err, msg)
 	} else {
@@ -297,6 +313,7 @@ func (s *OSCServer) queryChildren(msg *goosc.Message) {
 // --> Ack <list-of-operators>
 //
 func (s *OSCServer) queryParents(msg *goosc.Message) {
+	ClearError()
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -319,16 +336,19 @@ func (s *OSCServer) queryParents(msg *goosc.Message) {
 			
 
 func (s *OSCServer) panic(msg *goosc.Message) {
+	ClearError()
 	op.PanicAll()
 	s.client.Ack(msg.Address, empty)
 }
 
 func (s *OSCServer) reset(msg *goosc.Message) {
+	ClearError()
 	op.ResetAll()
 	s.client.Ack(msg.Address, empty)
 }
 
 func (s *OSCServer) help(msg *goosc.Message) {
+	ClearError()
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
 	topic := ""

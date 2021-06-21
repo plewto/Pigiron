@@ -2,16 +2,12 @@ package main
 
 import (
 	"fmt"
-	// "time"
 	"os"
 
 	"github.com/plewto/pigiron/config"
-	 "github.com/plewto/pigiron/osc"
-
-	
+	"github.com/plewto/pigiron/osc"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/op"
-
 )
 
 
@@ -21,18 +17,13 @@ func main() {
 	osc.Init()
 	osc.Listen()
 	go repl()
-	
+	fmt.Println()
 	for { // main loop
 		if osc.Exit {
 			Exit()
 		}
 	}
 }
-
-// func main() {
-// 	fmt.Println("Main TEST")
-// }
-
 
 func Exit() {
 	fmt.Println("Pigiron exit.")

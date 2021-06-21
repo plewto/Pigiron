@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-
+	"time"
 	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/osc"
 	"github.com/plewto/pigiron/midi"
@@ -16,6 +16,9 @@ func main() {
 	config.DumpGlobalParameters()
 	osc.Init()
 	osc.Listen()
+	if config.BatchFilename != "" {
+		LoadBatchFile(config.BatchFilename)
+	}
 	go repl()
 	fmt.Println()
 	for { // main loop

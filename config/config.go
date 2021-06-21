@@ -19,7 +19,7 @@ import (
 var (
 	GlobalParameters = globalParameters{}
 	configFilename string
-	batchFilename string
+	BatchFilename string
 	tomlTree *toml.Tree
 )
 
@@ -56,8 +56,8 @@ func parseCommandLine() {
 	configFilename = subUserHome(configFilename)
 	// batch filename
 	defaultFile = ""
-	flag.StringVar(&batchFilename, "batch", defaultFile, "Sets initial OSC batch file.")
-	batchFilename = subUserHome(batchFilename)
+	flag.StringVar(&BatchFilename, "batch", defaultFile, "Sets initial OSC batch file.")
+	BatchFilename = subUserHome(BatchFilename)
 	
 	flag.Parse()
 }

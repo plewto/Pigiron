@@ -1,3 +1,4 @@
+---------------------------------------------------------------------- 001
 BUG 001 21-june-2021 Closed
     OSC command /pig/q-children and pig/q-parents without arguments  causes
     a segmentation fault.
@@ -5,3 +6,7 @@ BUG 001 21-june-2021 Closed
     1) expect() is not detecting missing argument.
     2) In queryChildren() msg.Arguments has a spurious empty strings.
     Fix: expect() test for spurious initial value in arguments.
+
+---------------------------------------------------------------------- 002
+BUG 002 21-june-2021 Open
+    Configuration color specifications use illegal escape charter.

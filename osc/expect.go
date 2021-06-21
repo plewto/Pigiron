@@ -23,6 +23,16 @@ func (x expectType) String() string {
 func expect(template []expectType, arguments []interface{}) ([]string, error) {
 	var err error
 	acc := make([]string, len(arguments))
+
+	// Bug 001 fix
+	// Removes spurious first element from arguments.
+	if len(arguments) == 1 {
+		s := fmt.Sprintf("%v", arguments[0])
+		if s == "" {
+			arguments = arguments[1:]
+		}
+	}
+	
 	if len(template) > len(arguments) {
 		msg := "Expected at least %d arguments, got %d"
 		err = errors.New(fmt.Sprintf(msg, len(template), len(arguments)))

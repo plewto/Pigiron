@@ -1,3 +1,7 @@
-BUG 001 21-june-2021 Open
-OSC command /pig/q-children without arguments and when there are no Operators
-causes a segmentation fault.
+BUG 001 21-june-2021 Closed
+    OSC command /pig/q-children and pig/q-parents without arguments  causes
+    a segmentation fault.
+
+    1) expect() is not detecting missing argument.
+    2) In queryChildren() msg.Arguments has a spurious empty strings.
+    Fix: expect() test for spurious initial value in arguments.

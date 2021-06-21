@@ -273,6 +273,8 @@ func (s *OSCServer) queryRoots(msg *goosc.Message) {
 func (s *OSCServer) queryChildren(msg *goosc.Message) {
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
+	fmt.Printf("\n\nDEBUG queryChildren() args == %v\n", args)
+	fmt.Printf("DEBUG err = %v\n\n", err)
 	if err != nil {
 		s.sendError(err, msg)
 	} else {

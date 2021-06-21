@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"runtime"
 )
 
 
@@ -27,6 +28,8 @@ type globalParameters struct {
 	MIDIInputPollInterval int64 // ms
 	MIDIOutputBufferSize int64
 	MIDIOutputLatency int64
+	TextColor string
+	ErrorColor string
 }
 
 // ResetGlobalParameters sets all global configuration parameter to default values."
@@ -47,6 +50,16 @@ func ResetGlobalParameters() {
 	GlobalParameters.MIDIInputPollInterval = 0
 	GlobalParameters.MIDIOutputBufferSize = 1024
 	GlobalParameters.MIDIOutputLatency = 0
+	GlobalParameters.TextColor = "\033[97m"
+	GlobalParameters.ErrorColor = "\033[31m"
+	clearWindowsColors()
+}
+
+func clearWindowsColors() {
+	if runtime.GOOS == "windows" {
+		GlobalParameters.TextColor = ""
+		GlobalParameters.ErrorColor = ""
+	}
 }
 
 

@@ -7,11 +7,6 @@ import (
 )
 
 
-
-func prompt() {
-	fmt.Print("PIG: ")
-}
-
 var oscHelp = make(map[string]func())
 
 func init() {

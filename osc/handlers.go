@@ -15,7 +15,7 @@ import (
 	"github.com/plewto/pigiron/midi"
 )
 
-func (s *PigServer) sendError(err error, msg *goosc.Message) {
+func (s *OSCServer) sendError(err error, msg *goosc.Message) {
 	fmt.Printf("OSC ERROR: %s\n", msg.Address)
 	fmt.Printf("%v\n", err)
 	errmsg := toSlice(err)
@@ -23,13 +23,13 @@ func (s *PigServer) sendError(err error, msg *goosc.Message) {
 }
 
 
-func (s *PigServer) ping(msg *goosc.Message) {
+func (s *OSCServer) ping(msg *goosc.Message) {
 	fmt.Printf("%s\n", msg.Address)
 	s.client.Ack(msg.Address, empty)
 }
 
 
-func (s *PigServer) exit(msg *goosc.Message) {
+func (s *OSCServer) exit(msg *goosc.Message) {
 	s.client.Ack(msg.Address, empty)
 	Exit = true
 }
@@ -38,7 +38,7 @@ func (s *PigServer) exit(msg *goosc.Message) {
 // /pig/new-operator <opType> <name>
 // --> actual name
 //
-func (s *PigServer) newOperator(msg *goosc.Message) {
+func (s *OSCServer) newOperator(msg *goosc.Message) {
 	template := []expectType{xpString, xpString}
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -60,7 +60,7 @@ func (s *PigServer) newOperator(msg *goosc.Message) {
 // /pig/new-midi-output <device> <name>
 // --> actual name
 //
-func (s *PigServer) newMIDIOutput(msg *goosc.Message) {
+func (s *OSCServer) newMIDIOutput(msg *goosc.Message) {
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -81,7 +81,7 @@ func (s *PigServer) newMIDIOutput(msg *goosc.Message) {
 // /pig/new-midi-input <device> <name>
 // --> actual name
 //
-func (s *PigServer) newMIDIInput(msg *goosc.Message) {
+func (s *OSCServer) newMIDIInput(msg *goosc.Message) {
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -99,7 +99,7 @@ func (s *PigServer) newMIDIInput(msg *goosc.Message) {
 	}
 }		
 
-func (s *PigServer) deleteOperator(msg *goosc.Message) {
+func (s *OSCServer) deleteOperator(msg *goosc.Message) {
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -113,7 +113,7 @@ func (s *PigServer) deleteOperator(msg *goosc.Message) {
 
 // /pig/connect <parent-name> <child-name>
 //
-func (s *PigServer) connect(msg *goosc.Message) {
+func (s *OSCServer) connect(msg *goosc.Message) {
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -140,7 +140,7 @@ func (s *PigServer) connect(msg *goosc.Message) {
 
 // /pig/disconnect <parent> <child>
 //
-func (s *PigServer) disconnect(msg *goosc.Message) {
+func (s *OSCServer) disconnect(msg *goosc.Message) {
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -164,7 +164,7 @@ func (s *PigServer) disconnect(msg *goosc.Message) {
 // /pig/disconnect-all <operator>
 // --> Ack | Error
 //
-func (s *PigServer) disconnectAll(msg *goosc.Message) {
+func (s *OSCServer) disconnectAll(msg *goosc.Message) {
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -179,12 +179,12 @@ func (s *PigServer) disconnectAll(msg *goosc.Message) {
 	}
 }
 
-func (s *PigServer) destroyForest(msg *goosc.Message) {
+func (s *OSCServer) destroyForest(msg *goosc.Message) {
 	op.DestroyForest()
 	s.client.Ack(msg.Address, empty)
 }
 
-func (s *PigServer) printForest(msg *goosc.Message) {
+func (s *OSCServer) printForest(msg *goosc.Message) {
 	for _, root := range op.RootOperators() {
 		fmt.Println("\nOperator tree:")
 		root.PrintTree()
@@ -197,7 +197,7 @@ func (s *PigServer) printForest(msg *goosc.Message) {
 // /pig/q-is-parent <parent> <child>
 // --> bool
 //
-func (s *PigServer) queryIsParent(msg *goosc.Message) {
+func (s *OSCServer) queryIsParent(msg *goosc.Message) {
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -219,7 +219,7 @@ func (s *PigServer) queryIsParent(msg *goosc.Message) {
 }
 		
 
-func (s *PigServer) queryMIDIInputs(msg *goosc.Message) {
+func (s *OSCServer) queryMIDIInputs(msg *goosc.Message) {
 	ids := midi.InputIDs()
 	acc := make([]string, len(ids))
 	fmt.Println("MIDI Input devices:")
@@ -231,7 +231,7 @@ func (s *PigServer) queryMIDIInputs(msg *goosc.Message) {
 	s.client.Ack(msg.Address, acc)
 }
 
-func (s *PigServer) queryMIDIOutputs(msg *goosc.Message) {
+func (s *OSCServer) queryMIDIOutputs(msg *goosc.Message) {
 	ids := midi.OutputIDs()
 	acc := make([]string, len(ids))
 	fmt.Println("MIDI Output devices:")
@@ -246,7 +246,7 @@ func (s *PigServer) queryMIDIOutputs(msg *goosc.Message) {
 // /pig/q-operators
 // --> ACK <list-of-operators>
 //
-func (s *PigServer) queryOperators(msg *goosc.Message) {
+func (s *OSCServer) queryOperators(msg *goosc.Message) {
 	oplist := op.Operators()
 	acc := make([]string, len(oplist))
 	for i, p := range oplist {
@@ -258,7 +258,7 @@ func (s *PigServer) queryOperators(msg *goosc.Message) {
 // /pig/q-roots
 // --> ACK <list-of-operators>
 //
-func (s *PigServer) queryRoots(msg *goosc.Message) {
+func (s *OSCServer) queryRoots(msg *goosc.Message) {
 	oplist := op.RootOperators()
 	acc := make([]string, len(oplist))
 	for i, p := range oplist {
@@ -270,7 +270,7 @@ func (s *PigServer) queryRoots(msg *goosc.Message) {
 // /pig/q-children <operator>
 // --> Ack <list-of-operators>
 //
-func (s *PigServer) queryChildren(msg *goosc.Message) {
+func (s *OSCServer) queryChildren(msg *goosc.Message) {
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -294,7 +294,7 @@ func (s *PigServer) queryChildren(msg *goosc.Message) {
 // /pig/q-parents <operator>
 // --> Ack <list-of-operators>
 //
-func (s *PigServer) queryParents(msg *goosc.Message) {
+func (s *OSCServer) queryParents(msg *goosc.Message) {
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
 	if err != nil {
@@ -316,17 +316,17 @@ func (s *PigServer) queryParents(msg *goosc.Message) {
 }
 			
 
-func (s *PigServer) panic(msg *goosc.Message) {
+func (s *OSCServer) panic(msg *goosc.Message) {
 	op.PanicAll()
 	s.client.Ack(msg.Address, empty)
 }
 
-func (s *PigServer) reset(msg *goosc.Message) {
+func (s *OSCServer) reset(msg *goosc.Message) {
 	op.ResetAll()
 	s.client.Ack(msg.Address, empty)
 }
 
-func (s *PigServer) help(msg *goosc.Message) {
+func (s *OSCServer) help(msg *goosc.Message) {
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
 	topic := ""

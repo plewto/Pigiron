@@ -4,9 +4,11 @@ import (
 	"fmt"
 	// "time"
 	"os"
-	
+
 	"github.com/plewto/pigiron/config"
-	"github.com/plewto/pigiron/osc"
+	 "github.com/plewto/pigiron/osc"
+
+	
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/op"
 
@@ -16,13 +18,14 @@ import (
 func main() {
 	fmt.Println("Pigiron")
 	config.DumpGlobalParameters()
+	osc.Init()
 	osc.Listen()
-	go repl()
+	//go repl()
 	
 	for { // main loop
-		if osc.Exit {
-			Exit()
-		}
+		// if osc.Exit {
+		// 	Exit()
+		// }
 	}
 }
 
@@ -42,5 +45,6 @@ func Exit() {
 func Cleanup() {
 	midi.Cleanup()
 	op.Cleanup()
+	osc.Cleanup()
 	
 }

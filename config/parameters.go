@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"runtime"
 )
 
 
@@ -50,17 +49,11 @@ func ResetGlobalParameters() {
 	GlobalParameters.MIDIInputPollInterval = 0
 	GlobalParameters.MIDIOutputBufferSize = 1024
 	GlobalParameters.MIDIOutputLatency = 0
-	GlobalParameters.TextColor = "\033[97m"
-	GlobalParameters.ErrorColor = "\033[31m"
-	clearWindowsColors()
+	GlobalParameters.TextColor = getColor("white")
+	GlobalParameters.ErrorColor = getColor("red")
 }
 
-func clearWindowsColors() {
-	if runtime.GOOS == "windows" {
-		GlobalParameters.TextColor = ""
-		GlobalParameters.ErrorColor = ""
-	}
-}
+
 
 
 // DumpGlobalParameters prints the global configuration values.

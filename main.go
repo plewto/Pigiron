@@ -12,7 +12,8 @@ import (
 
 
 func main() {
-	fmt.Println("Pigiron")
+	fmt.Print(config.GlobalParameters.TextColor)
+	fmt.Println("Welcome to Pigiron")
 	config.DumpGlobalParameters()
 	osc.Init()
 	osc.Listen()

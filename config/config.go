@@ -161,13 +161,13 @@ func readConfigurationFile(filename string) {
 		GlobalParameters.MIDIInputPollInterval = readInt("midi-input.poll-interval", 0)
 		GlobalParameters.MIDIOutputBufferSize = readInt("midi-output.buffer-size", 1024)
 		GlobalParameters.MIDIOutputLatency = readInt("midi-output.latency", 0)
-		GlobalParameters.TextColor = readString("colors.text", "")
-		GlobalParameters.ErrorColor = readString("colors.error", "")
-		clearWindowsColors()
+		GlobalParameters.TextColor = getColor(readString("colors.text", ""))
+		GlobalParameters.ErrorColor = getColor(readString("colors.error", ""))
 	}
 }
 
 func init() {
+	defineColors()
 	parseCommandLine()
 	ResetGlobalParameters()
 	readConfigurationFile(configFilename)

@@ -1,88 +1,67 @@
-// config package sets global parameters via a configuration file.
-//
-// On application startup configuration values are read from the file
-// ~/.config/pigiron/config.toml and stored to the GlobalParameters
-// struct.  An alternate config file may be specified on the command line 
-//    pigiron alternate-config.toml
-//
-
 package config
 
+/*
+ * Parse command line arguments.
+ * Load toml config file.
+ * Establish initial OSC batch filename.
+*/
+
 import (
+	"flag"
 	"fmt"
-	"strings"
-	"strconv"
 	"os"
 	"path/filepath"
 	toml "github.com/pelletier/go-toml"
+	"strings"
+	"strconv"
 )
 
 var (
-	GlobalParameters = globalParameters {}
+	GlobalParameters = globalParameters{}
 	configFilename string
+	batchFilename string
 	tomlTree *toml.Tree
 )
 
-// globalParameters struct holds application wide configuration values.
+// subUserHome substitutes leading ~ charater for user home directory.
 //
-type globalParameters struct {
-	OSCServerRoot string
-	OSCServerHost string
-	OSCServerPort int64
-	OSCClientRoot string
-	OSCClientHost string
-	OSCClientPort int64
-	OSCClientFilename string
-	MaxTreeDepth int64
-	MIDIInputBufferSize int64
-	MIDIInputPollInterval int64 // ms
-	MIDIOutputBufferSize int64
-	MIDIOutputLatency int64
-}
-
-// ResetGlobalParameters sets all global configuration parameter to default values."
-//
-func ResetGlobalParameters() {
-	GlobalParameters.OSCServerRoot = "pig"
-	GlobalParameters.OSCServerHost = "127.0.0.1"
-	GlobalParameters.OSCServerPort = 8000
-	GlobalParameters.OSCClientRoot = "pig-client"
-	GlobalParameters.OSCClientHost = "127.0.0.1"
-	GlobalParameters.OSCClientPort = 8001
-	GlobalParameters.OSCClientFilename = ""
-	GlobalParameters.MaxTreeDepth = 12
-	GlobalParameters.MIDIInputBufferSize = 1024
-	GlobalParameters.MIDIInputPollInterval = 0
-	GlobalParameters.MIDIOutputBufferSize = 1024
-	GlobalParameters.MIDIOutputLatency = 0
-}
-
-
-// determinConfigFilename returns the configuration filename.
-// The default filename is <config>/pigiron/config.toml
-// where <config> is the User's configuration directory.
-// Typically on ~/.config/ on Linux.
-//
-// An alternate configuration file may be specified on the
-// command line.  
-// 
-func determineConfigFilename() string {
-	if len(os.Args) < 2 {
-		base, err := os.UserConfigDir()
-		if err == nil {
-			home, _ := os.UserHomeDir()
-			base = filepath.Join(home, ".config")
-		}
-		return filepath.Join(base, "pigiron", "config.toml")
-	} else {
-		filename := os.Args[1]
-		if len(filename) > 2 && filename[0:1] == "~/" {
-			home, _ := os.UserHomeDir()
-			filename = filepath.Join(home, filename[2:])
-		}
-		return filename
+func subUserHome(filename string) string {
+	result := filename
+	if len(filename) > 0 && string(filename[0]) == "~" {
+		home, _ := os.UserHomeDir()
+		result = filepath.Join(home, filename[1:])
 	}
+	return result
 }
+
+
+// parseCommandLine deciphers command line arguments.
+//
+// --config filename
+//     Use alternate configuration file.
+//     Defaults to ~/<config-dir>/pigiron/config.toml
+//
+// --batch filename
+//     Sets OSC batch file to run at startup.
+//     Defaults to no file.
+//
+func parseCommandLine() {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		configDir = ".config"
+	}
+	// config filename
+	defaultFile := filepath.Join(configDir, "pigiron", "config.toml")
+	flag.StringVar(&configFilename, "config", defaultFile, "Sets configuration file.")
+	configFilename = subUserHome(configFilename)
+	// batch filename
+	defaultFile = ""
+	flag.StringVar(&batchFilename, "batch", defaultFile, "Sets initial OSC batch file.")
+	batchFilename = subUserHome(batchFilename)
+	
+	flag.Parse()
+}
+
 
 func splitPath(path string) []string {
 	return strings.Split(path, ".")
@@ -97,7 +76,7 @@ func hasPath(path string) bool {
 
 
 // readInt reads an int from the config file.
-// Returns fallback if path does not exists or its value is invalid.
+// Returns fallback if path does not exists or it's value is invalid.
 //
 func readInt(path string, fallback int64) int64 {
 	if hasPath(path) {
@@ -119,7 +98,7 @@ func readInt(path string, fallback int64) int64 {
 
 
 // readFloat reads float from config file.
-// Returns fallback if path does not exists or its value is invalid.
+// Returns fallback if path does not exists or it's value is invalid.
 //
 func readFloat(path string, fallback float64) float64 {
 	if hasPath(path) {
@@ -153,18 +132,19 @@ func readString(path string, fallback string) string {
 }
 
 
-func init() {
-	ResetGlobalParameters()
+// readConfigurationFile sets GlobalParameters fields from toml config file.
+//
+func readConfigurationFile(filename string) {
 	var err error
-	configFilename = determineConfigFilename()
-	tomlTree, err = toml.LoadFile(configFilename)
+	tomlTree, err = toml.LoadFile(filename)
 	if err != nil {
-		fmt.Printf("ERROR: Can not load configuration file \"%s\"\n", configFilename)
-		fmt.Println("ERROR:", err.Error())
+		fmt.Printf("ERROR: Can not open configuration file: '%s'\n", filename)
+		fmt.Println("ERROR: ", err.Error())
 		fmt.Println()
+		ResetGlobalParameters()
 		return
 	} else {
-		fmt.Printf("Using config file: \"%s\"\n", configFilename)
+		fmt.Printf("Using configuration file: '%s'\n", filename)
 		GlobalParameters.OSCServerRoot = readString("osc-server.root", "pig")
 		GlobalParameters.OSCServerHost = readString("osc-server.host", "127.0.0.1")
 		GlobalParameters.OSCServerPort = readInt("osc-server.port", 8000)
@@ -180,23 +160,10 @@ func init() {
 	}
 }
 
-
-// DumpGlobalParameters prints the global configuration values.
-//
-func DumpGlobalParameters() {
-	fmt.Println("Global Parameters:")
-	fmt.Printf("\tconfig file was \"%s\"\n", configFilename)
-	fmt.Printf("\tOSCServerRoot         : %v\n", GlobalParameters.OSCServerRoot)
-	fmt.Printf("\tOSCServerHost         : %v\n", GlobalParameters.OSCServerHost)
-	fmt.Printf("\tOSCServerPort         : %v\n", GlobalParameters.OSCServerPort)
-	fmt.Printf("\tOSCClientRoot         : %v\n", GlobalParameters.OSCClientRoot)
-	fmt.Printf("\tOSCClientHost         : %v\n", GlobalParameters.OSCClientHost)
-	fmt.Printf("\tOSCClientPort         : %v\n", GlobalParameters.OSCClientPort)
-	fmt.Printf("\tOSCClientFilename     : %v\n", GlobalParameters.OSCClientFilename)
-	fmt.Printf("\tMaxTreeDepth          : %v\n", GlobalParameters.MaxTreeDepth)
-	fmt.Printf("\tMIDIInputBufferSize   : %v\n", GlobalParameters.MIDIInputBufferSize)
-	fmt.Printf("\tMIDIInputPollInterval : %v\n", GlobalParameters.MIDIInputPollInterval)
-	fmt.Printf("\tMIDIOutputBufferSize  : %v\n", GlobalParameters.MIDIOutputBufferSize)
-	fmt.Printf("\tMIDIOutputLatency     : %v\n", GlobalParameters.MIDIOutputLatency)
+func init() {
+	parseCommandLine()
+	ResetGlobalParameters()
+	readConfigurationFile(configFilename)
 }
 	
+

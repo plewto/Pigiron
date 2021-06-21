@@ -16,22 +16,19 @@ import (
 func main() {
 	fmt.Println("Pigiron")
 	config.DumpGlobalParameters()
-
 	osc.Listen()
-
-	fmt.Println("Starting main loop")
-
-	// main loop
 	go repl()
 	
-	for {
+	for { // main loop
 		if osc.Exit {
 			Exit()
 		}
 	}
-	
-	
 }
+
+// func main() {
+// 	fmt.Println("Main TEST")
+// }
 
 
 func Exit() {

@@ -366,4 +366,14 @@ func (s *OSCServer) help(msg *goosc.Message) {
 	}
 }
 	
-
+func (s *OSCServer) batchLoad(msg *goosc.Message) {
+	ClearError()
+	template := []expectType{xpString}
+	args, err := expect(template, msg.Arguments)
+	if err != nil {
+		s.sendError(err, msg)
+	} else {
+		filename := args[0]
+		LoadBatchFile(filename)
+	}
+}

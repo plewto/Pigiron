@@ -61,6 +61,7 @@ func NewServer(ip string, port int, root string) PigServer {
 	server.AddMsgHandler("panic", server.panic)
 	server.AddMsgHandler("reset", server.panic)
 	server.AddMsgHandler("help", server.help)
+	server.AddMsgHandler("batch", server.batchLoad)
 	return server
 }
 

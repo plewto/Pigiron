@@ -1,4 +1,4 @@
-package main
+package osc
 
 import (
 	"fmt"
@@ -10,14 +10,14 @@ import (
 	"time"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/config"
-	"github.com/plewto/pigiron/osc"
+	//"github.com/plewto/pigiron/osc"
 )
 
 const remark string = "#"
 
 var (
 	replReader = bufio.NewReader(os.Stdin)
-	replClient osc.PigClient
+	replClient PigClient
 )
 
 // subUserHome substitutes leading ~ charater for user home directory.
@@ -36,16 +36,11 @@ func printBar() {
 }
 
 
-func prompt() {
-	root := config.GlobalParameters.OSCServerRoot
-	fmt.Printf("/%s/ ", root)
-}
-
-func repl() {
+func REPL() {
 	root := config.GlobalParameters.REPLRoot
 	host := config.GlobalParameters.REPLHost
 	port := int(config.GlobalParameters.REPLPort)
-	replClient = osc.NewClient(host, port, root, "")
+	replClient = NewClient(host, port, root, "")
 	for {
 		prompt()
 		s := read()
@@ -70,8 +65,8 @@ func dispatch(command string, args string) {
 		// ignore blank line
 	case "#" :
 		// ignore comment
-	case "batch": 
-		LoadBatchFile(args)
+	// case "batch": 
+	// 	LoadBatchFile(args)
 	default: // transmit OSC
 		root := config.GlobalParameters.REPLRoot
 		address := fmt.Sprintf("/%s/%s", root, command)
@@ -105,7 +100,7 @@ func eval(s string) {
 
 
 func LoadBatchFile(filename string) {
-	osc.ClearError()
+	ClearError()
 	filename = subUserHome(filename)
 	fmt.Print(config.GlobalParameters.TextColor)
 	printBar()
@@ -121,7 +116,7 @@ func LoadBatchFile(filename string) {
 		for i, line := range lines {
 			eval(line)
 			time.Sleep(10*time.Millisecond)
-			if osc.OSCError() {
+			if OSCError() {
 				fmt.Print(config.GlobalParameters.ErrorColor)
 				fmt.Printf("ERROR: batch file line %d\n", i)
 				fmt.Printf("ERROR: %s\n", line)

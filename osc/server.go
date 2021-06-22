@@ -40,28 +40,28 @@ func NewServer(ip string, port int, root string) PigServer {
 		Addr: addr,
 		Dispatcher: server.dispatcher,
 	}
-	server.AddMsgHandler("ping", server.ping)
-	server.AddMsgHandler("exit", server.exit)
-	server.AddMsgHandler("new-operator", server.newOperator)
-	server.AddMsgHandler("new-midi-input", server.newMIDIInput)
-	server.AddMsgHandler("new-midi-output", server.newMIDIOutput)
-	server.AddMsgHandler("delete-operator", server.deleteOperator)
-	server.AddMsgHandler("connect", server.connect)
-	server.AddMsgHandler("disconnect",     server.disconnect)
-	server.AddMsgHandler("disconnect-all", server.disconnectAll)
-	server.AddMsgHandler("destroy-forest", server.destroyForest)
-	server.AddMsgHandler("print-forest", server.printForest)
-	server.AddMsgHandler("q-is-parent", server.queryIsParent)
-	server.AddMsgHandler("q-midi-inputs", server.queryMIDIInputs)
-	server.AddMsgHandler("q-midi-outputs", server.queryMIDIOutputs)
-	server.AddMsgHandler("q-operators", server.queryOperators)
-	server.AddMsgHandler("q-roots", server.queryRoots)
-	server.AddMsgHandler("q-children", server.queryChildren)
-	server.AddMsgHandler("q-parents", server.queryParents)
-	server.AddMsgHandler("panic", server.panic)
-	server.AddMsgHandler("reset", server.panic)
-	server.AddMsgHandler("help", server.help)
-	server.AddMsgHandler("batch", server.batchLoad)
+	server.AddMsgHandler("ping", server.remotePing)
+	server.AddMsgHandler("exit", server.remoteExit)
+	server.AddMsgHandler("new-operator", server.remoteNewOperator)
+	server.AddMsgHandler("new-midi-input", server.remoteNewMIDIInput)
+	server.AddMsgHandler("new-midi-output", server.remoteNewMIDIOutput)
+	server.AddMsgHandler("delete-operator", server.remoteDeleteOperator)
+	server.AddMsgHandler("connect", server.remoteConnect)
+	server.AddMsgHandler("disconnect",     server.remoteDisconnect)
+	server.AddMsgHandler("disconnect-all", server.remoteDisconnectAll)
+	server.AddMsgHandler("destroy-forest", server.remoteDestroyForest)
+	server.AddMsgHandler("print-forest", server.remotePrintForest)
+	server.AddMsgHandler("q-is-parent", server.remoteQueryIsParent)
+	server.AddMsgHandler("q-midi-inputs", server.remoteQueryMIDIInputs)
+	server.AddMsgHandler("q-midi-outputs", server.remoteQueryMIDIOutputs)
+	server.AddMsgHandler("q-operators", server.remoteQueryOperators)
+	server.AddMsgHandler("q-roots", server.remoteQueryRoots)
+	server.AddMsgHandler("q-children", server.remoteQueryChildren)
+	server.AddMsgHandler("q-parents", server.remoteQueryParents)
+	server.AddMsgHandler("panic", server.remotePanic)
+	server.AddMsgHandler("reset", server.remotePanic)
+	server.AddMsgHandler("help", server.remoteHelp)
+	server.AddMsgHandler("batch", server.remoteBatchLoad)
 	return server
 }
 
@@ -100,5 +100,5 @@ func (s *OSCServer) Port() int {
 }
 
 // func (s *OSCServer) Close() {
-// 	s.backingServer.Close()
+// 	s.backingServer.remoteClose()
 // }

@@ -24,14 +24,14 @@ func (s *OSCServer) sendError(err error, msg *goosc.Message) {
 }
 
 
-func (s *OSCServer) ping(msg *goosc.Message) {
+func (s *OSCServer) remotePing(msg *goosc.Message) {
 	ClearError()
 	fmt.Printf("%s\n", msg.Address)
 	s.client.Ack(msg.Address, empty)
 }
 
 
-func (s *OSCServer) exit(msg *goosc.Message) {
+func (s *OSCServer) remoteExit(msg *goosc.Message) {
 	ClearError()
 	s.client.Ack(msg.Address, empty)
 	Exit = true
@@ -41,7 +41,7 @@ func (s *OSCServer) exit(msg *goosc.Message) {
 // /pig/new-operator <opType> <name>
 // --> actual name
 //
-func (s *OSCServer) newOperator(msg *goosc.Message) {
+func (s *OSCServer) remoteNewOperator(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString, xpString}
 	args, err := expect(template, msg.Arguments)
@@ -64,7 +64,7 @@ func (s *OSCServer) newOperator(msg *goosc.Message) {
 // /pig/new-midi-output <device> <name>
 // --> actual name
 //
-func (s *OSCServer) newMIDIOutput(msg *goosc.Message) {
+func (s *OSCServer) remoteNewMIDIOutput(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
@@ -86,7 +86,7 @@ func (s *OSCServer) newMIDIOutput(msg *goosc.Message) {
 // /pig/new-midi-input <device> <name>
 // --> actual name
 //
-func (s *OSCServer) newMIDIInput(msg *goosc.Message) {
+func (s *OSCServer) remoteNewMIDIInput(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
@@ -105,7 +105,7 @@ func (s *OSCServer) newMIDIInput(msg *goosc.Message) {
 	}
 }		
 
-func (s *OSCServer) deleteOperator(msg *goosc.Message) {
+func (s *OSCServer) remoteDeleteOperator(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
@@ -120,7 +120,7 @@ func (s *OSCServer) deleteOperator(msg *goosc.Message) {
 
 // /pig/connect <parent-name> <child-name>
 //
-func (s *OSCServer) connect(msg *goosc.Message) {
+func (s *OSCServer) remoteConnect(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
@@ -148,7 +148,7 @@ func (s *OSCServer) connect(msg *goosc.Message) {
 
 // /pig/disconnect <parent> <child>
 //
-func (s *OSCServer) disconnect(msg *goosc.Message) {
+func (s *OSCServer) remoteDisconnect(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
@@ -173,7 +173,7 @@ func (s *OSCServer) disconnect(msg *goosc.Message) {
 // /pig/disconnect-all <operator>
 // --> Ack | Error
 //
-func (s *OSCServer) disconnectAll(msg *goosc.Message) {
+func (s *OSCServer) remoteDisconnectAll(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
@@ -189,13 +189,13 @@ func (s *OSCServer) disconnectAll(msg *goosc.Message) {
 	}
 }
 
-func (s *OSCServer) destroyForest(msg *goosc.Message) {
+func (s *OSCServer) remoteDestroyForest(msg *goosc.Message) {
 	ClearError()
 	op.DestroyForest()
 	s.client.Ack(msg.Address, empty)
 }
 
-func (s *OSCServer) printForest(msg *goosc.Message) {
+func (s *OSCServer) remotePrintForest(msg *goosc.Message) {
 	ClearError()
 	for _, root := range op.RootOperators() {
 		fmt.Println("\nOperator tree:")
@@ -209,7 +209,7 @@ func (s *OSCServer) printForest(msg *goosc.Message) {
 // /pig/q-is-parent <parent> <child>
 // --> bool
 //
-func (s *OSCServer) queryIsParent(msg *goosc.Message) {
+func (s *OSCServer) remoteQueryIsParent(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString, xpString}	
 	args, err := expect(template, msg.Arguments)
@@ -232,7 +232,7 @@ func (s *OSCServer) queryIsParent(msg *goosc.Message) {
 }
 		
 
-func (s *OSCServer) queryMIDIInputs(msg *goosc.Message) {
+func (s *OSCServer) remoteQueryMIDIInputs(msg *goosc.Message) {
 	ClearError()
 	ids := midi.InputIDs()
 	acc := make([]string, len(ids))
@@ -245,7 +245,7 @@ func (s *OSCServer) queryMIDIInputs(msg *goosc.Message) {
 	s.client.Ack(msg.Address, acc)
 }
 
-func (s *OSCServer) queryMIDIOutputs(msg *goosc.Message) {
+func (s *OSCServer) remoteQueryMIDIOutputs(msg *goosc.Message) {
 	ClearError()
 	ids := midi.OutputIDs()
 	acc := make([]string, len(ids))
@@ -261,7 +261,7 @@ func (s *OSCServer) queryMIDIOutputs(msg *goosc.Message) {
 // /pig/q-operators
 // --> ACK <list-of-operators>
 //
-func (s *OSCServer) queryOperators(msg *goosc.Message) {
+func (s *OSCServer) remoteQueryOperators(msg *goosc.Message) {
 	ClearError()
 	oplist := op.Operators()
 	acc := make([]string, len(oplist))
@@ -274,7 +274,7 @@ func (s *OSCServer) queryOperators(msg *goosc.Message) {
 // /pig/q-roots
 // --> ACK <list-of-operators>
 //
-func (s *OSCServer) queryRoots(msg *goosc.Message) {
+func (s *OSCServer) remoteQueryRoots(msg *goosc.Message) {
 	ClearError()
 	oplist := op.RootOperators()
 	acc := make([]string, len(oplist))
@@ -287,7 +287,7 @@ func (s *OSCServer) queryRoots(msg *goosc.Message) {
 // /pig/q-children <operator>
 // --> Ack <list-of-operators>
 //
-func (s *OSCServer) queryChildren(msg *goosc.Message) {
+func (s *OSCServer) remoteQueryChildren(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
@@ -312,7 +312,7 @@ func (s *OSCServer) queryChildren(msg *goosc.Message) {
 // /pig/q-parents <operator>
 // --> Ack <list-of-operators>
 //
-func (s *OSCServer) queryParents(msg *goosc.Message) {
+func (s *OSCServer) remoteQueryParents(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
@@ -335,19 +335,19 @@ func (s *OSCServer) queryParents(msg *goosc.Message) {
 }
 			
 
-func (s *OSCServer) panic(msg *goosc.Message) {
+func (s *OSCServer) remotePanic(msg *goosc.Message) {
 	ClearError()
 	op.PanicAll()
 	s.client.Ack(msg.Address, empty)
 }
 
-func (s *OSCServer) reset(msg *goosc.Message) {
+func (s *OSCServer) remoteReset(msg *goosc.Message) {
 	ClearError()
 	op.ResetAll()
 	s.client.Ack(msg.Address, empty)
 }
 
-func (s *OSCServer) help(msg *goosc.Message) {
+func (s *OSCServer) remoteHelp(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)
@@ -366,7 +366,7 @@ func (s *OSCServer) help(msg *goosc.Message) {
 	}
 }
 	
-func (s *OSCServer) batchLoad(msg *goosc.Message) {
+func (s *OSCServer) remoteBatchLoad(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString}
 	args, err := expect(template, msg.Arguments)

@@ -68,6 +68,7 @@ func Listen() {
 
 
 func Cleanup() {
-	//globalServer.Close()
+	globalServer.Close()
+	replServer.Close()
 }
 

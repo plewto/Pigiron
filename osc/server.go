@@ -15,7 +15,7 @@ type PigServer interface {
 	ListenAndServe()
 	IP() string
 	Port() int
-	//Close()
+	Close()
 }
 
 type OSCServer struct {
@@ -99,6 +99,6 @@ func (s *OSCServer) Port() int {
 	return s.port
 }
 
-// func (s *OSCServer) Close() {
-// 	s.backingServer.remoteClose()
-// }
+func (s *OSCServer) Close() {
+	s.backingServer.CloseConnection()
+}

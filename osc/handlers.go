@@ -421,3 +421,4 @@ func (s *OSCServer) remoteBatchLoad(msg *goosc.Message) {
 		LoadBatchFile(filename)
 	}
 }
+

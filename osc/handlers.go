@@ -24,13 +24,18 @@ func (s *OSCServer) sendError(err error, msg *goosc.Message) {
 }
 
 
+// osc /pig/ping -> ACK
+// diagnostic function.
+//
 func (s *OSCServer) remotePing(msg *goosc.Message) {
 	ClearError()
 	fmt.Printf("%s\n", msg.Address)
 	s.client.Ack(msg.Address, empty)
 }
 
-
+// osc /pig/exit -> ACK
+// Terminate application
+//
 func (s *OSCServer) remoteExit(msg *goosc.Message) {
 	ClearError()
 	s.client.Ack(msg.Address, empty)
@@ -38,8 +43,9 @@ func (s *OSCServer) remoteExit(msg *goosc.Message) {
 }
 
 
-// /pig/new-operator <opType> <name>
-// --> actual name
+// osc /pig/new-operator opType name
+// -> ACK actual-name
+// -> ERROR
 //
 func (s *OSCServer) remoteNewOperator(msg *goosc.Message) {
 	ClearError()
@@ -61,8 +67,9 @@ func (s *OSCServer) remoteNewOperator(msg *goosc.Message) {
 }
 
 
-// /pig/new-midi-output <device> <name>
-// --> actual name
+// osc /pig/new-midi-output <device> <name>
+// -> ACK actual-name
+// -> ERROR
 //
 func (s *OSCServer) remoteNewMIDIOutput(msg *goosc.Message) {
 	ClearError()
@@ -83,8 +90,9 @@ func (s *OSCServer) remoteNewMIDIOutput(msg *goosc.Message) {
 	}
 }
 
-// /pig/new-midi-input <device> <name>
-// --> actual name
+// osc /pig/new-midi-input <device> <name>
+// -> ACK actual-name
+// -> ERROR
 //
 func (s *OSCServer) remoteNewMIDIInput(msg *goosc.Message) {
 	ClearError()
@@ -105,6 +113,10 @@ func (s *OSCServer) remoteNewMIDIInput(msg *goosc.Message) {
 	}
 }		
 
+// osc /pig/delete-operator <name>
+// -> ACK
+// -> ERROR
+//
 func (s *OSCServer) remoteDeleteOperator(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString}
@@ -118,7 +130,9 @@ func (s *OSCServer) remoteDeleteOperator(msg *goosc.Message) {
 	}
 }
 
-// /pig/connect <parent-name> <child-name>
+// osc /pig/connect <parent-name> <child-name>
+// -> ACK
+// -> ERROR
 //
 func (s *OSCServer) remoteConnect(msg *goosc.Message) {
 	ClearError()
@@ -146,7 +160,9 @@ func (s *OSCServer) remoteConnect(msg *goosc.Message) {
 	}
 }
 
-// /pig/disconnect <parent> <child>
+// osc /pig/disconnect <parent> <child>
+// -> ACK
+// -> ERROR
 //
 func (s *OSCServer) remoteDisconnect(msg *goosc.Message) {
 	ClearError()
@@ -170,8 +186,9 @@ func (s *OSCServer) remoteDisconnect(msg *goosc.Message) {
 	}
 }
 
-// /pig/disconnect-all <operator>
-// --> Ack | Error
+// osc /pig/disconnect-all <operator>
+// -> ACK
+// -> ERROR
 //
 func (s *OSCServer) remoteDisconnectAll(msg *goosc.Message) {
 	ClearError()
@@ -189,12 +206,19 @@ func (s *OSCServer) remoteDisconnectAll(msg *goosc.Message) {
 	}
 }
 
+// osc /pig/destroy-forest
+// -> ACK
+//
 func (s *OSCServer) remoteDestroyForest(msg *goosc.Message) {
 	ClearError()
 	op.DestroyForest()
 	s.client.Ack(msg.Address, empty)
 }
 
+
+// osc /pig/print-forest
+// -> ACK
+//
 func (s *OSCServer) remotePrintForest(msg *goosc.Message) {
 	ClearError()
 	for _, root := range op.RootOperators() {
@@ -206,8 +230,9 @@ func (s *OSCServer) remotePrintForest(msg *goosc.Message) {
 }
 
 
-// /pig/q-is-parent <parent> <child>
-// --> bool
+// osc /pig/q-is-parent <parent> <child>
+// -> ACK bool
+// -> ERROR
 //
 func (s *OSCServer) remoteQueryIsParent(msg *goosc.Message) {
 	ClearError()
@@ -231,7 +256,9 @@ func (s *OSCServer) remoteQueryIsParent(msg *goosc.Message) {
 	}
 }
 		
-
+// osc /pig/q-midi-inputs
+// -> ACK list of MIDI input devices
+//
 func (s *OSCServer) remoteQueryMIDIInputs(msg *goosc.Message) {
 	ClearError()
 	ids := midi.InputIDs()
@@ -245,6 +272,10 @@ func (s *OSCServer) remoteQueryMIDIInputs(msg *goosc.Message) {
 	s.client.Ack(msg.Address, acc)
 }
 
+
+// osc /pig/q-midi-outputs
+// -> ACK list of MIDI output devices
+//
 func (s *OSCServer) remoteQueryMIDIOutputs(msg *goosc.Message) {
 	ClearError()
 	ids := midi.OutputIDs()
@@ -258,8 +289,8 @@ func (s *OSCServer) remoteQueryMIDIOutputs(msg *goosc.Message) {
 	s.client.Ack(msg.Address, acc)
 }
 
-// /pig/q-operators
-// --> ACK <list-of-operators>
+// osc /pig/q-operators
+// -> ACK list of operators
 //
 func (s *OSCServer) remoteQueryOperators(msg *goosc.Message) {
 	ClearError()
@@ -271,8 +302,8 @@ func (s *OSCServer) remoteQueryOperators(msg *goosc.Message) {
 	s.client.Ack(msg.Address, acc)
 }
 
-// /pig/q-roots
-// --> ACK <list-of-operators>
+// osc /pig/q-roots
+// -> ACK list of root operators
 //
 func (s *OSCServer) remoteQueryRoots(msg *goosc.Message) {
 	ClearError()
@@ -284,8 +315,9 @@ func (s *OSCServer) remoteQueryRoots(msg *goosc.Message) {
 	s.client.Ack(msg.Address, acc)
 }
 
-// /pig/q-children <operator>
-// --> Ack <list-of-operators>
+// osc /pig/q-children <operator>
+// -> ACK list of operators
+// -> ERROR
 //
 func (s *OSCServer) remoteQueryChildren(msg *goosc.Message) {
 	ClearError()
@@ -309,8 +341,8 @@ func (s *OSCServer) remoteQueryChildren(msg *goosc.Message) {
 	}
 }
 
-// /pig/q-parents <operator>
-// --> Ack <list-of-operators>
+// osc /pig/q-parents <operator>
+// -> ACK list of operators
 //
 func (s *OSCServer) remoteQueryParents(msg *goosc.Message) {
 	ClearError()
@@ -333,20 +365,29 @@ func (s *OSCServer) remoteQueryParents(msg *goosc.Message) {
 		s.client.Ack(msg.Address, acc)
 	}
 }
-			
 
+// osc /pig/panic
+// -> ACK
+//
 func (s *OSCServer) remotePanic(msg *goosc.Message) {
 	ClearError()
 	op.PanicAll()
 	s.client.Ack(msg.Address, empty)
 }
 
+// osc /pig/reset
+// -> ACK
+//
 func (s *OSCServer) remoteReset(msg *goosc.Message) {
 	ClearError()
 	op.ResetAll()
 	s.client.Ack(msg.Address, empty)
 }
 
+
+// osc /pig/help topic
+// no response
+//
 func (s *OSCServer) remoteHelp(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString}
@@ -365,7 +406,10 @@ func (s *OSCServer) remoteHelp(msg *goosc.Message) {
 		fmt.Println("Try  'help help'")
 	}
 }
-	
+
+// osc /pig.batch filename
+// no direct osc response.
+//
 func (s *OSCServer) remoteBatchLoad(msg *goosc.Message) {
 	ClearError()
 	template := []expectType{xpString}

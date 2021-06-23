@@ -18,26 +18,11 @@ var (
 	// Exit application if true.
 	// This should proabbly be replaced with a go channel message.
 	Exit bool = false
-
-	// errorFlag bool = false
 )
-
 
 const (
 	XpString util.ExpectType = util.XpString
 )
-
-// func ClearError() {
-// 	errorFlag = false
-// }
-
-// func signalError() {
-// 	errorFlag = true
-// }
-
-// func OSCError() bool {
-// 	return errorFlag
-// }
 
 
 // Must execute after config init()
@@ -61,7 +46,6 @@ func Init() {
 	AddOSCHandler(globalServer, "q-midi-outputs", remoteQueryMIDIOutputs)
 	
 }
-
 
 
 func Listen() {
@@ -93,6 +77,7 @@ func remoteExit(msg *goosc.Message)([]string, error) {
 	return empty, err
 }
 
+
 // osc /pig/q-midi-inputs
 // -> ACK list of MIDI input devices
 //
@@ -108,6 +93,7 @@ func remoteQueryMIDIInputs(msg *goosc.Message)([]string, error) {
 	}
 	return acc, err
 }
+
 
 // osc /pig/q-midi-outputs
 // -> ACK list of MIDI output devices

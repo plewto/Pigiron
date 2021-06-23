@@ -20,8 +20,6 @@ import (
 	"strings"
 	"os"
 	goosc "github.com/hypebeast/go-osc/osc"
-	"github.com/plewto/pigiron/config"
-	"github.com/plewto/pigiron/util"
 )
 
 
@@ -160,39 +158,3 @@ func (c *BasicClient) Info() string {
 	return acc
 }
 	
-
-// REPLClient implementes PigClient for text only output.
-//
-type REPLClient struct {}
-
-func (c REPLClient) Ack(address string, data []string) {
-	fmt.Print(config.GlobalParameters.TextColor)
-	fmt.Println("----------------------------  OK")
-	fmt.Printf("%s\n", address)
-	for i, d := range data {
-		fmt.Printf("\t[%2d] %s\n", i, d)
-	}
-	util.Prompt()
-}
-
-func (c REPLClient) Error(address string, data []string) {
-	fmt.Print(config.GlobalParameters.ErrorColor)
-	fmt.Println(":----------------------------  ERROR")
-	fmt.Printf("%s\n", address)
-	for i, d := range data {
-		fmt.Printf("\t[%2d] %s\n", i, d)
-	}
-	fmt.Print(config.GlobalParameters.TextColor)
-	util.Prompt()
-}
-
-
-func (c REPLClient) Info() string {
-	acc := "REPLClient"
-	return acc
-}	
-
-
-func (c REPLClient) Send(msg *goosc.Message) {
-	// ignore
-}

@@ -1,6 +1,12 @@
 package osc
 
 import (
+	"fmt"
+
+	goosc "github.com/hypebeast/go-osc/osc"
+	"github.com/rakyll/portmidi"
+	"github.com/plewto/pigiron/midi"
+	"github.com/plewto/pigiron/util"
 	"github.com/plewto/pigiron/config"
 )
 
@@ -13,21 +19,25 @@ var (
 	// This should proabbly be replaced with a go channel message.
 	Exit bool = false
 
-	errorFlag bool = false
+	// errorFlag bool = false
 )
 
 
-func ClearError() {
-	errorFlag = false
-}
+const (
+	XpString util.ExpectType = util.XpString
+)
 
-func signalError() {
-	errorFlag = true
-}
+// func ClearError() {
+// 	errorFlag = false
+// }
 
-func OSCError() bool {
-	return errorFlag
-}
+// func signalError() {
+// 	errorFlag = true
+// }
+
+// func OSCError() bool {
+// 	return errorFlag
+// }
 
 
 // Must execute after config init()
@@ -46,6 +56,9 @@ func Init() {
 	globalServer = NewServer(host, port, root)
 
 	AddOSCHandler(globalServer, "ping", remotePing)
+	AddOSCHandler(globalServer, "exit", remoteExit)
+	AddOSCHandler(globalServer, "q-midi-inputs", remoteQueryMIDIInputs)
+	AddOSCHandler(globalServer, "q-midi-outputs", remoteQueryMIDIOutputs)
 	
 }
 
@@ -61,3 +74,53 @@ func Cleanup() {
 }
 
 
+// osc /pig/ping -> ACK
+// diagnostic function.
+//
+func remotePing(msg *goosc.Message)([]string, error) {
+	var err error
+	fmt.Printf("PING %s\n", msg.Address)
+	return empty, err
+}
+
+
+// osc /pig/exit -> ACK
+// Terminate application
+//
+func remoteExit(msg *goosc.Message)([]string, error) {
+	var err error
+	Exit = true
+	return empty, err
+}
+
+// osc /pig/q-midi-inputs
+// -> ACK list of MIDI input devices
+//
+func remoteQueryMIDIInputs(msg *goosc.Message)([]string, error) {
+	var err error
+	ids := midi.InputIDs()
+	acc := make([]string, len(ids))
+	fmt.Println("MIDI Input devices:")
+	for i, id := range ids {
+		info := portmidi.Info(id)
+		fmt.Printf("\t%s\n", info.Name)
+		acc[i] = fmt.Sprintf("\"%s\" ", info.Name)
+	}
+	return acc, err
+}
+
+// osc /pig/q-midi-outputs
+// -> ACK list of MIDI output devices
+//
+func remoteQueryMIDIOutputs(msg *goosc.Message)([] string, error) {
+	var err error
+	ids := midi.OutputIDs()
+	acc := make([]string, len(ids))
+	fmt.Println("MIDI Output devices:")
+	for i, id := range ids {
+		info := portmidi.Info(id)
+		fmt.Printf("\t%s\n", info.Name)
+		acc[i] = fmt.Sprintf("\"%s\" ", info.Name)
+	}
+	return acc, err
+}

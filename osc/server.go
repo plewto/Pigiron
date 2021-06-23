@@ -40,28 +40,33 @@ func NewServer(ip string, port int, root string) PigServer {
 		Addr: addr,
 		Dispatcher: server.dispatcher,
 	}
-	//server.AddMsgHandler("ping", server.remotePing)
-	server.AddMsgHandler("exit", server.remoteExit)
-	server.AddMsgHandler("new-operator", server.remoteNewOperator)
-	server.AddMsgHandler("new-midi-input", server.remoteNewMIDIInput)
-	server.AddMsgHandler("new-midi-output", server.remoteNewMIDIOutput)
-	server.AddMsgHandler("delete-operator", server.remoteDeleteOperator)
+	//++ server.AddMsgHandler("new-operator", server.remoteNewOperator)
+	//++ server.AddMsgHandler("new-midi-input", server.remoteNewMIDIInput)
+	//++ server.AddMsgHandler("new-midi-output", server.remoteNewMIDIOutput)
+	//++ server.AddMsgHandler("delete-operator", server.remoteDeleteOperator)
+	//++ server.AddMsgHandler("destroy-forest", server.remoteDestroyForest)
+	//++ server.AddMsgHandler("print-forest", server.remotePrintForest)
+	//++ server.AddMsgHandler("q-operators", server.remoteQueryOperators)
+	//++ server.AddMsgHandler("q-roots", server.remoteQueryRoots)
+	//++ server.AddMsgHandler("panic", server.remotePanic)
+	//++ server.AddMsgHandler("reset", server.remotePanic)
 	//server.AddMsgHandler("connect", server.remoteConnect)
 	//server.AddMsgHandler("disconnect",     server.remoteDisconnect)
 	//server.AddMsgHandler("disconnect-all", server.remoteDisconnectAll)
-	server.AddMsgHandler("destroy-forest", server.remoteDestroyForest)
-	server.AddMsgHandler("print-forest", server.remotePrintForest)
 	//server.AddMsgHandler("q-is-parent", server.remoteQueryIsParent)
-	server.AddMsgHandler("q-midi-inputs", server.remoteQueryMIDIInputs)
-	server.AddMsgHandler("q-midi-outputs", server.remoteQueryMIDIOutputs)
-	server.AddMsgHandler("q-operators", server.remoteQueryOperators)
-	server.AddMsgHandler("q-roots", server.remoteQueryRoots)
 	//server.AddMsgHandler("q-children", server.remoteQueryChildren)
 	//server.AddMsgHandler("q-parents", server.remoteQueryParents)
-	server.AddMsgHandler("panic", server.remotePanic)
-	server.AddMsgHandler("reset", server.remotePanic)
 	//server.AddMsgHandler("help", server.remoteHelp)
 	//server.AddMsgHandler("batch", server.remoteBatchLoad)
+
+	
+
+	
+
+
+	//++ server.AddMsgHandler("q-midi-inputs", server.remoteQueryMIDIInputs)
+	//++ server.AddMsgHandler("q-midi-outputs", server.remoteQueryMIDIOutputs)
+
 	return server
 }
 

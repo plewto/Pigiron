@@ -21,6 +21,7 @@ import (
 	"os"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/config"
+	"github.com/plewto/pigiron/util"
 )
 
 
@@ -171,7 +172,7 @@ func (c REPLClient) Ack(address string, data []string) {
 	for i, d := range data {
 		fmt.Printf("\t[%2d] %s\n", i, d)
 	}
-	prompt()
+	util.Prompt()
 }
 
 func (c REPLClient) Error(address string, data []string) {
@@ -182,7 +183,7 @@ func (c REPLClient) Error(address string, data []string) {
 		fmt.Printf("\t[%2d] %s\n", i, d)
 	}
 	fmt.Print(config.GlobalParameters.TextColor)
-	prompt()
+	util.Prompt()
 }
 
 

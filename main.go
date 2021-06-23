@@ -21,7 +21,7 @@ func main() {
 		// osc.LoadBatchFile(config.BatchFilename) // BUG 003 -- do not use --
 		fmt.Println("BUG 003, command line batch file is disabled.")
 	}
-	go osc.REPL()
+	// go osc.REPL()
 	fmt.Println()
 	for { // main loop
 		if osc.Exit {

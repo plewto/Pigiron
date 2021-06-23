@@ -5,7 +5,6 @@ package osc
  *
 */
 
-
 import (
 	"fmt"
 
@@ -13,25 +12,31 @@ import (
 	"github.com/rakyll/portmidi"
 	"github.com/plewto/pigiron/op"
 	"github.com/plewto/pigiron/midi"
+	"github.com/plewto/pigiron/util"
 )
+
+const (
+	XpString util.ExpectType = util.XpString
+)
+
 
 func (s *OSCServer) sendError(err error, msg *goosc.Message) {
 	signalError()
 	fmt.Printf("OSC ERROR: %s\n", msg.Address)
 	fmt.Printf("%v\n", err)
-	errmsg := toSlice(err)
+	errmsg := util.StringSlice(err)
 	s.client.Error(msg.Address, errmsg)
 }
-
 
 // osc /pig/ping -> ACK
 // diagnostic function.
 //
-func (s *OSCServer) remotePing(msg *goosc.Message) {
-	ClearError()
-	fmt.Printf("%s\n", msg.Address)
-	s.client.Ack(msg.Address, empty)
+func remotePing(msg *goosc.Message)([]string, error) {
+	var err error
+	fmt.Printf("PING %s\n", msg.Address)
+	return empty, err
 }
+
 
 // osc /pig/exit -> ACK
 // Terminate application
@@ -49,8 +54,8 @@ func (s *OSCServer) remoteExit(msg *goosc.Message) {
 //
 func (s *OSCServer) remoteNewOperator(msg *goosc.Message) {
 	ClearError()
-	template := []expectType{xpString, xpString}
-	args, err := expect(template, msg.Arguments)
+	template := []util.ExpectType{XpString, XpString}
+	args, err := util.Expect(template, msg.Arguments)
 	if err != nil {
 		s.sendError(err, msg)
 	} else {
@@ -61,7 +66,7 @@ func (s *OSCServer) remoteNewOperator(msg *goosc.Message) {
 		if err != nil {
 			s.sendError(err, msg)
 		} else {
-			s.client.Ack(msg.Address, toSlice(newOp.Name()))
+			s.client.Ack(msg.Address, util.StringSlice(newOp.Name()))
 		}
 	}
 }
@@ -73,8 +78,8 @@ func (s *OSCServer) remoteNewOperator(msg *goosc.Message) {
 //
 func (s *OSCServer) remoteNewMIDIOutput(msg *goosc.Message) {
 	ClearError()
-	template := []expectType{xpString, xpString}	
-	args, err := expect(template, msg.Arguments)
+	template := []util.ExpectType{XpString, XpString}	
+	args, err := util.Expect(template, msg.Arguments)
 	if err != nil {
 		s.sendError(err, msg)
 	} else {
@@ -85,7 +90,7 @@ func (s *OSCServer) remoteNewMIDIOutput(msg *goosc.Message) {
 		if err != nil {
 			s.sendError(err, msg)
 		} else {
-			s.client.Ack(msg.Address, toSlice(newOp.Name()))
+			s.client.Ack(msg.Address, util.StringSlice(newOp.Name()))
 		}
 	}
 }
@@ -96,8 +101,8 @@ func (s *OSCServer) remoteNewMIDIOutput(msg *goosc.Message) {
 //
 func (s *OSCServer) remoteNewMIDIInput(msg *goosc.Message) {
 	ClearError()
-	template := []expectType{xpString, xpString}	
-	args, err := expect(template, msg.Arguments)
+	template := []util.ExpectType{XpString, XpString}	
+	args, err := util.Expect(template, msg.Arguments)
 	if err != nil {
 		s.sendError(err, msg)
 	} else {
@@ -108,7 +113,7 @@ func (s *OSCServer) remoteNewMIDIInput(msg *goosc.Message) {
 		if err != nil {
 			s.sendError(err, msg)
 		} else {
-			s.client.Ack(msg.Address, toSlice(newOp.Name()))
+			s.client.Ack(msg.Address, util.StringSlice(newOp.Name()))
 		}
 	}
 }		
@@ -119,8 +124,8 @@ func (s *OSCServer) remoteNewMIDIInput(msg *goosc.Message) {
 //
 func (s *OSCServer) remoteDeleteOperator(msg *goosc.Message) {
 	ClearError()
-	template := []expectType{xpString}
-	args, err := expect(template, msg.Arguments)
+	template := []util.ExpectType{XpString}
+	args, err := util.Expect(template, msg.Arguments)
 	if err != nil {
 		s.sendError(err, msg)
 	} else {
@@ -134,77 +139,77 @@ func (s *OSCServer) remoteDeleteOperator(msg *goosc.Message) {
 // -> ACK
 // -> ERROR
 //
-func (s *OSCServer) remoteConnect(msg *goosc.Message) {
-	ClearError()
-	template := []expectType{xpString, xpString}	
-	args, err := expect(template, msg.Arguments)
-	if err != nil {
-		s.sendError(err, msg)
-	} else {
-		parent, err1 := op.GetOperator(args[0])
-		if err1 != nil {
-			s.sendError(err1, msg)
-			return
-		}
-		child, err2 := op.GetOperator(args[1])
-		if err2 != nil {
-			s.sendError(err2, msg)
-			return
-		}
-		err3 := parent.Connect(child)
-		if err3 != nil {
-			s.sendError(err3, msg)
-		} else {
-			s.client.Ack(msg.Address, empty)
-		}
-	}
-}
+// func (s *OSCServer) remoteConnect(msg *goosc.Message) {
+// 	ClearError()
+// 	template := []util.ExpectType{XpString, XpString}	
+// 	args, err := util.Expect(template, msg.Arguments)
+// 	if err != nil {
+// 		s.sendError(err, msg)
+// 	} else {
+// 		parent, err1 := op.GetOperator(args[0])
+// 		if err1 != nil {
+// 			s.sendError(err1, msg)
+// 			return
+// 		}
+// 		child, err2 := op.GetOperator(args[1])
+// 		if err2 != nil {
+// 			s.sendError(err2, msg)
+// 			return
+// 		}
+// 		err3 := parent.Connect(child)
+// 		if err3 != nil {
+// 			s.sendError(err3, msg)
+// 		} else {
+// 			s.client.Ack(msg.Address, empty)
+// 		}
+// 	}
+// }
 
 // osc /pig/disconnect <parent> <child>
 // -> ACK
 // -> ERROR
 //
-func (s *OSCServer) remoteDisconnect(msg *goosc.Message) {
-	ClearError()
-	template := []expectType{xpString, xpString}	
-	args, err := expect(template, msg.Arguments)
-	if err != nil {
-		s.sendError(err, msg)
-	} else {
-		parent, err1 := op.GetOperator(args[0])
-		if err1 != nil {
-			s.sendError(err1, msg)
-			return
-		}
-		child, err2 := op.GetOperator(args[1])
-		if err2 != nil {
-			s.sendError(err2, msg)
-			return
-		}
-		parent.Disconnect(child)
-		s.client.Ack(msg.Address, empty)
-	}
-}
+// func (s *OSCServer) remoteDisconnect(msg *goosc.Message) {
+// 	ClearError()
+// 	template := []util.ExpectType{XpString, XpString}	
+// 	args, err := util.Expect(template, msg.Arguments)
+// 	if err != nil {
+// 		s.sendError(err, msg)
+// 	} else {
+// 		parent, err1 := op.GetOperator(args[0])
+// 		if err1 != nil {
+// 			s.sendError(err1, msg)
+// 			return
+// 		}
+// 		child, err2 := op.GetOperator(args[1])
+// 		if err2 != nil {
+// 			s.sendError(err2, msg)
+// 			return
+// 		}
+// 		parent.Disconnect(child)
+// 		s.client.Ack(msg.Address, empty)
+// 	}
+// }
 
 // osc /pig/disconnect-all <operator>
 // -> ACK
 // -> ERROR
 //
-func (s *OSCServer) remoteDisconnectAll(msg *goosc.Message) {
-	ClearError()
-	template := []expectType{xpString}
-	args, err := expect(template, msg.Arguments)
-	if err != nil {
-		s.sendError(err, msg)
-	}
-	p, err2 := op.GetOperator(args[0])
-	if err2 != nil {
-		s.sendError(err2, msg)
-	} else {
-		p.DisconnectAll()
-		s.client.Ack(msg.Address, args)
-	}
-}
+// func (s *OSCServer) remoteDisconnectAll(msg *goosc.Message) {
+// 	ClearError()
+// 	template := []util.ExpectType{XpString}
+// 	args, err := util.Expect(template, msg.Arguments)
+// 	if err != nil {
+// 		s.sendError(err, msg)
+// 	}
+// 	p, err2 := op.GetOperator(args[0])
+// 	if err2 != nil {
+// 		s.sendError(err2, msg)
+// 	} else {
+// 		p.DisconnectAll()
+// 		s.client.Ack(msg.Address, args)
+// 	}
+// }
 
 // osc /pig/destroy-forest
 // -> ACK
@@ -234,27 +239,27 @@ func (s *OSCServer) remotePrintForest(msg *goosc.Message) {
 // -> ACK bool
 // -> ERROR
 //
-func (s *OSCServer) remoteQueryIsParent(msg *goosc.Message) {
-	ClearError()
-	template := []expectType{xpString, xpString}	
-	args, err := expect(template, msg.Arguments)
-	if err != nil {
-		s.sendError(err, msg)
-	} else {
-		parent, err1 := op.GetOperator(args[0])
-		if err1 != nil {
-			s.sendError(err1, msg)
-			return
-		}
-		child, err2 := op.GetOperator(args[1])
-		if err2 != nil {
-			s.sendError(err2, msg)
-			return
-		}
-		flag := child.IsChildOf(parent)
-		s.client.Ack(msg.Address, toSlice(flag))
-	}
-}
+// func (s *OSCServer) remoteQueryIsParent(msg *goosc.Message) {
+// 	ClearError()
+// 	template := []util.ExpectType{XpString, XpString}	
+// 	args, err := util.Expect(template, msg.Arguments)
+// 	if err != nil {
+// 		s.sendError(err, msg)
+// 	} else {
+// 		parent, err1 := op.GetOperator(args[0])
+// 		if err1 != nil {
+// 			s.sendError(err1, msg)
+// 			return
+// 		}
+// 		child, err2 := op.GetOperator(args[1])
+// 		if err2 != nil {
+// 			s.sendError(err2, msg)
+// 			return
+// 		}
+// 		flag := child.IsChildOf(parent)
+// 		s.client.Ack(msg.Address, util.StringSlice(flag))
+// 	}
+// }
 		
 // osc /pig/q-midi-inputs
 // -> ACK list of MIDI input devices
@@ -319,52 +324,52 @@ func (s *OSCServer) remoteQueryRoots(msg *goosc.Message) {
 // -> ACK list of operators
 // -> ERROR
 //
-func (s *OSCServer) remoteQueryChildren(msg *goosc.Message) {
-	ClearError()
-	template := []expectType{xpString}
-	args, err := expect(template, msg.Arguments)
-	if err != nil {
-		s.sendError(err, msg)
-	} else {
-		p, err2 := op.GetOperator(args[0])
-		if err2 != nil {
-			s.sendError(err, msg)
-		}
-		children := p.Children()
-		acc := make([]string, len(children))
-		i := 0
-		for key, _ := range children {
-			acc[i] = key
-			i++
-		}
-		s.client.Ack(msg.Address, acc)
-	}
-}
+// func (s *OSCServer) remoteQueryChildren(msg *goosc.Message) {
+// 	ClearError()
+// 	template := []util.ExpectType{XpString}
+// 	args, err := util.Expect(template, msg.Arguments)
+// 	if err != nil {
+// 		s.sendError(err, msg)
+// 	} else {
+// 		p, err2 := op.GetOperator(args[0])
+// 		if err2 != nil {
+// 			s.sendError(err, msg)
+// 		}
+// 		children := p.Children()
+// 		acc := make([]string, len(children))
+// 		i := 0
+// 		for key, _ := range children {
+// 			acc[i] = key
+// 			i++
+// 		}
+// 		s.client.Ack(msg.Address, acc)
+// 	}
+// }
 
 // osc /pig/q-parents <operator>
 // -> ACK list of operators
 //
-func (s *OSCServer) remoteQueryParents(msg *goosc.Message) {
-	ClearError()
-	template := []expectType{xpString}
-	args, err := expect(template, msg.Arguments)
-	if err != nil {
-		s.sendError(err, msg)
-	} else {
-		p, err2 := op.GetOperator(args[0])
-		if err2 != nil {
-			s.sendError(err, msg)
-		}
-		parents := p.Parents()
-		acc := make([]string, len(parents))
-		i := 0
-		for key, _ := range parents {
-			acc[i] = key
-			i++
-		}
-		s.client.Ack(msg.Address, acc)
-	}
-}
+// func (s *OSCServer) remoteQueryParents(msg *goosc.Message) {
+// 	ClearError()
+// 	template := []util.ExpectType{XpString}
+// 	args, err := util.Expect(template, msg.Arguments)
+// 	if err != nil {
+// 		s.sendError(err, msg)
+// 	} else {
+// 		p, err2 := op.GetOperator(args[0])
+// 		if err2 != nil {
+// 			s.sendError(err, msg)
+// 		}
+// 		parents := p.Parents()
+// 		acc := make([]string, len(parents))
+// 		i := 0
+// 		for key, _ := range parents {
+// 			acc[i] = key
+// 			i++
+// 		}
+// 		s.client.Ack(msg.Address, acc)
+// 	}
+// }
 
 // osc /pig/panic
 // -> ACK
@@ -385,40 +390,40 @@ func (s *OSCServer) remoteReset(msg *goosc.Message) {
 }
 
 
-// osc /pig/help topic
-// no response
-//
-func (s *OSCServer) remoteHelp(msg *goosc.Message) {
-	ClearError()
-	template := []expectType{xpString}
-	args, err := expect(template, msg.Arguments)
-	topic := ""
-	if err != nil {
-		topic = "help"
-	} else {
-		topic = args[0]
-	}
-	fn, flag := oscHelp[topic]
-	if flag {
-		fn()
-	} else {
-		fmt.Println("Invalid help topic: %s", topic)
-		fmt.Println("Try  'help help'")
-	}
-}
+// // osc /pig/help topic
+// // no response
+// //
+// func (s *OSCServer) remoteHelp(msg *goosc.Message) {
+// 	ClearError()
+// 	template := []util.ExpectType{XpString}
+// 	args, err := util.Expect(template, msg.Arguments)
+// 	topic := ""
+// 	if err != nil {
+// 		topic = "help"
+// 	} else {
+// 		topic = args[0]
+// 	}
+// 	fn, flag := oscHelp[topic]
+// 	if flag {
+// 		fn()
+// 	} else {
+// 		fmt.Println("Invalid help topic: %s", topic)
+// 		fmt.Println("Try  'help help'")
+// 	}
+// }
 
-// osc /pig.batch filename
-// no direct osc response.
-//
-func (s *OSCServer) remoteBatchLoad(msg *goosc.Message) {
-	ClearError()
-	template := []expectType{xpString}
-	args, err := expect(template, msg.Arguments)
-	if err != nil {
-		s.sendError(err, msg)
-	} else {
-		filename := args[0]
-		LoadBatchFile(filename)
-	}
-}
+// // osc /pig.batch filename
+// // no direct osc response.
+// //
+// func (s *OSCServer) remoteBatchLoad(msg *goosc.Message) {
+// 	ClearError()
+// 	template := []util.ExpectType{XpString}
+// 	args, err := util.Expect(template, msg.Arguments)
+// 	if err != nil {
+// 		s.sendError(err, msg)
+// 	} else {
+// 		filename := args[0]
+// 		LoadBatchFile(filename)
+// 	}
+// }
 

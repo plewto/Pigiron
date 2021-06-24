@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	globalClient PigClient
-	globalServer PigServer
+	GlobalClient PigClient
+	REPLClient PigClient
+	GlobalServer PigServer
 	empty []string
 
 	// Exit application if true.
@@ -33,28 +34,35 @@ func Init() {
 	port := int(config.GlobalParameters.OSCClientPort)
 	root := config.GlobalParameters.OSCClientRoot
 	filename := config.GlobalParameters.OSCClientFilename
-	globalClient = NewClient(host, port, root, filename)
+	GlobalClient = NewClient(host, port, root, filename)
+	GlobalClient.SetForREPL(false)
+
+	// Create repl client
+	REPLClient = NewClient("", 0, "pig", "")
+	REPLClient.SetForREPL(true)
+	
 	// Create global OSC server
 	host = config.GlobalParameters.OSCServerHost
 	port = int(config.GlobalParameters.OSCServerPort)
 	root = config.GlobalParameters.OSCServerRoot
-	globalServer = NewServer(host, port, root)
-
-	AddOSCHandler(globalServer, "ping", remotePing)
-	AddOSCHandler(globalServer, "exit", remoteExit)
-	AddOSCHandler(globalServer, "q-midi-inputs", remoteQueryMIDIInputs)
-	AddOSCHandler(globalServer, "q-midi-outputs", remoteQueryMIDIOutputs)
+	GlobalServer = NewServer(host, port, root)
+	GlobalServer.AddClient(GlobalClient)
+	GlobalServer.AddClient(REPLClient)
 	
+	AddOSCHandler(GlobalServer, "ping", remotePing)
+	AddOSCHandler(GlobalServer, "exit", remoteExit)
+	AddOSCHandler(GlobalServer, "q-midi-inputs", remoteQueryMIDIInputs)
+	AddOSCHandler(GlobalServer, "q-midi-outputs", remoteQueryMIDIOutputs)
 }
 
 
 func Listen() {
-	globalServer.ListenAndServe()
+	GlobalServer.ListenAndServe()
 }
 
 
 func Cleanup() {
-	globalServer.Close()
+	GlobalServer.Close()
 }
 
 

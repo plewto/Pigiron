@@ -9,8 +9,10 @@ import (
 type PigServer interface {
 	Root() string
 	SetRoot(string)
-	Client() PigClient
-	SetClient(PigClient)
+	// Client() PigClient
+	// SetClient(PigClient)
+	Clients() []PigClient
+	AddClient(client PigClient)
 	AddMsgHandler(command string, handler func(msg *goosc.Message))
 	ListenAndServe()
 	IP() string
@@ -22,7 +24,7 @@ type OSCServer struct {
 	backingServer *goosc.Server
 	dispatcher *goosc.StandardDispatcher
 	root string
-	client PigClient
+	clients []PigClient
 	ip string
 	port int
 }
@@ -33,7 +35,8 @@ func NewServer(ip string, port int, root string) PigServer {
 	server.ip = ip
 	server.port = port
 	server.root = root
-	server.client = globalClient
+	//server.client = globalClient
+	server.clients = make([]PigClient, 0, 4)
 	addr := fmt.Sprintf("%s:%d", ip, port)
 	server.dispatcher = goosc.NewStandardDispatcher()
 	server.backingServer = &goosc.Server {
@@ -61,13 +64,22 @@ func (s *OSCServer) SetRoot(root string) {
 	s.root = root
 }
 
-func (s *OSCServer) Client() PigClient {
-	return s.client
+// func (s *OSCServer) Client() PigClient {
+// 	return s.client
+// }
+
+// func (s *OSCServer) SetClient(client PigClient) {
+// 	s.client = client
+// }
+
+func (s *OSCServer) Clients() []PigClient {
+	return s.clients
 }
 
-func (s *OSCServer) SetClient(client PigClient) {
-	s.client = client
+func (s *OSCServer) AddClient(client PigClient) {
+	s.clients = append(s.clients, client)
 }
+
 
 func (s *OSCServer) IP() string {
 	return s.ip
@@ -82,14 +94,32 @@ func (s *OSCServer) Close() {
 }
 
 
+// func AddOSCHandler(s PigServer, address string, handler func(*goosc.Message)([]string, error)) {
+// 	address = fmt.Sprintf("/%s/%s", s.Root(), address)
+// 	var result = func(msg *goosc.Message) {
+// 		status, err := handler(msg)
+// 		if err != nil {
+// 			s.Client().Error(address, status)
+// 		} else {
+// 			s.Client().Ack(address, status)
+// 		}
+// 	}
+// 	s.AddMsgHandler(address, result)
+// }
+
+
 func AddOSCHandler(s PigServer, address string, handler func(*goosc.Message)([]string, error)) {
 	address = fmt.Sprintf("/%s/%s", s.Root(), address)
 	var result = func(msg *goosc.Message) {
 		status, err := handler(msg)
 		if err != nil {
-			s.Client().Error(address, status)
+			for _, c := range s.Clients() {
+				c.Error(address, status)
+			}
 		} else {
-			s.Client().Ack(address, status)
+			for _, c := range s.Clients() {
+				c.Ack(address, status)
+			}
 		}
 	}
 	s.AddMsgHandler(address, result)

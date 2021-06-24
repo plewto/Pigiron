@@ -6,7 +6,6 @@ import (
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/rakyll/portmidi"
 	"github.com/plewto/pigiron/midi"
-	"github.com/plewto/pigiron/util"
 	"github.com/plewto/pigiron/config"
 )
 
@@ -19,10 +18,6 @@ var (
 	// Exit application if true.
 	// This should proabbly be replaced with a go channel message.
 	Exit bool = false
-)
-
-const (
-	XpString util.ExpectType = util.XpString
 )
 
 

@@ -20,7 +20,6 @@ import (
 	//"strings"
 	"os"
 	goosc "github.com/hypebeast/go-osc/osc"
-	"github.com/plewto/pigiron/util"
 	"github.com/plewto/pigiron/config"
 )
 
@@ -129,7 +128,7 @@ func (c *BasicClient) Ack(sourceAddress string, payload []string) {
 		for i, p := range payload {
 			fmt.Printf("\t[%2d] %s\n", i, p)
 		}
-		util.Prompt()
+		Prompt()
 	} else {
 		msg := goosc.NewMessage(address)
 		msg.Append(sourceAddress)
@@ -155,7 +154,7 @@ func (c *BasicClient) Error(sourceAddress string, payload []string) {
 			fmt.Printf("\t[%2d] %s\n", i, p)
 		}
 		fmt.Print(config.GlobalParameters.TextColor)
-		util.Prompt()
+		Prompt()
 	} else {
 		msg := goosc.NewMessage(address)
 		msg.Append(sourceAddress)

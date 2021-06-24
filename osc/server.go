@@ -94,20 +94,6 @@ func (s *OSCServer) Close() {
 }
 
 
-// func AddOSCHandler(s PigServer, address string, handler func(*goosc.Message)([]string, error)) {
-// 	address = fmt.Sprintf("/%s/%s", s.Root(), address)
-// 	var result = func(msg *goosc.Message) {
-// 		status, err := handler(msg)
-// 		if err != nil {
-// 			s.Client().Error(address, status)
-// 		} else {
-// 			s.Client().Ack(address, status)
-// 		}
-// 	}
-// 	s.AddMsgHandler(address, result)
-// }
-
-
 func AddOSCHandler(s PigServer, address string, handler func(*goosc.Message)([]string, error)) {
 	address = fmt.Sprintf("/%s/%s", s.Root(), address)
 	var result = func(msg *goosc.Message) {

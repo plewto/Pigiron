@@ -2,7 +2,7 @@ package osc
 
 import (
 	"fmt"
-
+	"errors" 
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/rakyll/portmidi"
 	"github.com/plewto/pigiron/midi"
@@ -48,6 +48,7 @@ func Init() {
 	AddOSCHandler(GlobalServer, "exit", remoteExit)
 	AddOSCHandler(GlobalServer, "q-midi-inputs", remoteQueryMIDIInputs)
 	AddOSCHandler(GlobalServer, "q-midi-outputs", remoteQueryMIDIOutputs)
+	AddOSCHandler(GlobalServer, "error", remoteError)
 }
 
 
@@ -91,7 +92,6 @@ func remoteQueryMIDIInputs(msg *goosc.Message)([]string, error) {
 	fmt.Println("MIDI Input devices:")
 	for i, id := range ids {
 		info := portmidi.Info(id)
-		fmt.Printf("\t%s\n", info.Name)
 		acc[i] = fmt.Sprintf("\"%s\" ", info.Name)
 	}
 	return acc, err
@@ -108,8 +108,15 @@ func remoteQueryMIDIOutputs(msg *goosc.Message)([] string, error) {
 	fmt.Println("MIDI Output devices:")
 	for i, id := range ids {
 		info := portmidi.Info(id)
-		fmt.Printf("\t%s\n", info.Name)
 		acc[i] = fmt.Sprintf("\"%s\" ", info.Name)
 	}
 	return acc, err
+}
+
+
+func remoteError(msg *goosc.Message)([] string, error) {
+	var err error
+	err = errors.New("This is an error")
+	tx := StringSlice("Alpha", "Bete", "Gamma")
+	return tx, err
 }

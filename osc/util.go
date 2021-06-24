@@ -17,5 +17,5 @@ func StringSlice(values ...interface{}) []string {
 
 func Prompt() {
 	root := config.GlobalParameters.OSCServerRoot
-	fmt.Printf("\n/%s/ ", root)
+	fmt.Printf("\n/%s: ", root)
 }

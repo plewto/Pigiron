@@ -123,12 +123,10 @@ func (c *BasicClient) Send(msg *goosc.Message) {
 func (c *BasicClient) Ack(sourceAddress string, payload []string) {
 	address := fmt.Sprintf("/%s/ACK", c.root)
 	if c.ForREPL() {
-		fmt.Print(config.GlobalParameters.TextColor)
 		fmt.Printf("------------------------ ACK %s\n", address)
 		for i, p := range payload {
 			fmt.Printf("\t[%2d] %s\n", i, p)
 		}
-		Prompt()
 	} else {
 		msg := goosc.NewMessage(address)
 		msg.Append(sourceAddress)
@@ -153,8 +151,6 @@ func (c *BasicClient) Error(sourceAddress string, payload []string) {
 		for i, p := range payload {
 			fmt.Printf("\t[%2d] %s\n", i, p)
 		}
-		fmt.Print(config.GlobalParameters.TextColor)
-		Prompt()
 	} else {
 		msg := goosc.NewMessage(address)
 		msg.Append(sourceAddress)

@@ -17,9 +17,11 @@ package osc
 
 import (
 	"fmt"
-	"strings"
+	//"strings"
 	"os"
 	goosc "github.com/hypebeast/go-osc/osc"
+	"github.com/plewto/pigiron/util"
+	"github.com/plewto/pigiron/config"
 )
 
 
@@ -30,6 +32,8 @@ type PigClient interface {
 	Ack(address string, data []string)
 	Error(address string, data []string)
 	Info() string
+	ForREPL() bool
+	SetForREPL(flag bool)
 }
 
 
@@ -45,8 +49,7 @@ type BasicClient struct {
 	backing *goosc.Client
 	root string
 	filename string
-	verbose bool
-	
+	forREPL bool
 }
 
 // NewClient creates a new instance of PigClient.
@@ -76,19 +79,14 @@ func (c *BasicClient) Port() int {
 	return c.backing.Port()
 }
 	
-
-// echo prints each transmitted OSC message to the terminal.
-// Does nothing if verbose is false.
-//
-func (c *BasicClient) echo(address string, payload string) {
-	if c.verbose {
-		fmt.Printf("\nResponse to : %s\n", address)
-		for _, s := range strings.Split(payload, "\n") {
-			fmt.Printf("            : %s\n", s)
-		}
-		fmt.Print("PIG: ")
-	}
+func (c *BasicClient) ForREPL() bool {
+	return c.forREPL
 }
+
+func (c *BasicClient) SetForREPL(flag bool) {
+	c.forREPL = flag
+}
+
 
 
 // writeResponseFile creates a file for the most recently transmitted message.
@@ -96,6 +94,9 @@ func (c *BasicClient) echo(address string, payload string) {
 // silently ignored.
 //
 func (c *BasicClient) writeResponseFile(address string, payload string) {
+	if c.ForREPL() {
+		return
+	}
 	if len(c.filename) > 0 {
 		file, err := os.Create(c.filename)
 		if err == nil {
@@ -108,7 +109,9 @@ func (c *BasicClient) writeResponseFile(address string, payload string) {
 
 
 func (c *BasicClient) Send(msg *goosc.Message) {
-	c.backing.Send(msg)
+	if !c.ForREPL() {
+		c.backing.Send(msg)
+	}
 }
 
 // Ack transmits an 'Acknowledgment' message.
@@ -120,16 +123,24 @@ func (c *BasicClient) Send(msg *goosc.Message) {
 //
 func (c *BasicClient) Ack(sourceAddress string, payload []string) {
 	address := fmt.Sprintf("/%s/ACK", c.root)
-	msg := goosc.NewMessage(address)
-	msg.Append(sourceAddress)
-	acc := fmt.Sprintf("ACK\n%s\n", sourceAddress)
-	for _, s := range payload {
-		msg.Append(s)
-		acc += fmt.Sprintf("%s\n", s)
+	if c.ForREPL() {
+		fmt.Print(config.GlobalParameters.TextColor)
+		fmt.Printf("------------------------ ACK %s\n", address)
+		for i, p := range payload {
+			fmt.Printf("\t[%2d] %s\n", i, p)
+		}
+		util.Prompt()
+	} else {
+		msg := goosc.NewMessage(address)
+		msg.Append(sourceAddress)
+		acc := fmt.Sprintf("ACK\n%s\n", sourceAddress)
+		for _, s := range payload {
+			msg.Append(s)
+			acc += fmt.Sprintf("%s\n", s)
+		}
+		c.backing.Send(msg)
+		c.writeResponseFile(address, acc)
 	}
-	c.backing.Send(msg)
-	c.writeResponseFile(address, acc)
-	c.echo(address, acc)
 }
 
 // Error transmits an 'Error' message.
@@ -137,16 +148,25 @@ func (c *BasicClient) Ack(sourceAddress string, payload []string) {
 //
 func (c *BasicClient) Error(sourceAddress string, payload []string) {
 	address := fmt.Sprintf("/%s/ERROR", c.root)
-	msg := goosc.NewMessage(address)
-	msg.Append(sourceAddress)
-	acc := fmt.Sprintf("ERROR\n%s\n", sourceAddress)
-	for _, s := range payload {
-		msg.Append(s)
-		acc += fmt.Sprintf("%s\n", s)
+	if c.ForREPL() {
+		fmt.Print(config.GlobalParameters.ErrorColor)
+		fmt.Printf("------------------------ ERROR %s\n", address)
+		for i, p := range payload {
+			fmt.Printf("\t[%2d] %s\n", i, p)
+		}
+		fmt.Print(config.GlobalParameters.TextColor)
+		util.Prompt()
+	} else {
+		msg := goosc.NewMessage(address)
+		msg.Append(sourceAddress)
+		acc := fmt.Sprintf("ERROR\n%s\n", sourceAddress)
+		for _, s := range payload {
+			msg.Append(s)
+			acc += fmt.Sprintf("%s\n", s)
+		}
+		c.backing.Send(msg)
+		c.writeResponseFile(address, acc)
 	}
-	c.backing.Send(msg)
-	c.writeResponseFile(address, acc)
-	c.echo(address, acc)
 }
 
 
@@ -154,7 +174,7 @@ func (c *BasicClient) Info() string {
 	acc := "BasicClient\n"
 	acc += fmt.Sprintf("\troot     : \"%s\"\n", c.root)
 	acc += fmt.Sprintf("\tfilename : \"%s\"\n", c.filename)
-	acc += fmt.Sprintf("\tverbose  : %v\n", c.verbose)
+	// acc += fmt.Sprintf("\tverbose  : %v\n", c.verbose)
 	return acc
 }
 	

@@ -16,6 +16,7 @@ func main() {
 	fmt.Println("Welcome to Pigiron")
 	config.DumpGlobalParameters()
 	osc.Init()
+	op.Init()
 	osc.Listen()
 	if config.BatchFilename != "" {  
 		// osc.LoadBatchFile(config.BatchFilename) // BUG 003 -- do not use --

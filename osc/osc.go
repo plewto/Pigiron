@@ -47,6 +47,7 @@ func Init() {
 	AddOSCHandler(GlobalServer, "q-midi-inputs", remoteQueryMIDIInputs)
 	AddOSCHandler(GlobalServer, "q-midi-outputs", remoteQueryMIDIOutputs)
 	AddOSCHandler(GlobalServer, "batch", remoteBatchLoad)
+	AddOSCHandler(GlobalServer, "q-commands", remoteQueryCommands)
 }
 
 
@@ -98,7 +99,7 @@ func remoteQueryMIDIInputs(msg *goosc.Message)([]string, error) {
 // osc /pig/q-midi-outputs
 // -> ACK list of MIDI output devices
 //
-func remoteQueryMIDIOutputs(msg *goosc.Message)([] string, error) {
+func remoteQueryMIDIOutputs(msg *goosc.Message)([]string, error) {
 	var err error
 	ids := midi.OutputIDs()
 	acc := make([]string, len(ids))
@@ -112,7 +113,7 @@ func remoteQueryMIDIOutputs(msg *goosc.Message)([] string, error) {
 // osc /pig/batch filename
 // 
 //
-func remoteBatchLoad(msg *goosc.Message)([] string, error) {
+func remoteBatchLoad(msg *goosc.Message)([]string, error) {
 	template := []ExpectType{XpString}
 	args, err := Expect(template, msg.Arguments)
 	if err != nil {
@@ -125,4 +126,10 @@ func remoteBatchLoad(msg *goosc.Message)([] string, error) {
 	filename := fmt.Sprintf("%s", args[0])
 	err = BatchLoad(filename)
 	return empty, err
+}
+
+
+func remoteQueryCommands(msg *goosc.Message)([]string, error) {
+	var err error
+	return GlobalServer.Commands(), err
 }

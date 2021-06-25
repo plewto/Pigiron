@@ -2,7 +2,6 @@ package osc
 
 import (
 	"fmt"
-	"errors" 
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/rakyll/portmidi"
 	"github.com/plewto/pigiron/midi"
@@ -16,7 +15,6 @@ var (
 	empty []string
 
 	// Exit application if true.
-	// This should proabbly be replaced with a go channel message.
 	Exit bool = false
 )
 
@@ -48,7 +46,7 @@ func Init() {
 	AddOSCHandler(GlobalServer, "exit", remoteExit)
 	AddOSCHandler(GlobalServer, "q-midi-inputs", remoteQueryMIDIInputs)
 	AddOSCHandler(GlobalServer, "q-midi-outputs", remoteQueryMIDIOutputs)
-	AddOSCHandler(GlobalServer, "error", remoteError)
+	AddOSCHandler(GlobalServer, "batch", remoteBatchLoad)
 }
 
 
@@ -89,7 +87,6 @@ func remoteQueryMIDIInputs(msg *goosc.Message)([]string, error) {
 	var err error
 	ids := midi.InputIDs()
 	acc := make([]string, len(ids))
-	fmt.Println("MIDI Input devices:")
 	for i, id := range ids {
 		info := portmidi.Info(id)
 		acc[i] = fmt.Sprintf("\"%s\" ", info.Name)
@@ -105,7 +102,6 @@ func remoteQueryMIDIOutputs(msg *goosc.Message)([] string, error) {
 	var err error
 	ids := midi.OutputIDs()
 	acc := make([]string, len(ids))
-	fmt.Println("MIDI Output devices:")
 	for i, id := range ids {
 		info := portmidi.Info(id)
 		acc[i] = fmt.Sprintf("\"%s\" ", info.Name)
@@ -113,10 +109,20 @@ func remoteQueryMIDIOutputs(msg *goosc.Message)([] string, error) {
 	return acc, err
 }
 
-
-func remoteError(msg *goosc.Message)([] string, error) {
-	var err error
-	err = errors.New("This is an error")
-	tx := StringSlice("Alpha", "Bete", "Gamma")
-	return tx, err
+// osc /pig/batch filename
+// 
+//
+func remoteBatchLoad(msg *goosc.Message)([] string, error) {
+	template := []ExpectType{XpString}
+	args, err := Expect(template, msg.Arguments)
+	if err != nil {
+		fmt.Print(config.GlobalParameters.ErrorColor)
+		fmt.Printf("ERROR: %s\n", msg.Address)
+		fmt.Printf("ERROR: %s\n", err)
+		fmt.Print(config.GlobalParameters.TextColor)
+		return empty, err
+	}
+	filename := fmt.Sprintf("%s", args[0])
+	err = BatchLoad(filename)
+	return empty, err
 }

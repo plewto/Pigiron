@@ -2,6 +2,8 @@ package osc
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"github.com/plewto/pigiron/config"
 )
 
@@ -13,6 +15,17 @@ func StringSlice(values ...interface{}) []string {
 	}
 	return acc
 }
+
+
+func SubUserHome(filename string) string {
+	if len(filename) > 0 && filename[0] == byte('~') {
+		home, _ := os.UserHomeDir()
+		filename = filepath.Join(home, filename[1:])
+	}
+	return filename
+}
+		
+		
 
 
 func Prompt() {

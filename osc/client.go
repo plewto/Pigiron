@@ -122,7 +122,7 @@ func (c *BasicClient) Send(msg *goosc.Message) {
 //
 func (c *BasicClient) Ack(sourceAddress string, payload []string) {
 	address := fmt.Sprintf("/%s/ACK", c.root)
-	if c.ForREPL() {
+	if c.ForREPL() && !inBatchMode {
 		fmt.Printf("------------------------ ACK %s\n", address)
 		for i, p := range payload {
 			fmt.Printf("\t[%2d] %s\n", i, p)
@@ -162,6 +162,7 @@ func (c *BasicClient) Error(sourceAddress string, payload []string) {
 		c.backing.Send(msg)
 		c.writeResponseFile(address, acc)
 	}
+	batchError = true
 }
 
 

@@ -45,21 +45,28 @@ func Read() string {
 }
 
 
-func split(s string) (string, []string) {
-	var command string = ""
-	var args []string = make([]string, 0)
-	words := strings.Split(s, ",")
-	if len(words) > 0 {
-		command = strings.TrimSpace(words[0])
-		if len(words) > 1 {
-			for _, w := range words[1:] {
-				args = append(args, strings.TrimSpace(w))
-			}
-		}
+// splits command from arguments  
+func splitCommand(s string)(string, string) {
+	s = strings.TrimSpace(s)
+	pos := strings.Index(s, " ")
+	if pos < 0 {
+		return s, ""
 	}
+	command, args := s[:pos], strings.TrimSpace(s[pos:])
 	return command, args
 }
 	
+
+func parse(s string)(string, []string) {
+	command, rawArgs := splitCommand(s)
+	acc := make([]string, 0, len(rawArgs))
+	for _, a := range strings.Split(rawArgs, ",") {
+		acc = append(acc, strings.TrimSpace(a))
+	}
+	return command, acc
+}
+
+
 func Eval(command string, args []string) {
 	switch command {
 	case "":  // ignore blank lines
@@ -103,7 +110,7 @@ func BatchLoad(filename string) error {
 	lines := strings.Split(string(raw), "\n")
 	for i, line := range lines {
 		fmt.Printf("Batch [%3d]  %s\n", i+1, line)
-		command, args := split(line)
+		command, args := parse(line)
 		Eval(command, args)
 		sleep(10)
 		if batchError {
@@ -114,15 +121,13 @@ func BatchLoad(filename string) error {
 	return err
 }
 		
-		
-	
 
 func REPL() {
 	for {
 		fmt.Print(config.GlobalParameters.TextColor)
 		Prompt()
 		raw := Read()
-		command, args := split(raw)
+		command, args := parse(raw)
 		Eval(command, args)
 		time.Sleep(10 * time.Millisecond)
 	}

@@ -29,7 +29,7 @@ import (
 type PigClient interface {
 	Send(*goosc.Message)
 	Ack(address string, data []string)
-	Error(address string, data []string)
+	Error(address string, data []string, err error)
 	Info() string
 	ForREPL() bool
 	SetForREPL(flag bool)
@@ -143,11 +143,12 @@ func (c *BasicClient) Ack(sourceAddress string, payload []string) {
 // Error transmits an 'Error' message.
 // With exception of the OSC message address, Error is identical to Ack.
 //
-func (c *BasicClient) Error(sourceAddress string, payload []string) {
+func (c *BasicClient) Error(sourceAddress string, payload []string, err error) {
 	address := fmt.Sprintf("/%s/ERROR", c.root)
 	if c.ForREPL() {
 		fmt.Print(config.GlobalParameters.ErrorColor)
 		fmt.Printf("------------------------ ERROR %s\n", address)
+		fmt.Printf("\t%s\n", err)
 		for i, p := range payload {
 			fmt.Printf("\t[%2d] %s\n", i, p)
 		}
@@ -155,6 +156,7 @@ func (c *BasicClient) Error(sourceAddress string, payload []string) {
 		msg := goosc.NewMessage(address)
 		msg.Append(sourceAddress)
 		acc := fmt.Sprintf("ERROR\n%s\n", sourceAddress)
+		msg.Append(fmt.Sprintf("%s", err))
 		for _, s := range payload {
 			msg.Append(s)
 			acc += fmt.Sprintf("%s\n", s)

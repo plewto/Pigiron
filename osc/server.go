@@ -101,7 +101,7 @@ func AddOSCHandler(s PigServer, command string, handler func(*goosc.Message)([]s
 		status, err := handler(msg)
 		if err != nil {
 			for _, c := range s.Clients() {
-				c.Error(address, status)
+				c.Error(address, status, err)
 			}
 		} else {
 			for _, c := range s.Clients() {

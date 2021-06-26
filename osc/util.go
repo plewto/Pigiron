@@ -16,6 +16,13 @@ func StringSlice(values ...interface{}) []string {
 	return acc
 }
 
+func ToStringSlice(values []interface{}) []string {
+	acc := make([]string, len(values))
+	for i, v := range values {
+		acc[i] = fmt.Sprintf("%v", v)
+	}
+	return acc
+}
 
 func SubUserHome(filename string) string {
 	if len(filename) > 0 && filename[0] == byte('~') {

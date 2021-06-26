@@ -105,6 +105,7 @@ func bar(text string) {
 }
 
 func (r *REPLResponder) Ack(sourceAddress string, args []string) {
+	batchError = false
 	if !inBatchMode {
 		setTextColor()
 		bar("OK")
@@ -127,6 +128,7 @@ func (r *REPLResponder) Error(sourceAddress string, args []string, err error) {
 	}
 	setTextColor()
 	Prompt()
+	batchError = true
 }
 
 

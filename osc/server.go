@@ -98,7 +98,7 @@ func (s *OSCServer) Close() {
 }
 
 
-func AddOSCHandler(s PigServer, command string, handler func(*goosc.Message)([]string, error)) {
+func AddHandler(s PigServer, command string, handler func(*goosc.Message)([]string, error)) {
 	address := fmt.Sprintf("/%s/%s", s.Root(), command)
 	var result = func(msg *goosc.Message) {
 		status, err := handler(msg)

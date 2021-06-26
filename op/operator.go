@@ -37,7 +37,7 @@ type Operator interface {
 	Disconnect(child Operator) Operator
 	DisconnectAll()
 	DisconnectTree()
-	Disjoin()
+	DisconnectParents()
 
 	// OSC
 	OSCAddress() string
@@ -215,6 +215,7 @@ func (op *baseOperator) IsChildOf(parent Operator) bool {
 }
 
 
+// TODO: Validate
 func (op *baseOperator) circularTreeTest(depth int) bool {
 	if depth > int(config.GlobalParameters.MaxTreeDepth) {
 		return true
@@ -263,7 +264,7 @@ func (op *baseOperator) DisconnectTree() {
 	}
 }
 	
-func (op *baseOperator) Disjoin() {
+func (op *baseOperator) DisconnectParents() {
 	for _, parent := range op.Parents() {
 		parent.Disconnect(op)
 	}

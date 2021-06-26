@@ -117,6 +117,7 @@ func BatchLoad(filename string) error {
 			break
 		}
 	}
+	batchError = false
 	inBatchMode = false
 	return err
 }

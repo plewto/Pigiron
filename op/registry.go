@@ -1,6 +1,7 @@
 package op
 
 import (
+	"time"
 	"fmt"
 	"strings"
 	"errors"
@@ -125,25 +126,42 @@ func NewOperator(opType string, name string) (Operator, error) {
 	return op, err
 }
 
-// DeleteOperator() removes the named operator from the registry.
-// It is not an error if the operator does not exists.
+// DeleteOperator() Deletes named operator.
+// Returns error if operator does not exists.
 //
-func DeleteOperator(name string) {
+func DeleteOperator(name string) error {
+	var err error
+	var op Operator
+	op, err = GetOperator(name) 
+	if err != nil {
+		return err
+	}
+	op.Panic()
+	time.Sleep(1 * time.Millisecond)
+	op.DisconnectAll()
+	op.Close()
 	delete(registry, name)
+	return err
 }
 
 
 
-// ClearRegistry() removes all Operators from the registry.
+// ClearRegistry() Deletes all Operators.
 //
-func ClearRegistry() {  // TODO: May want to add op cleanup code?
-	for key, _ := range registry {
-		delete(registry, key)
+func ClearRegistry() {
+	for _, root := range RootOperators() {
+		root.Panic()
+	}
+	time.Sleep(10 * time.Millisecond)
+	for _, op := range Operators() {
+		op.DisconnectAll()
+		delete(registry, op.Name())
+		op.Close()
 	}
 }
 
 
-// GetOperator() returns named operator from the registry.
+// GetOperator() returns named operator.
 // An error is returned as the second value and is non nil if no such
 // operator exists.
 //

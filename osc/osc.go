@@ -35,12 +35,12 @@ func Init() {
 	port = int(config.GlobalParameters.OSCServerPort)
 	root = config.GlobalParameters.OSCServerRoot
 	GlobalServer = NewServer(host, port, root)
-	AddOSCHandler(GlobalServer, "ping", remotePing)
-	AddOSCHandler(GlobalServer, "exit", remoteExit)
-	AddOSCHandler(GlobalServer, "q-midi-inputs", remoteQueryMIDIInputs)
-	AddOSCHandler(GlobalServer, "q-midi-outputs", remoteQueryMIDIOutputs)
-	AddOSCHandler(GlobalServer, "batch", remoteBatchLoad)
-	AddOSCHandler(GlobalServer, "q-commands", remoteQueryCommands)
+	AddHandler(GlobalServer, "ping", remotePing)
+	AddHandler(GlobalServer, "exit", remoteExit)
+	AddHandler(GlobalServer, "q-midi-inputs", remoteQueryMIDIInputs)
+	AddHandler(GlobalServer, "q-midi-outputs", remoteQueryMIDIOutputs)
+	AddHandler(GlobalServer, "batch", remoteBatchLoad)
+	AddHandler(GlobalServer, "q-commands", remoteQueryCommands)
 }
 
 

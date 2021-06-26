@@ -19,9 +19,6 @@ type globalParameters struct {
 	OSCClientHost string
 	OSCClientPort int64
 	OSCClientFilename string
-	REPLRoot string
-	REPLHost string
-	REPLPort int64
 	MaxTreeDepth int64
 	MIDIInputBufferSize int64
 	MIDIInputPollInterval int64 // ms
@@ -41,9 +38,6 @@ func ResetGlobalParameters() {
 	GlobalParameters.OSCClientHost = "127.0.0.1"
 	GlobalParameters.OSCClientPort = 8021
 	GlobalParameters.OSCClientFilename = ""
-	GlobalParameters.REPLRoot = "repl"
-	GlobalParameters.REPLHost = "127.0.0.1"
-	GlobalParameters.REPLPort = 8022
 	GlobalParameters.MaxTreeDepth = 12
 	GlobalParameters.MIDIInputBufferSize = 1024
 	GlobalParameters.MIDIInputPollInterval = 0
@@ -68,9 +62,6 @@ func DumpGlobalParameters() {
 	fmt.Printf("\tOSCClientHost         : %v\n", GlobalParameters.OSCClientHost)
 	fmt.Printf("\tOSCClientPort         : %v\n", GlobalParameters.OSCClientPort)
 	fmt.Printf("\tOSCClientFilename     : %v\n", GlobalParameters.OSCClientFilename)
-	fmt.Printf("\tREPLRoot              : %v\n", GlobalParameters.REPLRoot)
-	fmt.Printf("\tREPLHost              : %v\n", GlobalParameters.REPLHost)
-	fmt.Printf("\tREPLPort              : %v\n", GlobalParameters.REPLPort)
 	fmt.Printf("\tMaxTreeDepth          : %v\n", GlobalParameters.MaxTreeDepth)
 	fmt.Printf("\tMIDIInputBufferSize   : %v\n", GlobalParameters.MIDIInputBufferSize)
 	fmt.Printf("\tMIDIInputPollInterval : %v\n", GlobalParameters.MIDIInputPollInterval)

@@ -152,10 +152,6 @@ func readConfigurationFile(filename string) {
 		GlobalParameters.OSCClientHost = readString("osc-client.host", "127.0.0.1")
 		GlobalParameters.OSCClientPort = readInt("osc-client.port", 8021)
 		GlobalParameters.OSCClientFilename = readString("osc-client.file", "")
-		GlobalParameters.REPLRoot = readString("repl-server.root", "repl")
-		GlobalParameters.REPLHost = readString("repl-server.host", "127.0.0.1")
-		GlobalParameters.REPLPort = readInt("repl-server.port", 8022)
-		
 		GlobalParameters.MaxTreeDepth = readInt("tree.max-depth", 12)
 		GlobalParameters.MIDIInputBufferSize = readInt("midi-input.buffer-size", 1024)
 		GlobalParameters.MIDIInputPollInterval = readInt("midi-input.poll-interval", 0)

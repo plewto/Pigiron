@@ -49,7 +49,8 @@ func (r *BasicResponder) Ack(sourceAddress string, args []string) {
 	acc := fmt.Sprintf("ACK\n%s\n", sourceAddress)
 	msg := goosc.NewMessage(address)
 	msg.Append(sourceAddress)
-	for _, s := range args {
+	for _, a := range args {
+		s := fmt.Sprintf("%s", a)
 		msg.Append(s)
 		acc += fmt.Sprintf("%s\n", s)
 	}
@@ -64,7 +65,8 @@ func (r *BasicResponder) Error(sourceAddress string, args []string, err error) {
 	msg.Append(sourceAddress)
 	msg.Append(fmt.Sprintf("%s\n", err))
 	acc += fmt.Sprintf("%s\n", err)
-	for _, s := range args {
+	for _, a := range args {
+		s := fmt.Sprintf("%s", a)
 		msg.Append(s)
 		acc += fmt.Sprintf("%s\n", s)
 	}

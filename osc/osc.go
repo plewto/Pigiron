@@ -9,8 +9,6 @@ import (
 )
 
 var (
-	GlobalClient PigClient  // DEPRECIATED
-	REPLClient PigClient    // DEPRECIATED
 	globalResponder Responder
 	replResponder Responder
 	GlobalServer PigServer
@@ -24,26 +22,19 @@ var (
 // Must execute after config init()
 //
 func Init() {
-	// Create global OSC client
+	// Create global responders
 	host := config.GlobalParameters.OSCClientHost
 	port := int(config.GlobalParameters.OSCClientPort)
 	root := config.GlobalParameters.OSCClientRoot
 	filename := config.GlobalParameters.OSCClientFilename
-	GlobalClient = NewClient(host, port, root, filename)  // DEPRECIATED
-	GlobalClient.SetForREPL(false)  // DEPRECIATED
-
-	// Create repl client
-	REPLClient = NewClient("", 0, "pig", "") // DEPRECIATED
-	REPLClient.SetForREPL(true)  // DEPRECIATED
+	globalResponder = NewBasicResponder(host, port, root, filename)
+	replResponder = NewREPLResponder()
 	
 	// Create global OSC server
 	host = config.GlobalParameters.OSCServerHost
 	port = int(config.GlobalParameters.OSCServerPort)
 	root = config.GlobalParameters.OSCServerRoot
 	GlobalServer = NewServer(host, port, root)
-	GlobalServer.AddClient(GlobalClient)
-	GlobalServer.AddClient(REPLClient)
-	
 	AddOSCHandler(GlobalServer, "ping", remotePing)
 	AddOSCHandler(GlobalServer, "exit", remoteExit)
 	AddOSCHandler(GlobalServer, "q-midi-inputs", remoteQueryMIDIInputs)

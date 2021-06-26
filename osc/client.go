@@ -1,5 +1,8 @@
 package osc
 
+
+
+
 // PigClient provides for OSC return messages.
 // There are 2 possible response messages:
 //     1) ACK (Acknowledge)
@@ -24,6 +27,7 @@ import (
 )
 
 
+// **DEPRECIATED**
 // PigClient interface defines OSC server return messages.
 //
 type PigClient interface {

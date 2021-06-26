@@ -9,8 +9,10 @@ import (
 )
 
 var (
-	GlobalClient PigClient
-	REPLClient PigClient
+	GlobalClient PigClient  // DEPRECIATED
+	REPLClient PigClient    // DEPRECIATED
+	globalResponder Responder
+	replResponder Responder
 	GlobalServer PigServer
 	empty []string
 
@@ -27,12 +29,12 @@ func Init() {
 	port := int(config.GlobalParameters.OSCClientPort)
 	root := config.GlobalParameters.OSCClientRoot
 	filename := config.GlobalParameters.OSCClientFilename
-	GlobalClient = NewClient(host, port, root, filename)
-	GlobalClient.SetForREPL(false)
+	GlobalClient = NewClient(host, port, root, filename)  // DEPRECIATED
+	GlobalClient.SetForREPL(false)  // DEPRECIATED
 
 	// Create repl client
-	REPLClient = NewClient("", 0, "pig", "")
-	REPLClient.SetForREPL(true)
+	REPLClient = NewClient("", 0, "pig", "") // DEPRECIATED
+	REPLClient.SetForREPL(true)  // DEPRECIATED
 	
 	// Create global OSC server
 	host = config.GlobalParameters.OSCServerHost

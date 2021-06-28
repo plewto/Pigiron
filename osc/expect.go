@@ -5,12 +5,46 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
+	goosc "github.com/hypebeast/go-osc/osc"
 )
+
+
+var boolValues = map[string]string{
+	"false" : "false",
+	"0" : "false",
+	"f" : "false",
+	"off" : "false",
+	"no" : "false",
+	"n"  : "false",
+	"disable" : "false",
+	"true" : "true",
+	"1" : "true",
+	"t" : "true",
+	"on" : "true",
+	"yes" : "true",
+	"y" : "true",
+	"enable" : "true"}
+	
+func parseBool(s string)(string, error) {
+	var err error
+	v, flag := boolValues[strings.ToLower(s)]
+	if !flag {
+		msg := "Expected boolean, got %s"
+		err = errors.New(fmt.Sprintf(msg, s))
+		return "false", err
+	} else {
+		return v, err
+	}
+}
 
 
 // template s -> string
 //          i -> int
 //          f -> float
+//          b -> bool
+//          c -> midi channel (1..16)
+//          * -> any   (convert to string)
 //
 func Expect(template string, arguments []string)([]string, error) {
 	var err error
@@ -33,21 +67,43 @@ func Expect(template string, arguments []string)([]string, error) {
 		case 's':
 			acc[i] = arg
 		case 'i':
-			_, err2 := strconv.Atoi(arg)
-			if err2 != nil {
+			_, err := strconv.Atoi(arg)
+			if err != nil {
 				msg := "Expected int at index %d, got %s"
 				err = errors.New(fmt.Sprintf(msg, i, arg))
 				return empty, err
 			}
 			acc[i] = arg
 		case 'f':
-			_, err2 := strconv.ParseFloat(arg, 64)
-			if err2 != nil {
+			_, err := strconv.ParseFloat(arg, 64)
+			if err != nil {
 				msg := "Expecrted float at index %d, got %s"
 				err = errors.New(fmt.Sprintf(msg, i, arg))
 				return empty, err
 			}
 			acc[i] = arg
+		case 'b':
+			v, err := parseBool(arg)
+			if err != nil {
+				return empty, err
+			}
+			acc[i] = v
+		case 'c':
+			v, err := strconv.Atoi(arg)
+			if err != nil {
+				msg := "Expected MIDI channel at index %d, got %s"
+				err = errors.New(fmt.Sprintf(msg, i, arg))
+				return empty, err
+			}
+			if v < 1 || 16 < v {
+				msg := "Expected MIDI channel at index %d, got %s"
+				err = errors.New(fmt.Sprintf(msg, i, arg))
+				return empty, err
+			}
+			acc[i] = arg
+					
+		case '*':
+			acc[i] = fmt.Sprintf("%v", arg)
 		default:
 			acc[i] = arg
 		}
@@ -55,7 +111,12 @@ func Expect(template string, arguments []string)([]string, error) {
 	return acc, err
 }
 		
-	
+
+func ExpectMsg(template string, msg *goosc.Message)([]string, error) {
+	return Expect(template, ToStringSlice(msg.Arguments))
+}
+
+
 
 func ExpectLength(address string, args []string, index int) bool {
 	if index < len(args) {

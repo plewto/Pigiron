@@ -37,10 +37,10 @@ func initOperator(op *baseOperator, opType string, name string, mode midi.Channe
 	op.dispatchTable = make(map[string]func(args []string)([]string, error))
 	op.addCommandHandler("ping", op.remotePing)
 	op.addCommandHandler("q-commands", op.remoteQueryCommands)
-	op.addCommandHandler("q-is-root", op.remoteQueryIsRoot)
-	op.addCommandHandler("q-children", op.remoteQueryChildren)
-	op.addCommandHandler("q-parents", op.remoteQueryParents)
-	op.addCommandHandler("reset", op.remoteReset)
+	//op.addCommandHandler("q-is-root", op.remoteQueryIsRoot)
+	//op.addCommandHandler("q-children", op.remoteQueryChildren)
+	//op.addCommandHandler("q-parents", op.remoteQueryParents)
+	//op.addCommandHandler("reset", op.remoteReset)
 }
 
 func (op *baseOperator) OperatorType() string {
@@ -336,53 +336,53 @@ func (op *baseOperator) remoteQueryCommands(args []string)([]string, error) {
 	return op.Commands(), err
 }
 
-// osc /pig/op name, q-is-root
-// -> bool
-//
-func (op *baseOperator) remoteQueryIsRoot(args []string)([]string, error) {
-	var err error
-	acc := make([]string, 1, 1)
-	acc[0] = fmt.Sprintf("%v", op.IsRoot())
-	return acc, err
-}
+// // osc /pig/op name, q-is-root
+// // -> bool
+// //
+// func (op *baseOperator) remoteQueryIsRoot(args []string)([]string, error) {
+// 	var err error
+// 	acc := make([]string, 1, 1)
+// 	acc[0] = fmt.Sprintf("%v", op.IsRoot())
+// 	return acc, err
+// }
 
-// osc /pig/op name, q-children
-// -> list
-//
-func (op *baseOperator) remoteQueryChildren(args []string)([]string, error) {
-	var err error
-	clist := op.children()
-	acc := make([]string, len(clist))
-	i := 0
-	for name, _ := range clist {
-		acc[i] = name
-		i++
-	}
-	return acc, err
-}
+// // osc /pig/op name, q-children
+// // -> list
+// //
+// func (op *baseOperator) remoteQueryChildren(args []string)([]string, error) {
+// 	var err error
+// 	clist := op.children()
+// 	acc := make([]string, len(clist))
+// 	i := 0
+// 	for name, _ := range clist {
+// 		acc[i] = name
+// 		i++
+// 	}
+// 	return acc, err
+// }
 
-// osc /pig/op name, q-parents
-// -> list
-//
-func (op *baseOperator) remoteQueryParents(args []string)([]string, error) {
-	var err error
-	clist := op.parents()
-	acc := make([]string, len(clist))
-	i := 0
-	for name, _ := range clist {
-		acc[i] = name
-		i++
-	}
-	return acc, err
-}
+// // osc /pig/op name, q-parents
+// // -> list
+// //
+// func (op *baseOperator) remoteQueryParents(args []string)([]string, error) {
+// 	var err error
+// 	clist := op.parents()
+// 	acc := make([]string, len(clist))
+// 	i := 0
+// 	for name, _ := range clist {
+// 		acc[i] = name
+// 		i++
+// 	}
+// 	return acc, err
+// }
 
-// osc /pig/op name, reset
-// -> ACK
-//
-func (op *baseOperator) remoteReset(args []string)([]string, error) {
-	var err error
-	var acc []string
-	op.Reset()
-	return acc, err
-}
+// // osc /pig/op name, reset
+// // -> ACK
+// //
+// func (op *baseOperator) remoteReset(args []string)([]string, error) {
+// 	var err error
+// 	var acc []string
+// 	op.Reset()
+// 	return acc, err
+// }
 

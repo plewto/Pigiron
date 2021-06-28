@@ -1,10 +1,12 @@
 package op
 
 import (
+	"errors"
 	"fmt"
-	//"strings"
+	"strconv"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/osc"
+	"github.com/plewto/pigiron/midi"
 )
 
 var (
@@ -16,73 +18,101 @@ var (
 func Init() {
 	fmt.Println("opserver.Init() executing -- REMOVE THIS LIEN")
 	server := osc.GlobalServer
-	osc.AddHandler(server, "new-operator", remoteNewOperator)
-	osc.AddHandler(server, "new-midi-input", remoteNewMIDIInput)
-	osc.AddHandler(server, "new-midi-output", remoteNewMIDIOutput)
+	osc.AddHandler(server, "new", remoteNewOperator)
 	osc.AddHandler(server, "delete-operator", remoteDeleteOperator)
 	osc.AddHandler(server, "delete-all-operators", remoteDeleteAllOperators)
 	osc.AddHandler(server, "connect", remoteConnect)
 	osc.AddHandler(server, "disconnect-child", remoteDisconnect)
 	osc.AddHandler(server, "disconnect-all", remoteDisconnectAll)
 	osc.AddHandler(server, "disconnect-parents", remoteDisconnectParents)
+	osc.AddHandler(server, "reset", remoteReset)
+	osc.AddHandler(server, "reset-all", remoteResetAll)
+	osc.AddHandler(server, "enable-midi", remoteEnableMIDI)
+	osc.AddHandler(server, "q-midi-enabled", remoteQueryMIDIEnabled)
+	
+	osc.AddHandler(server, "q-channel-mode", remoteQueryChannelMode)
+	osc.AddHandler(server, "q-channels", remoteQuerySelectedChannels)
+	osc.AddHandler(server, "q-channel-selected", remoteQueryChannelSelected)
+	osc.AddHandler(server, "select-channels", remoteSelectChannels)
+	osc.AddHandler(server, "deselect-channels", remoteDeselectChannels)
+	osc.AddHandler(server, "select-all-channels", remoteSelectAllChannels)
+	osc.AddHandler(server, "deselect-all-channels", remoteDeselectAllChannels)
+	osc.AddHandler(server, "invert-channels", remoteInvertChannelSelection)
+
+	
         osc.AddHandler(server, "q-operator-types", remoteQueryOperatorTypes)
 	osc.AddHandler(server, "q-operators", remoteQueryOperators)
 	osc.AddHandler(server, "q-roots", remoteQueryRoots)
+	osc.AddHandler(server, "print-graph", remotePrintGraph)
 	osc.AddHandler(server, "q-graph", remoteQueryGraph)
 	osc.AddHandler(server, "q-commands", remoteQueryCommands)
-	osc.AddHandler(server, "op", dispatchOperatorCommand)
+	osc.AddHandler(server, "q-children", remoteQueryChildren)
+	osc.AddHandler(server, "q-parents", remoteQueryParents)
+
+	
+	osc.AddHandler(server, "op", dispatchExtendedCommand)
 }
 
 
 
 // osc /pig/new optype name
+//     /pig/new MidiInput name device
+//     /pig/new MidiOutput name device
 // -> name
 // Not used for MIDIInput or MIDIOutput
 //
 func remoteNewOperator(msg *goosc.Message)([]string, error) {
-	template := "ss"
-	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
+	args, err := osc.ExpectMsg("ss", msg)
 	if err != nil {
 		return empty, err
 	}
 	otype, name := args[0], args[1]
-	op, err := NewOperator(otype, name)
-	if err != nil {
-		return empty, err
+	switch otype {
+	case "MIDIInput":
+		return remoteNewMIDIInput(args)
+	case "MIDIOutput":
+		return remoteNewMIDIOutput(args)
+	default:
+		op, err := NewOperator(otype, name)
+		if err != nil {
+			return empty, err
+		}
+		return osc.StringSlice(op.Name()), err
 	}
-	return osc.StringSlice(op.Name()), err
 }
 
-// osc /pig/new-midi-input deviceSpec name
+// args ["input", name, device]
 // -> name
 //
-func remoteNewMIDIInput(msg *goosc.Message)([]string, error) {
-	template := "ss"
-	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
+func remoteNewMIDIInput(args []string)([]string, error) {
+	// template := "ss"
+	// args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
+	args, err := osc.Expect("sss", args)
 	if err != nil {
 		return empty, err
 	}
-	device, name := args[0], args[1]
+	name, device := args[1], args[2]
 	op, err := NewMIDIInput(name, device)
 	if err != nil {
-		return osc.ToStringSlice(msg.Arguments), err
+		return args, err
 	}
 	return osc.StringSlice(op.Name()), err
 }
 
-// osc /pig/new-midi-output deviceSpec name
+// args ["output", name, device]
 // -> name
 //
-func remoteNewMIDIOutput(msg *goosc.Message)([]string, error) {
-	template := "ss"
-	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
+func remoteNewMIDIOutput(args []string)([]string, error) {
+	//template := "ss"
+	//args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
+	args, err := osc.Expect("sss", args)
 	if err != nil {
 		return empty, err
 	}
-	device, name := args[0], args[1]
+	name, device := args[1], args[2]
 	op, err := NewMIDIOutput(name, device)
 	if err != nil {
-		return osc.ToStringSlice(msg.Arguments), err
+		return args, err
 	}
 	return osc.StringSlice(op.Name()), err
 }
@@ -93,8 +123,7 @@ func remoteNewMIDIOutput(msg *goosc.Message)([]string, error) {
 //
 func remoteDeleteOperator(msg *goosc.Message)([]string, error) {
 	var err error
-	template := "s"
-	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
+	args, err := osc.ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -106,6 +135,257 @@ func remoteDeleteOperator(msg *goosc.Message)([]string, error) {
 	DeleteOperator(name)
 	return empty, err
 }
+
+
+// osc /pig/reset name
+// -> ACK
+//
+func remoteReset (msg *goosc.Message)([]string, error) {
+	args, err := osc.ExpectMsg("s", msg)
+	if err != nil {
+		return empty, err
+	}
+	op, err := GetOperator(args[0])
+	if err != nil {
+		return empty, err
+	}
+	op.Reset()
+	return empty, err
+}
+
+// osc /pig/reset-all
+// -> ACK
+//
+func remoteResetAll(msg *goosc.Message)([]string, error) {
+	var err error
+	for _, op := range Operators() {
+		op.Reset()
+	}
+	return empty, err
+}
+
+
+// osc /pig/enable-midi name bool
+// -> bool
+//
+func remoteEnableMIDI(msg *goosc.Message)([]string, error) {
+	args, err := osc.ExpectMsg("sb", msg)
+	if err != nil {
+		return empty, err
+	}
+	name := args[0]
+	flag, _ := strconv.ParseBool(args[1])
+	op, err := GetOperator(name)
+	if err != nil {
+		return empty, err
+	}
+	op.SetMIDIOutputEnabled(flag)
+	rs := []string{fmt.Sprintf("%v", flag)}
+	return rs, err
+	return empty, err
+}
+
+// osc /pig/q-midi-enabled name
+// -> bool
+//
+func remoteQueryMIDIEnabled(msg *goosc.Message)([]string, error) {
+	args, err := osc.ExpectMsg("s", msg)
+	if err != nil {
+		return empty, err
+	}
+	op, err := GetOperator(args[0])
+	if err != nil {
+		return empty, err
+	}
+	acc := []string{fmt.Sprintf("%v", op.MIDIOutputEnabled())}
+	return acc, err
+}
+
+// osc /pig/q-midi-channel-mode name
+// -> mode
+//
+func remoteQueryChannelMode(msg *goosc.Message)([]string, error) {
+	args, err := osc.ExpectMsg("s", msg)
+	if err != nil {
+		return empty, err
+	}
+	op, err := GetOperator(args[0])
+	if err != nil {
+		return empty, err
+	}
+	mode := op.ChannelMode().String()
+	return []string{mode}, err
+}
+
+// osc /pig/q-channels name
+// -> list
+//
+func remoteQuerySelectedChannels(msg *goosc.Message)([]string, error) {
+	args, err := osc.ExpectMsg("s", msg)
+	if err != nil {
+		return empty, err
+	}
+	op, err := GetOperator(args[0])
+	if err != nil {
+		return empty, err
+	}
+	clist := op.SelectedChannelIndexes()
+	acc := make([]string, len(clist))
+	for i, ci := range clist {
+		acc[i] = fmt.Sprintf("%d", int(ci+1))
+	}
+	return acc, err
+}
+
+// osc /pig/select-channels name [channels ....]
+// -> list of enabled channels
+//
+func remoteSelectChannels(msg *goosc.Message)([]string, error) {
+	args, err := osc.ExpectMsg("si", msg)
+	if err != nil {
+		return empty, err
+	}
+	op, err := GetOperator(args[0])
+	if err != nil {
+		return empty, err
+	}
+	args = osc.ToStringSlice(msg.Arguments)
+	for _, s := range args[1:] {
+		n, err := strconv.Atoi(s)
+		if err != nil {
+			msg := "Expected MIDI channel, got '%v'"
+			err = errors.New(fmt.Sprintf(msg, s))
+			return empty, err
+		}
+		if n < 1 || 16 < n {
+			msg := "Expected MIDI channel, got '%v'"
+			err = errors.New(fmt.Sprintf(msg, s))
+			return empty, err
+		}
+		op.EnableChannel(midi.MIDIChannel(n), true)
+	}
+	clist := op.SelectedChannelIndexes()
+	acc := make([]string, len(clist))
+	for i, ci := range clist {
+		acc[i] = fmt.Sprintf("%d", ci+1)
+	}
+	return acc, err
+}
+
+// osc /pig/deselect-channels name [channels ....]
+// -> list of enabled channels
+//
+func remoteDeselectChannels(msg *goosc.Message)([]string, error) {
+	args, err := osc.ExpectMsg("si", msg)
+	if err != nil {
+		return empty, err
+	}
+	op, err := GetOperator(args[0])
+	if err != nil {
+		return empty, err
+	}
+	args = osc.ToStringSlice(msg.Arguments)
+	for _, s := range args[1:] {
+		n, err := strconv.Atoi(s)
+		if err != nil {
+			msg := "Expected MIDI channel, got '%v'"
+			err = errors.New(fmt.Sprintf(msg, s))
+			return empty, err
+		}
+		if n < 1 || 16 < n {
+			msg := "Expected MIDI channel, got '%v'"
+			err = errors.New(fmt.Sprintf(msg, s))
+			return empty, err
+		}
+		op.EnableChannel(midi.MIDIChannel(n), false)
+	}
+	clist := op.SelectedChannelIndexes()
+	acc := make([]string, len(clist))
+	for i, ci := range clist {
+		acc[i] = fmt.Sprintf("%d", ci+1)
+	}
+	return acc, err
+}
+
+// osc /pig/select-all-channels name
+// -> ACK
+//
+func remoteSelectAllChannels(msg *goosc.Message)([]string, error) {
+	args, err := osc.ExpectMsg("s", msg)
+	if err != nil {
+		return empty, err
+	}
+	op, err := GetOperator(args[0])
+	if err != nil {
+		return empty, err
+	}	
+	for i:=1; i<17; i++ {
+		op.EnableChannel(midi.MIDIChannel(i), true)
+	}
+	return empty, err
+}
+
+// osc /pig/deselect-all-channels name
+// -> ACK
+//
+func remoteDeselectAllChannels(msg *goosc.Message)([]string, error) {
+	args, err := osc.ExpectMsg("s", msg)
+	if err != nil {
+		return empty, err
+	}
+	op, err := GetOperator(args[0])
+	if err != nil {
+		return empty, err
+	}	
+	for i:=1; i<17; i++ {
+		op.EnableChannel(midi.MIDIChannel(i), false)
+	}
+	return empty, err
+}
+
+// osc /pig/invert-channels name
+// -> list of selected channels
+//
+func remoteInvertChannelSelection(msg *goosc.Message)([]string, error) {
+	args, err := osc.ExpectMsg("s", msg)
+	if err != nil {
+		return empty, err
+	}
+	op, err := GetOperator(args[0])
+	if err != nil {
+		return empty, err
+	}
+	for i:=0; i<16; i++ {
+		flag := op.ChannelIndexSelected(midi.MIDIChannelIndex(i))
+		op.EnableChannel(midi.MIDIChannel(i+1), flag)
+	}
+	clist := op.SelectedChannelIndexes()
+	acc := make([]string, len(clist))
+	for i, ci := range clist {
+		acc[i] = fmt.Sprintf("%d", int(ci+1))
+	}
+	return acc, err
+}
+	
+// osc /pig/q-channel-selected name c
+// -> bool
+//
+func remoteQueryChannelSelected(msg *goosc.Message)([]string, error) {
+	args, err := osc.ExpectMsg("sc", msg)
+		if err != nil {
+		return empty, err
+	}
+	op, err := GetOperator(args[0])
+	if err != nil {
+		return empty, err
+	}
+	s, _ := strconv.Atoi(args[1])
+	ci := midi.MIDIChannelIndex(s-1)
+	flag := op.ChannelIndexSelected(ci)
+	acc := []string{fmt.Sprintf("%v", flag)}
+	return acc, err
+}
+	
 
 // osc /pig/q-operators
 // -> list
@@ -151,30 +431,35 @@ func remoteDeleteAllOperators(msg *goosc.Message)([]string, error) {
 	return empty, err
 }
 
-// osc /pig/connect parent child
-// -> ACK | ERROR
+
+		
+// osc /pig/connect parent child [more...]
+// -> ACK
 //
 func remoteConnect(msg *goosc.Message)([]string, error) {
 	var err error
 	var parent, child Operator
-	template := "ss"
-	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
-	if err != nil {
+	args := osc.ToStringSlice(msg.Arguments)
+	if len(args) < 2 {
+		err = errors.New(fmt.Sprintf("Expected at least parent/child operator pair."))
 		return empty, err
 	}
-	parentName, childName := args[0], args[1]
-	parent, err = GetOperator(parentName)
-	if err != nil {
-		return empty, err
+	for i:=1; i<len(args); i++ {
+		parent, err = GetOperator(args[i-1])
+		if err != nil {
+			return empty, nil
+		}
+		child, err = GetOperator(args[i])
+		if err != nil {
+			return empty, err
+		}
+		parent.Connect(child)
 	}
-	child, err = GetOperator(childName)
-	if err != nil {
-		return empty, err
-	}
-	err = parent.Connect(child)
 	return empty, err
 }
-		
+			
+
+
 
 // osc /pig/disconnect-child parent child
 // -> ACK | ERROR
@@ -182,8 +467,7 @@ func remoteConnect(msg *goosc.Message)([]string, error) {
 func remoteDisconnect(msg *goosc.Message)([]string, error) {
 	var err error
 	var parent, child Operator
-	template := "ss"
-	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
+	args, err := osc.ExpectMsg("ss", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -208,8 +492,7 @@ func remoteDisconnect(msg *goosc.Message)([]string, error) {
 func remoteDisconnectAll(msg *goosc.Message)([]string, error) {
 	var err error
 	var parent Operator
-	template := "s"
-	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
+	args, err := osc.ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -228,8 +511,7 @@ func remoteDisconnectAll(msg *goosc.Message)([]string, error) {
 func remoteDisconnectParents(msg *goosc.Message)([]string, error) {
 	var err error
 	var op Operator
-	template := "s"
-	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
+	args, err := osc.ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -240,6 +522,17 @@ func remoteDisconnectParents(msg *goosc.Message)([]string, error) {
 	}
 	op.DisconnectParents()
 	op.Panic()
+	return empty, err
+}
+
+// osc /pig/print-graph
+// -> ACK
+//
+func remotePrintGraph(msg *goosc.Message)([]string, error) {
+	var err error
+	for _, op := range RootOperators() {
+		op.PrintTree()
+	}
 	return empty, err
 }
 
@@ -283,15 +576,61 @@ func remoteQueryCommands(msg *goosc.Message)([]string, error) {
 	return acc, err
 }
 
+// psc /pig/q-children name
+// -> list
+//
+func remoteQueryChildren(msg *goosc.Message)([]string, error) {
+	args, err := osc.ExpectMsg("s", msg)
+	if err != nil {
+		return empty, err
+	}
+	name := args[0]
+	op, err := GetOperator(name)
+	if err != nil {
+		return empty, err
+	}
+	children := op.children()
+	acc := make([]string, len(children))
+	i := 0
+	for key, _ := range children {
+		acc[i] = key
+		i++
+	}
+	return acc, err
+}
+
+// psc /pig/q-parents name
+// -> list
+//
+func remoteQueryParents(msg *goosc.Message)([]string, error) {
+	args, err := osc.ExpectMsg("s", msg)
+	if err != nil {
+		return empty, err
+	}
+	name := args[0]
+	op, err := GetOperator(name)
+	if err != nil {
+		return empty, err
+	}
+	parents := op.parents()
+	acc := make([]string, len(parents))
+	i := 0
+	for key, _ := range parents {
+		acc[i] = key
+		i++
+	}
+	return acc, err
+}
+	
+
 
 // osc  /pig/op  [name, command, arguments...]
 //
-func dispatchOperatorCommand(msg *goosc.Message)([]string, error) {
+func dispatchExtendedCommand(msg *goosc.Message)([]string, error) {
 	var err error
 	var args []string
 	var op Operator
-	template := "ss"
-	args, err = osc.Expect(template, osc.ToStringSlice(msg.Arguments))
+	args, err = osc.ExpectMsg("ss", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -303,3 +642,5 @@ func dispatchOperatorCommand(msg *goosc.Message)([]string, error) {
 	result, rerr := op.DispatchCommand(command, osc.ToStringSlice(msg.Arguments))
 	return result, rerr
 }
+
+

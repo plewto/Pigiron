@@ -40,8 +40,8 @@ func Init() {
 // Not used for MIDIInput or MIDIOutput
 //
 func remoteNewOperator(msg *goosc.Message)([]string, error) {
-	template := []osc.ExpectType{osc.XpString, osc.XpString}
-	args, err := osc.Expect(template, msg.Arguments)
+	template := "ss"
+	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
 	if err != nil {
 		return empty, err
 	}
@@ -57,8 +57,8 @@ func remoteNewOperator(msg *goosc.Message)([]string, error) {
 // -> name
 //
 func remoteNewMIDIInput(msg *goosc.Message)([]string, error) {
-	template := []osc.ExpectType{osc.XpString, osc.XpString}
-	args, err := osc.Expect(template, msg.Arguments)
+	template := "ss"
+	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
 	if err != nil {
 		return empty, err
 	}
@@ -74,8 +74,8 @@ func remoteNewMIDIInput(msg *goosc.Message)([]string, error) {
 // -> name
 //
 func remoteNewMIDIOutput(msg *goosc.Message)([]string, error) {
-	template := []osc.ExpectType{osc.XpString, osc.XpString}
-	args, err := osc.Expect(template, msg.Arguments)
+	template := "ss"
+	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
 	if err != nil {
 		return empty, err
 	}
@@ -93,8 +93,8 @@ func remoteNewMIDIOutput(msg *goosc.Message)([]string, error) {
 //
 func remoteDeleteOperator(msg *goosc.Message)([]string, error) {
 	var err error
-	template := []osc.ExpectType{osc.XpString}
-	args, err := osc.Expect(template, msg.Arguments)
+	template := "s"
+	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
 	if err != nil {
 		return empty, err
 	}
@@ -157,8 +157,8 @@ func remoteDeleteAllOperators(msg *goosc.Message)([]string, error) {
 func remoteConnect(msg *goosc.Message)([]string, error) {
 	var err error
 	var parent, child Operator
-	template := []osc.ExpectType{osc.XpString, osc.XpString}
-	args, err := osc.Expect(template, msg.Arguments)
+	template := "ss"
+	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
 	if err != nil {
 		return empty, err
 	}
@@ -182,8 +182,8 @@ func remoteConnect(msg *goosc.Message)([]string, error) {
 func remoteDisconnect(msg *goosc.Message)([]string, error) {
 	var err error
 	var parent, child Operator
-	template := []osc.ExpectType{osc.XpString, osc.XpString}
-	args, err := osc.Expect(template, msg.Arguments)
+	template := "ss"
+	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
 	if err != nil {
 		return empty, err
 	}
@@ -208,8 +208,8 @@ func remoteDisconnect(msg *goosc.Message)([]string, error) {
 func remoteDisconnectAll(msg *goosc.Message)([]string, error) {
 	var err error
 	var parent Operator
-	template := []osc.ExpectType{osc.XpString}
-	args, err := osc.Expect(template, msg.Arguments)
+	template := "s"
+	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
 	if err != nil {
 		return empty, err
 	}
@@ -228,8 +228,8 @@ func remoteDisconnectAll(msg *goosc.Message)([]string, error) {
 func remoteDisconnectParents(msg *goosc.Message)([]string, error) {
 	var err error
 	var op Operator
-	template := []osc.ExpectType{osc.XpString}
-	args, err := osc.Expect(template, msg.Arguments)
+	template := "s"
+	args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
 	if err != nil {
 		return empty, err
 	}
@@ -290,8 +290,8 @@ func dispatchOperatorCommand(msg *goosc.Message)([]string, error) {
 	var err error
 	var args []string
 	var op Operator
-	template := []osc.ExpectType{osc.XpString, osc.XpString}
-	args, err = osc.Expect(template, msg.Arguments)
+	template := "ss"
+	args, err = osc.Expect(template, osc.ToStringSlice(msg.Arguments))
 	if err != nil {
 		return empty, err
 	}

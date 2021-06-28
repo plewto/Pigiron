@@ -106,8 +106,8 @@ func remoteQueryMIDIOutputs(msg *goosc.Message)([]string, error) {
 // 
 //
 func remoteBatchLoad(msg *goosc.Message)([]string, error) {
-	template := []ExpectType{XpString}
-	args, err := Expect(template, msg.Arguments)
+	template := "s"
+	args, err := Expect(template, ToStringSlice(msg.Arguments))
 	if err != nil {
 		fmt.Print(config.GlobalParameters.ErrorColor)
 		fmt.Printf("ERROR: %s\n", msg.Address)

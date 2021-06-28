@@ -7,7 +7,7 @@ import (
 	"github.com/rakyll/portmidi"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
-	"github.com/plewto/pigiron/osc"
+	// "github.com/plewto/pigiron/osc"
 )
 
 
@@ -41,10 +41,10 @@ type Operator interface {
 	DisconnectParents()
 
 	// OSC
-	OSCAddress() string
-	FormatOSCAddress(command string) string
-	Server() osc.PigServer
-
+	DispatchCommand(command string, args []string)([]string, error)
+	Commands() []string
+	addCommandHandler(command string, handler func(args []string)([]string, error))
+	
 	// MIDI
 	MIDIOutputEnabled() bool
 	SetMIDIOutputEnabled(flag bool)
@@ -62,8 +62,7 @@ type baseOperator struct {
 	parentMap map[string]Operator
 	childrenMap map[string]Operator
 	midiOutputEnabled bool
-	server osc.PigServer
-	
+	dispatchTable map[string]func(args []string)([]string, error)
 }
 
 func initOperator(op *baseOperator, opType string, name string, mode midi.ChannelMode) {
@@ -79,13 +78,14 @@ func initOperator(op *baseOperator, opType string, name string, mode midi.Channe
 	}
 	op.parentMap = make(map[string]Operator)
 	op.childrenMap = make(map[string]Operator)
-	host := config.GlobalParameters.OSCServerHost
-	port := int(config.GlobalParameters.OSCServerPort)
-	root := config.GlobalParameters.OSCServerRoot
-	op.server = osc.NewServer(host, port, root) 
 	op.midiOutputEnabled = true
-	AddOpHandler(op, "ping", op.remotePing)
-	op.server.ListenAndServe()
+	op.dispatchTable = make(map[string]func(args []string)([]string, error))
+	op.addCommandHandler("ping", op.remotePing)
+	op.addCommandHandler("q-commands", op.remoteQueryCommands)
+	op.addCommandHandler("q-is-root", op.remoteQueryIsRoot)
+	op.addCommandHandler("q-children", op.remoteQueryChildren)
+	op.addCommandHandler("q-parents", op.remoteQueryParents)
+	op.addCommandHandler("reset", op.remoteReset)
 }
 
 func (op *baseOperator) OperatorType() string {
@@ -109,7 +109,6 @@ func (op *baseOperator) String() string {
 
 func (op *baseOperator) commonInfo() string {
 	s := fmt.Sprintf("%s  name: \"%s\"    %s\n", op.opType, op.name, op.channelSelector)
-	s += fmt.Sprintf("\tOSC address: '%s'\n", op.OSCAddress())
 	s += "\tparents: "
 	if op.IsRoot() {
 		s += "<none>\n"
@@ -309,16 +308,6 @@ func (op *baseOperator) SelectAllChannels() {
 	op.channelSelector.SelectAllChannels()
 }
 
-func (op *baseOperator) OSCAddress() string {
-	sfmt := "/%s/op/%s/"
-	root := config.GlobalParameters.OSCServerRoot
-	return fmt.Sprintf(sfmt, root, op.Name())
-}
-
-
-func (op *baseOperator) FormatOSCAddress(command string) string {
-	return fmt.Sprintf("%s%s", op.OSCAddress(), command)
-}
 
 func (op *baseOperator) MIDIOutputEnabled() bool {
 	return op.midiOutputEnabled
@@ -349,6 +338,96 @@ func (op *baseOperator) Send(event portmidi.Event) {
 }
 
 
-func (op *baseOperator) Server() osc.PigServer {
-	return op.server
+func (op *baseOperator) DispatchCommand(command string, args []string)([]string, error) {
+	var err error
+	var result []string
+	handler, flag := op.dispatchTable[command]
+	if !flag {
+		msg := "Invalid command for %s operator %s.  command: '%s'"
+		err = errors.New(fmt.Sprintf(msg, op.OperatorType(), op.Name(), command))
+		return result, err
+	}
+	result, err = handler(args)
+	return result, err
 }
+
+func (op *baseOperator) Commands() []string {
+	var keys []string = make([]string, 0, len(op.dispatchTable))
+	for k := range op.dispatchTable {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+func (op *baseOperator) addCommandHandler(command string, handler func(args []string)([]string, error)) {
+	op.dispatchTable[command] = handler
+}
+	
+
+// osc /pig/op name, ping
+// -> ACK
+//
+func (op *baseOperator) remotePing(args []string)([]string, error) {
+	var err error
+	var result = []string{op.Name(), "Ping"}
+	return result, err
+}
+
+// osc /pig/op name, q-commands
+// -> list of operator-local commands
+//
+func (op *baseOperator) remoteQueryCommands(args []string)([]string, error) {
+	var err error
+	return op.Commands(), err
+}
+
+// osc /pig/op name, q-is-root
+// -> bool
+//
+func (op *baseOperator) remoteQueryIsRoot(args []string)([]string, error) {
+	var err error
+	acc := make([]string, 1, 1)
+	acc[0] = fmt.Sprintf("%v", op.IsRoot())
+	return acc, err
+}
+
+// osc /pig/op name, q-children
+// -> list
+//
+func (op *baseOperator) remoteQueryChildren(args []string)([]string, error) {
+	var err error
+	clist := op.children()
+	acc := make([]string, len(clist))
+	i := 0
+	for name, _ := range clist {
+		acc[i] = name
+		i++
+	}
+	return acc, err
+}
+
+// osc /pig/op name, q-parents
+// -> list
+//
+func (op *baseOperator) remoteQueryParents(args []string)([]string, error) {
+	var err error
+	clist := op.parents()
+	acc := make([]string, len(clist))
+	i := 0
+	for name, _ := range clist {
+		acc[i] = name
+		i++
+	}
+	return acc, err
+}
+
+// osc /pig/op name, reset
+// -> ACK
+//
+func (op *baseOperator) remoteReset(args []string)([]string, error) {
+	var err error
+	var acc []string
+	op.Reset()
+	return acc, err
+}
+

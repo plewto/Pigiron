@@ -2,6 +2,7 @@ package op
 
 import (
 	"fmt"
+	//"strings"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/osc"
 )
@@ -29,6 +30,7 @@ func Init() {
 	osc.AddHandler(server, "q-roots", remoteQueryRoots)
 	osc.AddHandler(server, "q-graph", remoteQueryGraph)
 	osc.AddHandler(server, "q-commands", remoteQueryCommands)
+	osc.AddHandler(server, "op", dispatchOperatorCommand)
 }
 
 
@@ -273,9 +275,31 @@ func remoteQueryCommands(msg *goosc.Message)([]string, error) {
 	var err error
 	acc := osc.GlobalServer.Commands()
 	for _, op := range Operators() {
-		for _, cmd := range op.Server().Commands() {
-			acc = append(acc, cmd)
+		name := op.Name()
+		for _, cmd := range op.Commands() {
+			acc = append(acc, fmt.Sprintf("/pig/op %s, %s", name, cmd))
 		}
 	}
 	return acc, err
+}
+
+
+// osc  /pig/op  [name, command, arguments...]
+//
+func dispatchOperatorCommand(msg *goosc.Message)([]string, error) {
+	var err error
+	var args []string
+	var op Operator
+	template := []osc.ExpectType{osc.XpString, osc.XpString}
+	args, err = osc.Expect(template, msg.Arguments)
+	if err != nil {
+		return empty, err
+	}
+	name, command := args[0], args[1]
+	op, err = GetOperator(name)
+	if err != nil {
+		return empty, err
+	}
+	result, rerr := op.DispatchCommand(command, osc.ToStringSlice(msg.Arguments))
+	return result, rerr
 }

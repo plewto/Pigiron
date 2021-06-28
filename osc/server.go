@@ -9,9 +9,6 @@ import (
 type PigServer interface {
 	Root() string
 	SetRoot(string)
-	//Clients() []PigClient
-	//AddClient(client PigClient)
-	//RemoveAllClients()
 	GetResponder() Responder
 	GetREPLResponder() Responder
 	AddMsgHandler(address string, handler func(msg *goosc.Message))
@@ -26,7 +23,6 @@ type OSCServer struct {
 	backingServer *goosc.Server
 	dispatcher *goosc.StandardDispatcher
 	root string
-	//clients []PigClient
 	responder Responder
 	replResponder Responder
 	ip string
@@ -41,7 +37,6 @@ func NewServer(ip string, port int, root string) PigServer {
 	server.ip = ip
 	server.port = port
 	server.root = root
-	//server.clients = make([]PigClient, 0, 4)
 	server.responder = globalResponder
 	server.replResponder = replResponder
 	addr := fmt.Sprintf("%s:%d", ip, port)
@@ -112,3 +107,5 @@ func AddHandler(s PigServer, command string, handler func(*goosc.Message)([]stri
 	}
 	s.AddMsgHandler(address, result)
 }
+
+

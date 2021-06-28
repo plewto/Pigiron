@@ -28,6 +28,7 @@ func Init() {
 	osc.AddHandler(server, "q-operators", remoteQueryOperators)
 	osc.AddHandler(server, "q-roots", remoteQueryRoots)
 	osc.AddHandler(server, "q-graph", remoteQueryGraph)
+	osc.AddHandler(server, "q-commands", remoteQueryCommands)
 }
 
 
@@ -268,3 +269,13 @@ func remoteQueryGraph(msg *goosc.Message)([]string, error) {
 }
 			
 		
+func remoteQueryCommands(msg *goosc.Message)([]string, error) {
+	var err error
+	acc := osc.GlobalServer.Commands()
+	for _, op := range Operators() {
+		for _, cmd := range op.Server().Commands() {
+			acc = append(acc, cmd)
+		}
+	}
+	return acc, err
+}

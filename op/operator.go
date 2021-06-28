@@ -7,6 +7,7 @@ import (
 	"github.com/rakyll/portmidi"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
+	"github.com/plewto/pigiron/osc"
 )
 
 
@@ -42,6 +43,7 @@ type Operator interface {
 	// OSC
 	OSCAddress() string
 	FormatOSCAddress(command string) string
+	Server() osc.PigServer
 
 	// MIDI
 	MIDIOutputEnabled() bool
@@ -60,6 +62,8 @@ type baseOperator struct {
 	parentMap map[string]Operator
 	childrenMap map[string]Operator
 	midiOutputEnabled bool
+	server osc.PigServer
+	
 }
 
 func initOperator(op *baseOperator, opType string, name string, mode midi.ChannelMode) {
@@ -75,7 +79,13 @@ func initOperator(op *baseOperator, opType string, name string, mode midi.Channe
 	}
 	op.parentMap = make(map[string]Operator)
 	op.childrenMap = make(map[string]Operator)
+	host := config.GlobalParameters.OSCServerHost
+	port := int(config.GlobalParameters.OSCServerPort)
+	root := config.GlobalParameters.OSCServerRoot
+	op.server = osc.NewServer(host, port, root) 
 	op.midiOutputEnabled = true
+	AddOpHandler(op, "ping", op.remotePing)
+	op.server.ListenAndServe()
 }
 
 func (op *baseOperator) OperatorType() string {
@@ -99,7 +109,6 @@ func (op *baseOperator) String() string {
 
 func (op *baseOperator) commonInfo() string {
 	s := fmt.Sprintf("%s  name: \"%s\"    %s\n", op.opType, op.name, op.channelSelector)
-	//s += fmt.Sprintf("\tMIDI enabled: %v\n", op.MIDIEnabled())
 	s += fmt.Sprintf("\tOSC address: '%s'\n", op.OSCAddress())
 	s += "\tparents: "
 	if op.IsRoot() {
@@ -301,9 +310,9 @@ func (op *baseOperator) SelectAllChannels() {
 }
 
 func (op *baseOperator) OSCAddress() string {
-	sfmt := "/%s/op/%s/%s"
-	root := config.GlobalParameters.OSCClientRoot
-	return fmt.Sprintf(sfmt, root, op.OperatorType(), op.Name())
+	sfmt := "/%s/op/%s/"
+	root := config.GlobalParameters.OSCServerRoot
+	return fmt.Sprintf(sfmt, root, op.Name())
 }
 
 
@@ -340,4 +349,6 @@ func (op *baseOperator) Send(event portmidi.Event) {
 }
 
 
-
+func (op *baseOperator) Server() osc.PigServer {
+	return op.server
+}

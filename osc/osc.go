@@ -40,7 +40,6 @@ func Init() {
 	AddHandler(GlobalServer, "q-midi-inputs", remoteQueryMIDIInputs)
 	AddHandler(GlobalServer, "q-midi-outputs", remoteQueryMIDIOutputs)
 	AddHandler(GlobalServer, "batch", remoteBatchLoad)
-	AddHandler(GlobalServer, "q-commands", remoteQueryCommands)
 }
 
 
@@ -122,7 +121,3 @@ func remoteBatchLoad(msg *goosc.Message)([]string, error) {
 }
 
 
-func remoteQueryCommands(msg *goosc.Message)([]string, error) {
-	var err error
-	return GlobalServer.Commands(), err
-}

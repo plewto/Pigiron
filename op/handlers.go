@@ -228,9 +228,8 @@ func remoteEnableMIDI(msg *goosc.Message)([]string, error) {
 	if err != nil {
 		return empty, err
 	}
-	name := args[0]
 	flag, _ := strconv.ParseBool(args[1])
-	op, _ := GetOperator(name)
+	op, _ := GetOperator(args[0])
 	op.SetMIDIOutputEnabled(flag)
 	rs := []string{fmt.Sprintf("%v", flag)}
 	return rs, err
@@ -512,8 +511,7 @@ func remoteDisconnectAll(msg *goosc.Message)([]string, error) {
 	if err != nil {
 		return empty, err
 	}
-	name := args[0]
-	parent, _ = GetOperator(name)
+	parent, _ = GetOperator(args[0])
 	parent.DisconnectAll()
 	return empty, err
 }
@@ -528,8 +526,7 @@ func remoteDisconnectParents(msg *goosc.Message)([]string, error) {
 	if err != nil {
 		return empty, err
 	}
-	name := args[0]
-	op, _ = GetOperator(name)
+	op, _ = GetOperator(args[0])
 	op.DisconnectParents()
 	op.Panic()
 	return empty, err
@@ -596,8 +593,7 @@ func remoteQueryChildren(msg *goosc.Message)([]string, error) {
 	if err != nil {
 		return empty, err
 	}
-	name := args[0]
-	op, _ := GetOperator(name)
+	op, _ := GetOperator(args[0])
 	children := op.children()
 	acc := make([]string, len(children))
 	i := 0
@@ -616,8 +612,7 @@ func remoteQueryParents(msg *goosc.Message)([]string, error) {
 	if err != nil {
 		return empty, err
 	}
-	name := args[0]
-	op, _ := GetOperator(name)
+	op, _ := GetOperator(args[0])
 	parents := op.parents()
 	acc := make([]string, len(parents))
 	i := 0

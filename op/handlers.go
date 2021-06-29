@@ -4,9 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"github.com/rakyll/portmidi"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/osc"
 	"github.com/plewto/pigiron/midi"
+	"github.com/plewto/pigiron/config"
 )
 
 var (
@@ -17,6 +19,11 @@ var (
 //
 func Init() {
 	server := osc.GlobalServer
+	osc.AddHandler(server, "ping", remotePing)
+	osc.AddHandler(server, "exit", remoteExit)
+	osc.AddHandler(server, "q-midi-inputs", remoteQueryMIDIInputs)
+	osc.AddHandler(server, "q-midi-outputs", remoteQueryMIDIOutputs)
+	osc.AddHandler(server, "batch", remoteBatchLoad)
 	osc.AddHandler(server, "new", remoteNewOperator)
 	osc.AddHandler(server, "delete-operator", remoteDeleteOperator)
 	osc.AddHandler(server, "delete-all", remoteDeleteAllOperators)
@@ -49,6 +56,70 @@ func Init() {
 	osc.AddHandler(server, "op", dispatchExtendedCommand)
 }
 
+// osc /pig/ping -> ACK
+// diagnostic function.
+//
+func remotePing(msg *goosc.Message)([]string, error) {
+	var err error
+	fmt.Printf("PING %s\n", msg.Address)
+	return empty, err
+}
+
+// osc /pig/exit -> ACK
+// Terminate application
+//
+func remoteExit(msg *goosc.Message)([]string, error) {
+	var err error
+	osc.Exit = true
+	return empty, err
+}
+
+// osc /pig/q-midi-inputs
+// -> ACK list of MIDI input devices
+//
+func remoteQueryMIDIInputs(msg *goosc.Message)([]string, error) {
+	var err error
+	ids := midi.InputIDs()
+	acc := make([]string, len(ids))
+	for i, id := range ids {
+		info := portmidi.Info(id)
+		acc[i] = fmt.Sprintf("\"%s\" ", info.Name)
+	}
+	return acc, err
+}
+
+
+// osc /pig/q-midi-outputs
+// -> ACK list of MIDI output devices
+//
+func remoteQueryMIDIOutputs(msg *goosc.Message)([]string, error) {
+	var err error
+	ids := midi.OutputIDs()
+	acc := make([]string, len(ids))
+	for i, id := range ids {
+		info := portmidi.Info(id)
+		acc[i] = fmt.Sprintf("\"%s\" ", info.Name)
+	}
+	return acc, err
+}
+
+
+// osc /pig/batch filename
+// 
+//
+func remoteBatchLoad(msg *goosc.Message)([]string, error) {
+	args, err := ExpectMsg("s", msg)
+	if err != nil {
+		fmt.Print(config.GlobalParameters.ErrorColor)
+		fmt.Printf("ERROR: %s\n", msg.Address)
+		fmt.Printf("ERROR: %s\n", err)
+		fmt.Print(config.GlobalParameters.TextColor)
+		return empty, err
+	}
+	filename := fmt.Sprintf("%s", args[0])
+	err = osc.BatchLoad(filename)
+	return empty, err
+}
 
 
 // osc /pig/new optype name
@@ -58,7 +129,7 @@ func Init() {
 // Not used for MIDIInput or MIDIOutput
 //
 func remoteNewOperator(msg *goosc.Message)([]string, error) {
-	args, err := osc.ExpectMsg("ss", msg)
+	args, err := ExpectMsg("ss", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -73,7 +144,7 @@ func remoteNewOperator(msg *goosc.Message)([]string, error) {
 		if err != nil {
 			return empty, err
 		}
-		return osc.StringSlice(op.Name()), err
+		return StringSlice(op.Name()), err
 	}
 }
 
@@ -82,8 +153,8 @@ func remoteNewOperator(msg *goosc.Message)([]string, error) {
 //
 func remoteNewMIDIInput(args []string)([]string, error) {
 	// template := "ss"
-	// args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
-	args, err := osc.Expect("sss", args)
+	// args, err := Expect(template, ToStringSlice(msg.Arguments))
+	args, err := Expect("sss", args)
 	if err != nil {
 		return empty, err
 	}
@@ -92,7 +163,7 @@ func remoteNewMIDIInput(args []string)([]string, error) {
 	if err != nil {
 		return args, err
 	}
-	return osc.StringSlice(op.Name()), err
+	return StringSlice(op.Name()), err
 }
 
 // args ["output", name, device]
@@ -100,8 +171,8 @@ func remoteNewMIDIInput(args []string)([]string, error) {
 //
 func remoteNewMIDIOutput(args []string)([]string, error) {
 	//template := "ss"
-	//args, err := osc.Expect(template, osc.ToStringSlice(msg.Arguments))
-	args, err := osc.Expect("sss", args)
+	//args, err := Expect(template, ToStringSlice(msg.Arguments))
+	args, err := Expect("sss", args)
 	if err != nil {
 		return empty, err
 	}
@@ -110,7 +181,7 @@ func remoteNewMIDIOutput(args []string)([]string, error) {
 	if err != nil {
 		return args, err
 	}
-	return osc.StringSlice(op.Name()), err
+	return StringSlice(op.Name()), err
 }
 
 
@@ -119,14 +190,14 @@ func remoteNewMIDIOutput(args []string)([]string, error) {
 //
 func remoteDeleteOperator(msg *goosc.Message)([]string, error) {
 	var err error
-	args, err := osc.ExpectMsg("s", msg)
+	args, err := ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
 	name := args[0]
 	_, err = GetOperator(name)
 	if err != nil {
-		return osc.StringSlice(msg.Arguments), err
+		return StringSlice(msg.Arguments), err
 	}
 	DeleteOperator(name)
 	return empty, err
@@ -137,7 +208,7 @@ func remoteDeleteOperator(msg *goosc.Message)([]string, error) {
 // -> ACK
 //
 func remoteReset (msg *goosc.Message)([]string, error) {
-	args, err := osc.ExpectMsg("s", msg)
+	args, err := ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -165,7 +236,7 @@ func remoteResetAll(msg *goosc.Message)([]string, error) {
 // -> bool
 //
 func remoteEnableMIDI(msg *goosc.Message)([]string, error) {
-	args, err := osc.ExpectMsg("sb", msg)
+	args, err := ExpectMsg("sb", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -185,7 +256,7 @@ func remoteEnableMIDI(msg *goosc.Message)([]string, error) {
 // -> bool
 //
 func remoteQueryMIDIEnabled(msg *goosc.Message)([]string, error) {
-	args, err := osc.ExpectMsg("s", msg)
+	args, err := ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -201,7 +272,7 @@ func remoteQueryMIDIEnabled(msg *goosc.Message)([]string, error) {
 // -> mode
 //
 func remoteQueryChannelMode(msg *goosc.Message)([]string, error) {
-	args, err := osc.ExpectMsg("s", msg)
+	args, err := ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -217,7 +288,7 @@ func remoteQueryChannelMode(msg *goosc.Message)([]string, error) {
 // -> list
 //
 func remoteQuerySelectedChannels(msg *goosc.Message)([]string, error) {
-	args, err := osc.ExpectMsg("s", msg)
+	args, err := ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -237,7 +308,7 @@ func remoteQuerySelectedChannels(msg *goosc.Message)([]string, error) {
 // -> list of enabled channels
 //
 func remoteSelectChannels(msg *goosc.Message)([]string, error) {
-	args, err := osc.ExpectMsg("si", msg)
+	args, err := ExpectMsg("si", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -245,7 +316,7 @@ func remoteSelectChannels(msg *goosc.Message)([]string, error) {
 	if err != nil {
 		return empty, err
 	}
-	args = osc.ToStringSlice(msg.Arguments)
+	args = ToStringSlice(msg.Arguments)
 	for _, s := range args[1:] {
 		n, err := strconv.Atoi(s)
 		if err != nil {
@@ -272,7 +343,7 @@ func remoteSelectChannels(msg *goosc.Message)([]string, error) {
 // -> list of enabled channels
 //
 func remoteDeselectChannels(msg *goosc.Message)([]string, error) {
-	args, err := osc.ExpectMsg("si", msg)
+	args, err := ExpectMsg("si", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -280,7 +351,7 @@ func remoteDeselectChannels(msg *goosc.Message)([]string, error) {
 	if err != nil {
 		return empty, err
 	}
-	args = osc.ToStringSlice(msg.Arguments)
+	args = ToStringSlice(msg.Arguments)
 	for _, s := range args[1:] {
 		n, err := strconv.Atoi(s)
 		if err != nil {
@@ -307,7 +378,7 @@ func remoteDeselectChannels(msg *goosc.Message)([]string, error) {
 // -> ACK
 //
 func remoteSelectAllChannels(msg *goosc.Message)([]string, error) {
-	args, err := osc.ExpectMsg("s", msg)
+	args, err := ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -325,7 +396,7 @@ func remoteSelectAllChannels(msg *goosc.Message)([]string, error) {
 // -> ACK
 //
 func remoteDeselectAllChannels(msg *goosc.Message)([]string, error) {
-	args, err := osc.ExpectMsg("s", msg)
+	args, err := ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -343,7 +414,7 @@ func remoteDeselectAllChannels(msg *goosc.Message)([]string, error) {
 // -> list of selected channels
 //
 func remoteInvertChannelSelection(msg *goosc.Message)([]string, error) {
-	args, err := osc.ExpectMsg("s", msg)
+	args, err := ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -367,7 +438,7 @@ func remoteInvertChannelSelection(msg *goosc.Message)([]string, error) {
 // -> bool
 //
 func remoteQueryChannelSelected(msg *goosc.Message)([]string, error) {
-	args, err := osc.ExpectMsg("sc", msg)
+	args, err := ExpectMsg("sc", msg)
 		if err != nil {
 		return empty, err
 	}
@@ -435,7 +506,7 @@ func remoteDeleteAllOperators(msg *goosc.Message)([]string, error) {
 func remoteConnect(msg *goosc.Message)([]string, error) {
 	var err error
 	var parent, child Operator
-	args := osc.ToStringSlice(msg.Arguments)
+	args := ToStringSlice(msg.Arguments)
 	if len(args) < 2 {
 		err = errors.New(fmt.Sprintf("Expected at least parent/child operator pair."))
 		return empty, err
@@ -463,7 +534,7 @@ func remoteConnect(msg *goosc.Message)([]string, error) {
 func remoteDisconnect(msg *goosc.Message)([]string, error) {
 	var err error
 	var parent, child Operator
-	args, err := osc.ExpectMsg("ss", msg)
+	args, err := ExpectMsg("ss", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -488,7 +559,7 @@ func remoteDisconnect(msg *goosc.Message)([]string, error) {
 func remoteDisconnectAll(msg *goosc.Message)([]string, error) {
 	var err error
 	var parent Operator
-	args, err := osc.ExpectMsg("s", msg)
+	args, err := ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -507,7 +578,7 @@ func remoteDisconnectAll(msg *goosc.Message)([]string, error) {
 func remoteDisconnectParents(msg *goosc.Message)([]string, error) {
 	var err error
 	var op Operator
-	args, err := osc.ExpectMsg("s", msg)
+	args, err := ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -576,7 +647,7 @@ func remoteQueryCommands(msg *goosc.Message)([]string, error) {
 // -> list
 //
 func remoteQueryChildren(msg *goosc.Message)([]string, error) {
-	args, err := osc.ExpectMsg("s", msg)
+	args, err := ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -599,7 +670,7 @@ func remoteQueryChildren(msg *goosc.Message)([]string, error) {
 // -> list
 //
 func remoteQueryParents(msg *goosc.Message)([]string, error) {
-	args, err := osc.ExpectMsg("s", msg)
+	args, err := ExpectMsg("s", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -626,7 +697,7 @@ func dispatchExtendedCommand(msg *goosc.Message)([]string, error) {
 	var err error
 	var args []string
 	var op Operator
-	args, err = osc.ExpectMsg("ss", msg)
+	args, err = ExpectMsg("ss", msg)
 	if err != nil {
 		return empty, err
 	}
@@ -635,7 +706,7 @@ func dispatchExtendedCommand(msg *goosc.Message)([]string, error) {
 	if err != nil {
 		return empty, err
 	}
-	result, rerr := op.DispatchCommand(command, osc.ToStringSlice(msg.Arguments))
+	result, rerr := op.DispatchCommand(command, ToStringSlice(msg.Arguments))
 	return result, rerr
 }
 

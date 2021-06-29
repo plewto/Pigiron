@@ -1,10 +1,10 @@
 package osc
 
 import (
-	"fmt"
-	goosc "github.com/hypebeast/go-osc/osc"
-	"github.com/rakyll/portmidi"
-	"github.com/plewto/pigiron/midi"
+	//"fmt"
+	// goosc "github.com/hypebeast/go-osc/osc"
+	//"github.com/rakyll/portmidi"
+	//"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
 )
 
@@ -35,11 +35,6 @@ func Init() {
 	port = int(config.GlobalParameters.OSCServerPort)
 	root = config.GlobalParameters.OSCServerRoot
 	GlobalServer = NewServer(host, port, root)
-	AddHandler(GlobalServer, "ping", remotePing)
-	AddHandler(GlobalServer, "exit", remoteExit)
-	AddHandler(GlobalServer, "q-midi-inputs", remoteQueryMIDIInputs)
-	AddHandler(GlobalServer, "q-midi-outputs", remoteQueryMIDIOutputs)
-	AddHandler(GlobalServer, "batch", remoteBatchLoad)
 }
 
 
@@ -53,71 +48,14 @@ func Cleanup() {
 }
 
 
-// osc /pig/ping -> ACK
-// diagnostic function.
-//
-func remotePing(msg *goosc.Message)([]string, error) {
-	var err error
-	fmt.Printf("PING %s\n", msg.Address)
-	return empty, err
-}
 
 
-// osc /pig/exit -> ACK
-// Terminate application
-//
-func remoteExit(msg *goosc.Message)([]string, error) {
-	var err error
-	Exit = true
-	return empty, err
-}
 
 
-// osc /pig/q-midi-inputs
-// -> ACK list of MIDI input devices
-//
-func remoteQueryMIDIInputs(msg *goosc.Message)([]string, error) {
-	var err error
-	ids := midi.InputIDs()
-	acc := make([]string, len(ids))
-	for i, id := range ids {
-		info := portmidi.Info(id)
-		acc[i] = fmt.Sprintf("\"%s\" ", info.Name)
-	}
-	return acc, err
-}
 
 
-// osc /pig/q-midi-outputs
-// -> ACK list of MIDI output devices
-//
-func remoteQueryMIDIOutputs(msg *goosc.Message)([]string, error) {
-	var err error
-	ids := midi.OutputIDs()
-	acc := make([]string, len(ids))
-	for i, id := range ids {
-		info := portmidi.Info(id)
-		acc[i] = fmt.Sprintf("\"%s\" ", info.Name)
-	}
-	return acc, err
-}
 
-// osc /pig/batch filename
-// 
-//
-func remoteBatchLoad(msg *goosc.Message)([]string, error) {
-	template := "s"
-	args, err := Expect(template, ToStringSlice(msg.Arguments))
-	if err != nil {
-		fmt.Print(config.GlobalParameters.ErrorColor)
-		fmt.Printf("ERROR: %s\n", msg.Address)
-		fmt.Printf("ERROR: %s\n", err)
-		fmt.Print(config.GlobalParameters.TextColor)
-		return empty, err
-	}
-	filename := fmt.Sprintf("%s", args[0])
-	err = BatchLoad(filename)
-	return empty, err
-}
+
+
 
 

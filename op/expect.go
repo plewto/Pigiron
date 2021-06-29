@@ -1,4 +1,4 @@
-package osc
+package op
 
 
 import (
@@ -36,6 +36,23 @@ func parseBool(s string)(string, error) {
 	} else {
 		return v, err
 	}
+}
+
+
+func StringSlice(values ...interface{}) []string {
+	acc := make([]string, len(values))
+	for i, v := range values {
+		acc[i] = fmt.Sprintf("%v", v)
+	}
+	return acc
+}
+
+func ToStringSlice(values []interface{}) []string {
+	acc := make([]string, len(values))
+	for i, v := range values {
+		acc[i] = fmt.Sprintf("%v", v)
+	}
+	return acc
 }
 
 

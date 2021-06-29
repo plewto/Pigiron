@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"time"
 	"io/ioutil"
+	"path/filepath"
 	
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/config"
@@ -36,6 +37,19 @@ func init() {
 
 func sleep(n int) {
 	time.Sleep(time.Duration(n) * time.Millisecond)
+}
+
+func SubUserHome(filename string) string {
+	if len(filename) > 0 && filename[0] == byte('~') {
+		home, _ := os.UserHomeDir()
+		filename = filepath.Join(home, filename[1:])
+	}
+	return filename
+}
+
+func Prompt() {
+	root := config.GlobalParameters.OSCServerRoot
+	fmt.Printf("\n/%s: ", root)
 }
 
 

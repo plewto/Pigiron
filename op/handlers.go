@@ -25,14 +25,14 @@ func Init() {
 	osc.AddHandler(server, "q-midi-outputs", remoteQueryMIDIOutputs)
 	osc.AddHandler(server, "batch", remoteBatchLoad)
 	osc.AddHandler(server, "new", remoteNewOperator)
-	osc.AddHandler(server, "delete-operator", remoteDeleteOperator)
-	osc.AddHandler(server, "delete-all", remoteDeleteAllOperators)
+	osc.AddHandler(server, "del-operator", remoteDeleteOperator)
+	osc.AddHandler(server, "del-all", remoteDeleteAllOperators)
 	osc.AddHandler(server, "connect", remoteConnect)
 	osc.AddHandler(server, "disconnect-child", remoteDisconnect)
 	osc.AddHandler(server, "disconnect-all", remoteDisconnectAll)
 	osc.AddHandler(server, "disconnect-parents", remoteDisconnectParents)
 	osc.AddHandler(server, "reset-operator", remoteReset)
-	osc.AddHandler(server, "reset-all", remoteResetAll)   // clash with 'reset'
+	osc.AddHandler(server, "reset-all", remoteResetAll)  
 	osc.AddHandler(server, "enable-midi", remoteEnableMIDI)
 	osc.AddHandler(server, "q-midi-enabled", remoteQueryMIDIEnabled)
 	osc.AddHandler(server, "q-channel-mode", remoteQueryChannelMode)
@@ -51,7 +51,6 @@ func Init() {
 	osc.AddHandler(server, "q-commands", remoteQueryCommands)
 	osc.AddHandler(server, "q-children", remoteQueryChildren)
 	osc.AddHandler(server, "q-parents", remoteQueryParents)
-
 	
 	osc.AddHandler(server, "op", dispatchExtendedCommand)
 }
@@ -181,7 +180,7 @@ func remoteNewMIDIOutput(args []string)([]string, error) {
 }
 
 
-// osc /pig/delete-operator name
+// osc /pig/del-operator name
 // -> ACK
 //
 func remoteDeleteOperator(msg *goosc.Message)([]string, error) {
@@ -446,7 +445,7 @@ func remoteQueryOperatorTypes(msg *goosc.Message)([]string, error) {
 	return OperatorTypes(false), err
 }
 
-// osc /pig/delete-all-operators
+// osc /pig/del-all-operators
 // -> ACK
 //
 func remoteDeleteAllOperators(msg *goosc.Message)([]string, error) {

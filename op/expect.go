@@ -61,6 +61,7 @@ func ToStringSlice(values []interface{}) []string {
 //          f -> float
 //          b -> bool
 //          c -> midi channel (1..16)
+//          o -> operator name
 //          * -> any   (convert to string)
 //
 func Expect(template string, arguments []string)([]string, error) {
@@ -118,7 +119,14 @@ func Expect(template string, arguments []string)([]string, error) {
 				return empty, err
 			}
 			acc[i] = arg
-					
+		case 'o':
+			_, err := GetOperator(arg)
+			if err != nil {
+				msg := "Expected Operator name at index %d, got %s"
+				err = errors.New(fmt.Sprintf(msg, i, arg))
+				return empty, err
+			}
+			acc[i] = arg
 		case '*':
 			acc[i] = fmt.Sprintf("%v", arg)
 		default:

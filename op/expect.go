@@ -2,41 +2,15 @@ package op
 
 
 import (
-	"errors"
+	//"errors"
 	"fmt"
 	"strconv"
-	"strings"
+	//"strings"
 	goosc "github.com/hypebeast/go-osc/osc"
+	"github.com/plewto/pigiron/midi"
 )
 
 
-var boolValues = map[string]string{
-	"false" : "false",
-	"0" : "false",
-	"f" : "false",
-	"off" : "false",
-	"no" : "false",
-	"n"  : "false",
-	"disable" : "false",
-	"true" : "true",
-	"1" : "true",
-	"t" : "true",
-	"on" : "true",
-	"yes" : "true",
-	"y" : "true",
-	"enable" : "true"}
-	
-func parseBool(s string)(string, error) {
-	var err error
-	v, flag := boolValues[strings.ToLower(s)]
-	if !flag {
-		msg := "Expected boolean, got %s"
-		err = errors.New(fmt.Sprintf(msg, s))
-		return "false", err
-	} else {
-		return v, err
-	}
-}
 
 
 func StringSlice(values ...interface{}) []string {
@@ -56,147 +30,88 @@ func ToStringSlice(values []interface{}) []string {
 }
 
 
-// template s -> string
-//          i -> int
-//          f -> float
-//          b -> bool
-//          c -> midi channel (1..16)
-//          o -> operator name
-//          * -> any   (convert to string)
-//
-func Expect(template string, arguments []string)([]string, error) {
+type ExpectValue struct {
+	S string
+	I int64
+	F float64
+	B bool
+	C midi.MIDIChannel
+	O Operator}
+
+ 
+func Expect(template string, values []interface{})([]ExpectValue, error) {
 	var err error
-	acc := make([]string, len(arguments))
-	// Bug 001 fix
-	// Removes spurious first element from arguments.
-	if len(arguments) == 1 && arguments[0] == "" {
-		arguments = arguments[1:]
-	}
-
-	if len(template) > len(arguments) {
+	var acc []ExpectValue = make([]ExpectValue, len(template))
+	if len(template) > len(values) {
 		msg := "Expected at least %d arguments, got %d"
-		err = errors.New(fmt.Sprintf(msg, len(template), len(arguments)))
-		return empty, err
+		err = fmt.Errorf(msg, len(template), len(values))
+		return acc, err
 	}
-
 	for i, xtype := range template {
-		arg := arguments[i]
+		arg := values[i]
 		switch xtype {
 		case 's':
-			acc[i] = arg
+			acc[i].S = arg.(string)
 		case 'i':
-			_, err := strconv.Atoi(arg)
+			var s string = fmt.Sprintf("%d", arg)
+			var n int64 = 0
+			n, err = strconv.ParseInt(s, 10, 64)
 			if err != nil {
-				msg := "Expected int at index %d, got %s"
-				err = errors.New(fmt.Sprintf(msg, i, arg))
-				return empty, err
+				msg := "Expected int at index %d, got %v"
+				err = fmt.Errorf(msg, i, arg)
+				return acc, err
 			}
-			acc[i] = arg
+			acc[i].I = n
 		case 'f':
-			_, err := strconv.ParseFloat(arg, 64)
+			var s string = fmt.Sprintf("%f", arg)
+			var n float64 = 0.0
+			n, err = strconv.ParseFloat(s, 64)
 			if err != nil {
-				msg := "Expecrted float at index %d, got %s"
-				err = errors.New(fmt.Sprintf(msg, i, arg))
-				return empty, err
+				msg := "Expected float at index %d, got %v"
+				err = fmt.Errorf(msg, i, arg)
+				return acc, err
 			}
-			acc[i] = arg
+			acc[i].F = n
 		case 'b':
-			v, err := parseBool(arg)
+			var s string = fmt.Sprintf("%s", arg)
+			var v bool = false
+			v, err = strconv.ParseBool(s)
 			if err != nil {
-				return empty, err
+				msg := "Expected bool at index %d, got %s"
+				err = fmt.Errorf(msg, i, s)
+				return acc, err
 			}
-			acc[i] = v
+			acc[i].B = v
 		case 'c':
-			v, err := strconv.Atoi(arg)
-			if err != nil {
-				msg := "Expected MIDI channel at index %d, got %s"
-				err = errors.New(fmt.Sprintf(msg, i, arg))
-				return empty, err
+			var s string = fmt.Sprintf("%d", arg)
+			var n int64 = 0
+			n, err = strconv.ParseInt(s, 10, 64)
+			if err != nil || n < 1 || 16 < n {
+				msg := "Expected MIDI channel at index %d, got %v"
+				err = fmt.Errorf(msg, i, arg)
+				return acc, err
 			}
-			if v < 1 || 16 < v {
-				msg := "Expected MIDI channel at index %d, got %s"
-				err = errors.New(fmt.Sprintf(msg, i, arg))
-				return empty, err
-			}
-			acc[i] = arg
+			acc[i].C = midi.MIDIChannel(n)
 		case 'o':
-			_, err := GetOperator(arg)
+			var s string = fmt.Sprintf("%s", arg)
+			var op Operator
+			op, err = GetOperator(s)
 			if err != nil {
 				msg := "Expected Operator name at index %d, got %s"
-				err = errors.New(fmt.Sprintf(msg, i, arg))
-				return empty, err
+				err = fmt.Errorf(msg, i, arg)
+				return acc, err
 			}
-			acc[i] = arg
-		case '*':
-			acc[i] = fmt.Sprintf("%v", arg)
+			acc[i].O = op
 		default:
-			acc[i] = arg
+			msg := "Unknown Expect template type '%s'"
+			err = fmt.Errorf(msg, xtype)
+			panic(err)
 		}
 	}
 	return acc, err
 }
-		
-
-func ExpectMsg(template string, msg *goosc.Message)([]string, error) {
-	return Expect(template, ToStringSlice(msg.Arguments))
+			
+			
+func ExpectMsg(template string, msg *goosc.Message)([]ExpectValue, error) {
+	return Expect(template, msg.Arguments)
 }
-
-
-
-func ExpectLength(address string, args []string, index int) bool {
-	if index < len(args) {
-		return true
-	} else {
-		msg := "ERROR OSC message %s, Expected at least %d arguments, got %v\n"
-		fmt.Printf(msg, address, index+1, args)
-		return false
-	}
-}
-
-
-func GetStringValue(address string, args []string, index int, fallback string) string {
-	var s string
-	if ExpectLength(address, args, index) {
-		s = args[index]
-	} else {
-		s = fallback
-	}
-	return s
-}
-
-
-func GetIntValue(address string, args []string, index int, fallback int64) int64 {
-	var n int64
-	var err error
-	if ExpectLength(address, args, index) {
-		s := args[index]
-		n, err = strconv.ParseInt(s, 0, 64)
-		if err != nil {
-			msg := "ERROR OSC message %s, Expected int at index %d, got %s\n"
-			fmt.Println(msg, address, index, s)
-			n = fallback
-		}
-	}
-	return n
-}
-		
-func GetFloatValue(address string, args []string, index int, fallback float64) float64 {
-	var n float64
-	var err error
-	if ExpectLength(address, args, index) {
-		s := args[index]
-		n, err = strconv.ParseFloat(s, 64)
-		if err != nil {
-			msg := "ERROR OSC message %s, Expected float at index %d, got %s\n"
-			fmt.Println(msg, address, index, s)
-			n = fallback
-		}
-	}
-	return n
-}
-
-
-
-
-
-	

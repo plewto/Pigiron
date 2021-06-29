@@ -10,11 +10,11 @@ import (
 	"github.com/plewto/pigiron/op"
 )
 
-
 func main() {
 	fmt.Print(config.GlobalParameters.TextColor)
-	fmt.Println("Welcome to Pigiron")
-	config.DumpGlobalParameters()
+	printBanner()
+
+	//config.DumpGlobalParameters()
 	osc.Init()
 	op.Init()
 	osc.Listen()

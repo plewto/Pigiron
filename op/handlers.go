@@ -16,20 +16,18 @@ var (
 // Add general op-related handlers to global OSC server
 //
 func Init() {
-	fmt.Println("opserver.Init() executing -- REMOVE THIS LIEN")
 	server := osc.GlobalServer
 	osc.AddHandler(server, "new", remoteNewOperator)
 	osc.AddHandler(server, "delete-operator", remoteDeleteOperator)
-	osc.AddHandler(server, "delete-all-operators", remoteDeleteAllOperators)
+	osc.AddHandler(server, "delete-all", remoteDeleteAllOperators)
 	osc.AddHandler(server, "connect", remoteConnect)
 	osc.AddHandler(server, "disconnect-child", remoteDisconnect)
 	osc.AddHandler(server, "disconnect-all", remoteDisconnectAll)
 	osc.AddHandler(server, "disconnect-parents", remoteDisconnectParents)
-	osc.AddHandler(server, "reset", remoteReset)
-	osc.AddHandler(server, "reset-all", remoteResetAll)
+	osc.AddHandler(server, "reset-operator", remoteReset)
+	osc.AddHandler(server, "reset-all", remoteResetAll)   // clash with 'reset'
 	osc.AddHandler(server, "enable-midi", remoteEnableMIDI)
 	osc.AddHandler(server, "q-midi-enabled", remoteQueryMIDIEnabled)
-	
 	osc.AddHandler(server, "q-channel-mode", remoteQueryChannelMode)
 	osc.AddHandler(server, "q-channels", remoteQuerySelectedChannels)
 	osc.AddHandler(server, "q-channel-selected", remoteQueryChannelSelected)
@@ -38,12 +36,10 @@ func Init() {
 	osc.AddHandler(server, "select-all-channels", remoteSelectAllChannels)
 	osc.AddHandler(server, "deselect-all-channels", remoteDeselectAllChannels)
 	osc.AddHandler(server, "invert-channels", remoteInvertChannelSelection)
-
-	
+	osc.AddHandler(server, "print-graph", remotePrintGraph)
         osc.AddHandler(server, "q-operator-types", remoteQueryOperatorTypes)
 	osc.AddHandler(server, "q-operators", remoteQueryOperators)
 	osc.AddHandler(server, "q-roots", remoteQueryRoots)
-	osc.AddHandler(server, "print-graph", remotePrintGraph)
 	osc.AddHandler(server, "q-graph", remoteQueryGraph)
 	osc.AddHandler(server, "q-commands", remoteQueryCommands)
 	osc.AddHandler(server, "q-children", remoteQueryChildren)

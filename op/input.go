@@ -4,6 +4,7 @@ import (
 	"fmt"
 	
 	"github.com/rakyll/portmidi"
+	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
 )
@@ -32,6 +33,7 @@ func newMIDIInput(name string,  devID portmidi.DeviceID) (*MIDIInput, error) {
 		return op, err
 	}
 	op.stream = stream
+	op.addCommandHandler("q-device", op.remoteQueryDevice)
 	return op, err
 }
 
@@ -109,3 +111,15 @@ func (op *MIDIInput) Info() string {
 	s += fmt.Sprintf("\tDevice Name : %s\n", op.DeviceName())
 	return s
 }
+
+
+// osc /pig/op name q-device
+// -> id, device-name
+//
+func (op *MIDIInput) remoteQueryDevice(_ *goosc.Message)([]string, error) {
+	var err error
+	id := fmt.Sprintf("%v", op.DeviceID())
+	name := fmt.Sprintf("\"%s\"", op.DeviceName())
+	return []string{id, name}, err
+}
+	

@@ -6,6 +6,7 @@ import (
 	"time"
 	
 	"github.com/rakyll/portmidi"
+	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
 )
@@ -45,6 +46,7 @@ func newMIDIOutput(name string,  devID portmidi.DeviceID) (*MIDIOutput, error) {
 		return op, err
 	}
 	op.stream = stream
+	op.addCommandHandler("q-device", op.remoteQueryDevice)
 	return op, err
 }
 
@@ -131,3 +133,12 @@ func (op *MIDIOutput) Panic() {
 
 
 
+// osc /pig/op name q-device
+// -> id, device-name
+//
+func (op *MIDIOutput) remoteQueryDevice(_ *goosc.Message)([]string, error) {
+	var err error
+	id := fmt.Sprintf("%v", op.DeviceID())
+	name := fmt.Sprintf("\"%s\"", op.DeviceName())
+	return []string{id, name}, err
+}

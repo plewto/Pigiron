@@ -8,6 +8,10 @@ import (
 	"github.com/plewto/pigiron/midi"
 )
 
+// ChannelFilter is an Operator which selectively blocks MIDI channels.
+// Only MIDI messages with channels enabled in the filter are allowed through.
+// Separately non-channel messages may also be filtered.
+//
 type ChannelFilter struct {
 	baseOperator
 	enableSystemEvents bool 

@@ -1,7 +1,11 @@
 package op
 
+/*
+ * Defines global OSC handler functions.
+ *
+*/
+
 import (
-	//"errors"
 	"fmt"
 	"strconv"
 	"github.com/rakyll/portmidi"
@@ -11,9 +15,8 @@ import (
 	"github.com/plewto/pigiron/config"
 )
 
-var (
-	empty []string
-)
+var empty []string
+
 
 // Add general op-related handlers to global OSC server
 //
@@ -651,8 +654,6 @@ func remotePrintInfo(msg *goosc.Message)([]string, error) {
 	fmt.Println(args[0].O.Info())
 	return empty, err
 }
-
-
 
 // osc /pig/print-config
 // -> Ack

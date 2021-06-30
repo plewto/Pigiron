@@ -12,11 +12,9 @@ import (
 )
 
 // MIDIOutput is an Operator wrapper for MIDI output devices.
-// MIDIOutput implements the PigOp and DeviceWrapper interfaces.
-//
-// There may only be a single MIDIOutput for any one MIDI output device.
-// Upon construct new MIDIutputs are cached.  Attempts to create another
-// MIDIOutput for the same output device returns the cached object.
+// For each available MIDI device there may be only one corresponding MIDIOutput.
+// If an attempt is made to create a MIDIOutput for a device which is already
+// in use, the original MIDIOutput is returned.
 //
 type MIDIOutput struct {
 	baseOperator

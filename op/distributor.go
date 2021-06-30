@@ -6,13 +6,18 @@ import (
 	"github.com/plewto/pigiron/midi"
 )
 
+// Distributor is an Operator for changing MIDI channel numbers.
+// Incoming channel-message are rebroadcast on each of the distributors
+// selected channels.   The original message channel is ignored.
+// All non-channel messages are passed unchanged.
+//
 type Distributor struct {
 	baseOperator
 }
 
 func newDistributor(name string) *Distributor {
 	op := new(Distributor)
-	initOperator(&op.baseOperator, "ChannelFilter", name, midi.MultiChannel)
+	initOperator(&op.baseOperator, "Distributor", name, midi.MultiChannel)
 	op.Reset()
 	return op
 }

@@ -8,9 +8,11 @@ import (
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
-	// "github.com/plewto/pigiron/osc"
 )
 
+// baseOperator implements the Operator interface.
+// All Operator classes should extend baseOperator.
+//
 type baseOperator struct {
 	opType string
 	name string

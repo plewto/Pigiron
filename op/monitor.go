@@ -7,6 +7,8 @@ import (
 	"github.com/plewto/pigiron/midi"
 )
 
+// Monitor is an Operator for real-time monitoring of MIDI events.
+//
 type Monitor struct {
 	baseOperator
 }

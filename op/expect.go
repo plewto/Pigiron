@@ -1,18 +1,20 @@
 package op
 
+/*
+ * Expect provide OSC message argument validation.
+ *
+*/
 
 import (
-	//"errors"
 	"fmt"
 	"strconv"
-	//"strings"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/midi"
 )
 
 
-
-
+// StringSlice Embeds all arguments into string slice.
+//
 func StringSlice(values ...interface{}) []string {
 	acc := make([]string, len(values))
 	for i, v := range values {
@@ -21,6 +23,9 @@ func StringSlice(values ...interface{}) []string {
 	return acc
 }
 
+
+// ToStringSlice converts []interface slice into a string slice.
+//
 func ToStringSlice(values []interface{}) []string {
 	acc := make([]string, len(values))
 	for i, v := range values {
@@ -30,6 +35,11 @@ func ToStringSlice(values []interface{}) []string {
 }
 
 
+// ExpectValue struct holds return values for the Expect function.
+// Each field has a different type and the Expect function sets the appropriate
+// field based on it's template argument.  Only one field should ever have
+// a non-nil value.
+//
 type ExpectValue struct {
 	S string
 	I int64
@@ -38,7 +48,26 @@ type ExpectValue struct {
 	C midi.MIDIChannel
 	O Operator}
 
- 
+
+// Expect validates a list of values for appropriate type.
+// Each character in the template indicates the expected value for the
+// corresponding position of the values list.
+// The possible template characters are:
+//     s - string
+//     i - int64
+//     f - float64
+//     b - bool (see strconv.ParseBool for excepted values)
+//     c - MIDI channel (int 1 <= n <= 16)
+//     o - Operator name
+//
+// The returned error is non-nil if either:
+//    - len(template) > len(values)
+//    - values[i] does not correspond to template[i]
+//
+// If no errors are detected the result is a list of ExpectValue of
+// length len(template), with the appropriate ExpectType field set
+// for each element.
+//
 func Expect(template string, values []interface{})([]ExpectValue, error) {
 	var err error
 	var acc []ExpectValue = make([]ExpectValue, len(template))
@@ -111,7 +140,8 @@ func Expect(template string, values []interface{})([]ExpectValue, error) {
 	return acc, err
 }
 			
-			
+// ExpectMsg is identical to Expect but is applied to osc message Arguments field.
+//
 func ExpectMsg(template string, msg *goosc.Message)([]ExpectValue, error) {
 	return Expect(template, msg.Arguments)
 }

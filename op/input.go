@@ -10,6 +10,11 @@ import (
 )
 
 
+// MIDIInput is an Operator wrapper for MIDI input devices.
+// For each available MIDI device there may be only one corresponding MIDIInput.
+// If an attempt is made to create a MIDIInput for a device which is already
+// in use, the original MIDIInput is returned.
+//
 type MIDIInput struct {
 	baseOperator
 	devID portmidi.DeviceID

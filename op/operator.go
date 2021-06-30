@@ -6,6 +6,13 @@ import (
 	"github.com/plewto/pigiron/midi"
 )
 
+// Operator interface defines the primary pigiron object.
+// Operators are linked together as nodes on a MIDI process tree.
+// Each Operator has zero or more parents (inputs) and zero or more
+// children (outputs).  When an Operator receives a MIDI message via it's
+// Send method, it selectively forwards it to all of it's child Operators.
+// The message may be modified prior to rebroadcasting it.
+// 
 
 type Operator interface {
 	midi.ChannelSelector

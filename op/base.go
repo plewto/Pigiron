@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/rakyll/portmidi"
+	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
 	// "github.com/plewto/pigiron/osc"
@@ -17,7 +18,7 @@ type baseOperator struct {
 	parentMap map[string]Operator
 	childrenMap map[string]Operator
 	midiOutputEnabled bool
-	dispatchTable map[string]func(args []string)([]string, error)
+	dispatchTable map[string]func(*goosc.Message)([]string, error)
 }
 
 func initOperator(op *baseOperator, opType string, name string, mode midi.ChannelMode) {
@@ -34,13 +35,9 @@ func initOperator(op *baseOperator, opType string, name string, mode midi.Channe
 	op.parentMap = make(map[string]Operator)
 	op.childrenMap = make(map[string]Operator)
 	op.midiOutputEnabled = true
-	op.dispatchTable = make(map[string]func(args []string)([]string, error))
+	op.dispatchTable = make(map[string]func(*goosc.Message)([]string, error))
 	op.addCommandHandler("ping", op.remotePing)
 	op.addCommandHandler("q-commands", op.remoteQueryCommands)
-	//op.addCommandHandler("q-is-root", op.remoteQueryIsRoot)
-	//op.addCommandHandler("q-children", op.remoteQueryChildren)
-	//op.addCommandHandler("q-parents", op.remoteQueryParents)
-	//op.addCommandHandler("reset", op.remoteReset)
 }
 
 func (op *baseOperator) OperatorType() string {
@@ -293,7 +290,7 @@ func (op *baseOperator) Send(event portmidi.Event) {
 }
 
 
-func (op *baseOperator) DispatchCommand(command string, args []string)([]string, error) {
+func (op *baseOperator) DispatchCommand(command string, msg *goosc.Message)([]string, error) {
 	var err error
 	var result []string
 	handler, flag := op.dispatchTable[command]
@@ -302,7 +299,7 @@ func (op *baseOperator) DispatchCommand(command string, args []string)([]string,
 		err = errors.New(fmt.Sprintf(msg, op.OperatorType(), op.Name(), command))
 		return result, err
 	}
-	result, err = handler(args)
+	result, err = handler(msg)
 	return result, err
 }
 
@@ -314,7 +311,7 @@ func (op *baseOperator) Commands() []string {
 	return keys
 }
 
-func (op *baseOperator) addCommandHandler(command string, handler func(args []string)([]string, error)) {
+func (op *baseOperator) addCommandHandler(command string, handler func(*goosc.Message)([]string, error)) {
 	op.dispatchTable[command] = handler
 }
 	
@@ -322,7 +319,7 @@ func (op *baseOperator) addCommandHandler(command string, handler func(args []st
 // osc /pig/op name, ping
 // -> ACK
 //
-func (op *baseOperator) remotePing(args []string)([]string, error) {
+func (op *baseOperator) remotePing(*goosc.Message)([]string, error) {
 	var err error
 	var result = []string{op.Name(), "Ping"}
 	return result, err
@@ -331,58 +328,8 @@ func (op *baseOperator) remotePing(args []string)([]string, error) {
 // osc /pig/op name, q-commands
 // -> list of operator-local commands
 //
-func (op *baseOperator) remoteQueryCommands(args []string)([]string, error) {
+func (op *baseOperator) remoteQueryCommands(*goosc.Message)([]string, error) {
 	var err error
 	return op.Commands(), err
 }
-
-// // osc /pig/op name, q-is-root
-// // -> bool
-// //
-// func (op *baseOperator) remoteQueryIsRoot(args []string)([]string, error) {
-// 	var err error
-// 	acc := make([]string, 1, 1)
-// 	acc[0] = fmt.Sprintf("%v", op.IsRoot())
-// 	return acc, err
-// }
-
-// // osc /pig/op name, q-children
-// // -> list
-// //
-// func (op *baseOperator) remoteQueryChildren(args []string)([]string, error) {
-// 	var err error
-// 	clist := op.children()
-// 	acc := make([]string, len(clist))
-// 	i := 0
-// 	for name, _ := range clist {
-// 		acc[i] = name
-// 		i++
-// 	}
-// 	return acc, err
-// }
-
-// // osc /pig/op name, q-parents
-// // -> list
-// //
-// func (op *baseOperator) remoteQueryParents(args []string)([]string, error) {
-// 	var err error
-// 	clist := op.parents()
-// 	acc := make([]string, len(clist))
-// 	i := 0
-// 	for name, _ := range clist {
-// 		acc[i] = name
-// 		i++
-// 	}
-// 	return acc, err
-// }
-
-// // osc /pig/op name, reset
-// // -> ACK
-// //
-// func (op *baseOperator) remoteReset(args []string)([]string, error) {
-// 	var err error
-// 	var acc []string
-// 	op.Reset()
-// 	return acc, err
-// }
 

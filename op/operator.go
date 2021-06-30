@@ -2,6 +2,7 @@ package op
 
 import (
 	"github.com/rakyll/portmidi"
+	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/midi"
 )
 
@@ -36,9 +37,9 @@ type Operator interface {
 	DisconnectParents()
 
 	// OSC
-	DispatchCommand(command string, args []string)([]string, error)
+	DispatchCommand(command string, msg *goosc.Message)([]string, error)
 	Commands() []string
-	addCommandHandler(command string, handler func(args []string)([]string, error))
+	addCommandHandler(command string, handler func(*goosc.Message)([]string, error))
 	
 	// MIDI
 	MIDIOutputEnabled() bool

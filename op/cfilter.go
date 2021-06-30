@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/rakyll/portmidi"
+	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/midi"
 )
 
@@ -15,6 +16,8 @@ type ChannelFilter struct {
 func newChannelFilter(name string) *ChannelFilter {
 	op := new(ChannelFilter)
 	initOperator(&op.baseOperator, "ChannelFilter", name, midi.MultiChannel)
+	op.addCommandHandler("q-system-events-enabled", op.remoteQuerySystemEventsEnabled)
+	op.addCommandHandler("enable-system-events", op.remoteEnableSystemEvents)
 	op.Reset()
 	return op
 }
@@ -47,3 +50,24 @@ func (op *ChannelFilter) Info() string {
 	s += fmt.Sprintf("\tenable system events: %v\n", op.enableSystemEvents)
 	return s
 }
+
+
+// osc /pig/op name q-system-events-enabled
+// -> bool
+//
+func (op *ChannelFilter) remoteQuerySystemEventsEnabled(_ *goosc.Message)([]string, error) {
+	var err error
+	s := fmt.Sprintf("%v", op.enableSystemEvents)
+	return []string{s}, err
+}
+
+
+// osc /pig/op name enable-system-events flag
+// -> Ack
+//
+func (op *ChannelFilter) remoteEnableSystemEvents(msg *goosc.Message)([]string, error) {
+	args, err := ExpectMsg("ssb", msg)
+	op.enableSystemEvents = args[2].B
+	return empty, err
+}
+	

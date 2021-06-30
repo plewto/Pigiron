@@ -51,6 +51,11 @@ func Init() {
 	osc.AddHandler(server, "q-commands", remoteQueryCommands)
 	osc.AddHandler(server, "q-children", remoteQueryChildren)
 	osc.AddHandler(server, "q-parents", remoteQueryParents)
+	osc.AddHandler(server, "print-info", remotePrintInfo)
+	osc.AddHandler(server, "print-config", remotePrintConfig)
+
+
+	
 	osc.AddHandler(server, "op", dispatchExtendedCommand)
 }
 
@@ -616,7 +621,7 @@ func remoteQueryChildren(msg *goosc.Message)([]string, error) {
 	return acc, err
 }
 
-// psc /pig/q-parents name
+// osc /pig/q-parents name
 // -> list
 //
 func remoteQueryParents(msg *goosc.Message)([]string, error) {
@@ -634,7 +639,29 @@ func remoteQueryParents(msg *goosc.Message)([]string, error) {
 	}
 	return acc, err
 }
-	
+
+// osc /pig/print-info name
+// -> Ack
+//
+func remotePrintInfo(msg *goosc.Message)([]string, error) {
+	args, err := ExpectMsg("o", msg)
+	if err != nil {
+		return empty, err
+	}
+	fmt.Println(args[0].O.Info())
+	return empty, err
+}
+
+
+
+// osc /pig/print-config
+// -> Ack
+//
+func remotePrintConfig(msg *goosc.Message)([]string, error) {
+	var err error
+	config.PrintConfig()
+	return empty, err
+}
 
 // osc  /pig/op  [name, command, arguments...]
 //
@@ -645,7 +672,7 @@ func dispatchExtendedCommand(msg *goosc.Message)([]string, error) {
 	}
 	op := args[0].O
 	command := args[1].S
-	result, rerr := op.DispatchCommand(command, ToStringSlice(msg.Arguments))
+	result, rerr := op.DispatchCommand(command, msg)
 	return result, rerr
 }
 

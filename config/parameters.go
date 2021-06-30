@@ -52,8 +52,9 @@ func ResetGlobalParameters() {
 
 // DumpGlobalParameters prints the global configuration values.
 //
-func DumpGlobalParameters() {
-	fmt.Println("Global Parameters:")
+func PrintConfig() {
+	fmt.Println("Global configuration values\n")
+	fmt.Printf("\tpigiron version: %s\n", Version)
 	fmt.Printf("\tconfig file was \"%s\"\n", configFilename)
 	fmt.Printf("\tOSCServerRoot         : %v\n", GlobalParameters.OSCServerRoot)
 	fmt.Printf("\tOSCServerHost         : %v\n", GlobalParameters.OSCServerHost)

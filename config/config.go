@@ -16,6 +16,9 @@ import (
 	"strconv"
 )
 
+const Version = "0.0.1"
+	
+
 var (
 	GlobalParameters = globalParameters{}
 	configFilename string

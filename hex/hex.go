@@ -1,13 +1,13 @@
-package smf
+// Hex dump utility
+//
+package hex
 
-import (
-	"fmt"
-)
+import "fmt"
 
-const xDumpLineLength int = 16
+const LineLength int = 16
 
 func padHex(s string) string {
-	tlen := 3 * xDumpLineLength + 8
+	tlen := 3 * LineLength + 8
 	f := fmt.Sprintf("%%-%ds ", tlen)
 	return fmt.Sprintf(f, s) + "  :  "
 }
@@ -16,7 +16,7 @@ func padHex(s string) string {
 func formatLine(data []byte, start int) string {
 	acc := fmt.Sprintf("[%4x] ", start)
 	bcc := ""
-	for i, j := start, 0; i < len(data) && j < xDumpLineLength; i, j = i+1, j+1 {
+	for i, j := start, 0; i < len(data) && j < LineLength; i, j = i+1, j+1 {
 		value := data[i]
 		acc += fmt.Sprintf("%02x ", value)
 		if 0x20 <= value && value < 0x7F {
@@ -29,14 +29,16 @@ func formatLine(data []byte, start int) string {
 }
 		
 
+// HexDump prints formated values from byte slice.
+//
 func HexDump(data []byte, start int, end int) {
 	if end <= 0 {
 		end = len(data)
 	}
-	for i := start; i < end; i += xDumpLineLength {
+	for i := start; i < end; i += LineLength {
 		fmt.Println(formatLine(data, i))
 	}
-}
+} 
 
 
 

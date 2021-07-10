@@ -5,7 +5,7 @@ import (
 	"github.com/rakyll/portmidi"
 )
 
-// Implements RealtimeMIDIMessage
+// Implements MIDIMessage
 //
 type ChannelMessage struct {
 	bytes []byte
@@ -61,7 +61,8 @@ func (m *ChannelMessage) Dump() {
 	fmt.Printf("] %s\n", m)
 }
 
-func (m *ChannelMessage) ToPortmidiEvent() portmidi.Event {
+func (m *ChannelMessage) ToPortmidiEvent() (portmidi.Event, error) {
+	var err error
 	var time portmidi.Timestamp = portmidi.Timestamp(0)
 	var status int64 = int64(m.bytes[0])
 	var d1, d2 int64
@@ -73,7 +74,7 @@ func (m *ChannelMessage) ToPortmidiEvent() portmidi.Event {
 	}
 	var sysex = make([]byte, 0)
 	pme := portmidi.Event{time, status, d1, d2, sysex}
-	return pme
+	return pme, err
 }
 	
 		

@@ -1,6 +1,9 @@
 package smf
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/rakyll/portmidi"
+)
 
 type MetaType byte
 
@@ -145,6 +148,14 @@ func (m *MetaMessage) Data() []byte {
 	}
 	return m.bytes[index:]
 }
+
+func (m *MetaMessage) ToPortmidiEvent() (portmidi.Event, error) {
+	var dummy portmidi.Event
+	msg := "MetaMessage %s can not be converted to portmidi.Event"
+	err := fmt.Errorf(msg, m.MetaType())
+	return dummy, err
+}
+
 
 func newMetaMessage(mtype MetaType, data []byte) *MetaMessage {
 	head := []byte{byte(MetaStatus), byte(mtype)}

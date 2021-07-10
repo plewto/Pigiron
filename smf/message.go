@@ -110,10 +110,11 @@ type MIDIMessage interface {
 	Status() StatusByte
 	Bytes() []byte
 	Dump()
+	ToPortmidiEvent() (portmidi.Event, error)
 }
 	
-type RealtimeMIDIMessage interface {
-	MIDIMessage
-	ToPortmidiEvent() portmidi.Event
-}
+// type RealtimeMIDIMessage interface {
+// 	MIDIMessage
+//	
+// }
 

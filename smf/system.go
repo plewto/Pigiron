@@ -2,9 +2,10 @@ package smf
 
 import (
 	"fmt"
+	"github.com/rakyll/portmidi"
 )
 
-// Implements RealtimeMIDIMessage
+// Implements MIDIMessage
 //
 type SystemMessage struct {
 	bytes []byte
@@ -70,6 +71,10 @@ func (sys *SystemMessage) Bytes() []byte {
 	return sys.bytes
 }
 
+func (sys *SystemMessage) IsSystemExclusive() bool {
+	return sys.Status() == SysexStatus
+}
+
 
 func (sys *SystemMessage) Dump() {
 
@@ -109,3 +114,20 @@ func (sys *SystemMessage) Dump() {
 }
 	
 
+		
+func (sys *SystemMessage) ToPortmidiEvent() (portmidi.Event, error) {
+	var err error
+	var pm portmidi.Event
+	time := portmidi.Timestamp(0)
+	stat := int64(sys.Status())
+	if sys.IsSystemExclusive() {
+		// ISSURE: Should sysex status be included or excluded from payload? 
+		payload := sys.Bytes()
+		pm = portmidi.Event{time, stat, 0, 0, payload}
+	} else {
+		payload := []byte{}
+		pm = portmidi.Event{time, stat, 0, 0, payload}
+	}
+	return pm, err
+}
+	

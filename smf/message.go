@@ -1,10 +1,16 @@
 package smf
 
+/*
+ * Defines general MIDI messages.
+ *
+ */
+
 import (
 	"github.com/rakyll/portmidi"	
 )
 
-
+// StatusByte type represents MIDI message status byte.
+// 
 type StatusByte byte
 
 const (
@@ -16,7 +22,6 @@ const (
 	ChannelPressureStatus StatusByte = 0xD0
 	BendStatus StatusByte = 0xE0
 	MetaStatus StatusByte = 0xFF
-	
 	ClockStatus StatusByte = 0xF8
 	StartStatus StatusByte = 0xFA
 	ContinueStatus StatusByte = 0xFB
@@ -27,6 +32,8 @@ const (
 )
 
 var (
+	// statusTable maps StatusByte to string mnemonic.
+	//
 	statusTable = map[StatusByte]string {
 		NoteOffStatus: "OFF ",
 		NoteOnStatus: "ON  ",
@@ -77,22 +84,29 @@ var (
 	
 )
 
-
+// isStatusByte returns true iff argument is a valid MIDI status byte.
+//
 func isStatusByte(s byte) bool {
 	_, flag := statusTable[StatusByte(s)]
 	return flag
 }
 
+// isChannelStatus returns true iff argument is a channel-based status byte.
+//
 func isChannelStatus(s byte) bool {
 	_, flag := channelStatusTable[StatusByte(s)]
 	return flag
 }
 
+// isSystemStatus returns true iff argument is a system-message status byte.
+//
 func isSystemStatus(s byte) bool {
 	_, flag := systemStatusTable[StatusByte(s)]
 	return flag
 }
 
+// isMetaStatus returns true iff argument is the meta status byte.
+//
 func isMetaStatus(s byte) bool {
 	return StatusByte(s) == MetaStatus
 }
@@ -106,6 +120,13 @@ func (s StatusByte) String() string {
 	return c
 }
 
+
+// MIDIMessage interface universal MIDI message methods.
+// There are at least three implementing structure:
+//   ChannelMessage
+//   SystemMessage
+//   MetaMessage
+//
 type MIDIMessage interface {
 	Status() StatusByte
 	Bytes() []byte
@@ -113,8 +134,3 @@ type MIDIMessage interface {
 	ToPortmidiEvent() (portmidi.Event, error)
 }
 	
-// type RealtimeMIDIMessage interface {
-// 	MIDIMessage
-//	
-// }
-

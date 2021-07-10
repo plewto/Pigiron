@@ -1,7 +1,12 @@
 package smf
 
-import "fmt"
+/*
+ * Defines MIDI variable-length quantity.
+ * http://midi.teragonaudio.com/tech/midifile/vari.htm
+ *
+ */
 
+import "fmt"
 
 // VLQ implements MIDI file variable length quantity.
 //
@@ -47,7 +52,6 @@ func (vlq *VLQ) Value() int {
 	}
 	return acc
 }
-
 
 func (vlq *VLQ) String() string {
 	s := "VLQ [ "

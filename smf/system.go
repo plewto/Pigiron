@@ -1,16 +1,25 @@
 package smf
 
+/*
+ * Defines MIDI System-message implementation of MIDIMessage
+ *
+ */
+
 import (
 	"fmt"
 	"github.com/rakyll/portmidi"
 )
 
-// Implements MIDIMessage
+// SystemMessage implements MIDIMessage for real-time system messages.
 //
 type SystemMessage struct {
 	bytes []byte
 }
 
+// newSystemMessage returns pointer to new instance of SystemMessage
+// bytes - the byte stream defining this message.
+// Returns non-nil error if status byte (bytes[0]) is not valid as a system-message.
+//
 func newSystemMessage(bytes []byte) (*SystemMessage, error) {
 	var err error
 	var sys *SystemMessage
@@ -53,7 +62,6 @@ func NewEndSysexMessage() (*SystemMessage, error) {
 	bytes := []byte{byte(EndSysexStatus)}
 	return newSystemMessage(bytes)
 }
-
 
 // Do not include sysex status
 func NewSysexMessage(data []byte) (*SystemMessage, error) {
@@ -121,7 +129,7 @@ func (sys *SystemMessage) ToPortmidiEvent() (portmidi.Event, error) {
 	time := portmidi.Timestamp(0)
 	stat := int64(sys.Status())
 	if sys.IsSystemExclusive() {
-		// ISSURE: Should sysex status be included or excluded from payload? 
+		// ISSUE: Should sysex status be included or excluded from payload? 
 		payload := sys.Bytes()
 		pm = portmidi.Event{time, stat, 0, 0, payload}
 	} else {

@@ -1,16 +1,28 @@
 package smf
 
+/*
+ * Defines channel based MIDI Messages.
+ */ 
+
 import (
 	"fmt"
 	"github.com/rakyll/portmidi"
 )
 
-// Implements MIDIMessage
+// ChannelMessage struct implements MIDIMessage for channel based MIDI messages.
 //
 type ChannelMessage struct {
 	bytes []byte
 }
 
+// NewChannelMessage returns pointer to a new ChannelMessage instance.
+// status - must be a channel-based status byte. The lower 4 bits are masked out.
+// channelByte - The MIDI channel-1, The upper 4 bits are masked out.
+// data1 - The first data byte, 0x00 <= data1 < 0x80.
+// data2 - The second data byte, ignored for channel pressure and program events. 0x00 <= data2 < 0x80.
+//
+// Returns non-nil error if status is not a channel status.
+//
 func NewChannelMessage(status StatusByte, channelByte byte, data1 byte, data2 byte) (*ChannelMessage, error) {
 	var err error
 	var m *ChannelMessage
@@ -30,15 +42,21 @@ func NewChannelMessage(status StatusByte, channelByte byte, data1 byte, data2 by
 	return m, err
 }
 
+// Status returns the message status byte, the lower 4-bits are masked out.
+//
 func (m *ChannelMessage) Status() StatusByte {
 	sb := m.bytes[0]
 	return StatusByte(sb & 0xF0)
 }
 
+// ChannelByte returns the MIDI channel-1, 0 <= c < 16,
+//
 func (m *ChannelMessage) ChannelByte() byte {
 	return m.bytes[0] & 0x0F
 }
 
+// Bytes returns the corresponding byte sequence for this message.
+//
 func (m *ChannelMessage) Bytes() []byte {
 	return m.bytes
 }
@@ -61,6 +79,10 @@ func (m *ChannelMessage) Dump() {
 	fmt.Printf("] %s\n", m)
 }
 
+// Deportment converts ChannelMessage to equivalent portmidi.Event.
+// The event time is set to 0.
+// The error return is always nil.
+//
 func (m *ChannelMessage) ToPortmidiEvent() (portmidi.Event, error) {
 	var err error
 	var time portmidi.Timestamp = portmidi.Timestamp(0)
@@ -76,8 +98,3 @@ func (m *ChannelMessage) ToPortmidiEvent() (portmidi.Event, error) {
 	pme := portmidi.Event{time, status, d1, d2, sysex}
 	return pme, err
 }
-	
-		
-	
-
-		

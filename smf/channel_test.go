@@ -34,7 +34,8 @@ func TestChannelMessage(t *testing.T) {
 		msg := "ChannelMessage bytes contains incorrect values, expected [x 60, 64], got %v"
 		t.Fatalf(msg, bytes)
 	}
-	var pmEvent portmidi.Event = cmsg.ToPortmidiEvent()
+	var pmEvent portmidi.Event
+	pmEvent, _ = cmsg.ToPortmidiEvent()
 	if pmEvent.Status != int64(bytes[0]) {
 		msg := "ToPortmidiEvent conversion has wrong status, expected %d, got %d"
 		t.Fatalf(msg, bytes[0], pmEvent.Status)

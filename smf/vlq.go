@@ -17,7 +17,7 @@ func reverse(src []byte) []byte {
 	return acc
 }
 
-func (vlq *VLQ) SetBytes(bytes []byte) {
+func (vlq *VLQ) setBytes(bytes []byte) {
 	vlq.bytes = bytes
 }
 
@@ -57,9 +57,14 @@ func (vlq *VLQ) String() string {
 	s += fmt.Sprintf("] Value 0x%x", vlq.Value())
 	return s
 }
-		
 
 
 func (vlq *VLQ) Length() int {
 	return len(vlq.bytes)
+}
+
+func NewVLQ(value int) *VLQ {
+	vlq := &VLQ{}
+	vlq.SetValue(value)
+	return vlq
 }

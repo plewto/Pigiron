@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+
 // expectID checks byte buffer for specific chunk ID.
 // buffer - the data
 // index - location in buffer to be checked.
@@ -65,14 +66,14 @@ func getShort(buffer []byte, index int) (int, error) {
 
 // getByte extracts byte from buffer at index.
 //
-func getByte(buffer []byte, index int) (int, error) {
+func getByte(buffer []byte, index int) (byte, error) {
 	var err error
 	if len(buffer) <= index {
 		msg := "ERROR smf.getByte() index out of range: index = %d, buffer length = %d"
 		err = fmt.Errorf(msg, index, len(buffer))
 		return 0, err
 	}
-	return int(buffer[index]), err
+	return buffer[index], err
 }
 
 // getVLQ extracts variable-length-value starting at index.
@@ -99,6 +100,9 @@ func getVLQ(buffer []byte, index int)(*VLQ, error) {
 		}
 		index++
 	}
-	vlq.SetBytes(acc)
+	vlq.setBytes(acc)
 	return vlq, err
 }
+
+
+

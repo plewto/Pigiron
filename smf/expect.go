@@ -2,9 +2,24 @@ package smf
 
 import (
 	"fmt"
-	// "github.com/plewto/pigiron/pigerror"
 )
 
+func exError(message string, more ...string) error {
+	msg := fmt.Sprintf("ERROR: %s", message)
+	for _, s := range more {
+		msg += fmt.Sprintf("\nERROR: %s", s)
+	}
+	return fmt.Errorf(msg)
+}
+
+func compoundError(err1 error, message string, more ...string) error {
+	msg := fmt.Sprintf("ERROR: %s\n", message)
+	for _, s := range more {
+		msg += fmt.Sprintf("\nERROR: %s", s)
+	}
+	msg += fmt.Sprintf("PREVIOUS ERROR:\n%s", err1)
+	return fmt.Errorf(msg)
+}
 
 // expectChunkID checks byte buffer for specific chunk ID.
 // buffer - the data
@@ -17,7 +32,7 @@ func expectChunkID(buffer []byte, index int, target [4]byte) error {
 	for i, j := index, 0; j < 4; i, j = i+1, j+1 {
 		if i > len(buffer) {
 			msg := "smf.expectID index out of bounds, index = %d"
-			err = fmt.Errorf(msg, i)
+			err = exError(msg)
 			return err
 		}
 		if buffer[i] != target[j] {
@@ -25,8 +40,8 @@ func expectChunkID(buffer []byte, index int, target [4]byte) error {
 			for _, c := range target {
 				id += fmt.Sprintf("%c", c)
 			}
-			msg := "smf.expectID, expected chunk id '%v' not found"
-			err = fmt.Errorf(msg, id)
+			msg := fmt.Sprintf("smf.expectID, expected chunk id '%v' not found", id)
+			err = exError(msg)
 			return err
 		}
 	}
@@ -40,7 +55,8 @@ func getLong(buffer []byte, index int) (int, error) {
 	var err error
 	if len(buffer) < index+4 {
 		msg := "smf.getLong index out of range: index = %d, buffer length = %d"
-		err = fmt.Errorf(msg, index, len(buffer))
+		msg = fmt.Sprintf(msg, index, len(buffer))
+		err = exError(msg)
 		return 0, err
 	}
 	acc := 0
@@ -57,7 +73,8 @@ func getShort(buffer []byte, index int) (int, error) {
 	var err error
 	if len(buffer) < index+2 {
 		msg := "smf.getShort() index out of range: index = %d, buffer length = %d"
-		err = fmt.Errorf(msg, index, len(buffer))
+		msg = fmt.Sprintf(msg, index, len(buffer))
+		err = exError(msg)
 		return 0, err
 	}
 	acc := 0
@@ -74,7 +91,8 @@ func getByte(buffer []byte, index int) (byte, error) {
 	var err error
 	if len(buffer) <= index {
 		msg := "smf.getByte() index out of range: index = %d, buffer length = %d"
-		err = fmt.Errorf(msg, index, len(buffer))
+		msg = fmt.Sprintf(msg, index, len(buffer))
+		err = exError(msg)
 		return 0, err
 	}
 	return buffer[index], err
@@ -94,7 +112,8 @@ func getVLQ(buffer []byte, index int)(*VLQ, error) {
 		}
 		if index >= len(buffer) {
 			msg := "smf.getVLQ index out of bounds, index = %d, buffer length = %d"
-			err = fmt.Errorf(msg, index, len(buffer))
+			msg = fmt.Sprintf(msg, index, len(buffer))
+			err = exError(msg)
 			return vlq, err
 		}
 		n := buffer[index]
@@ -121,7 +140,8 @@ func getRunningStatusMessage(buffer []byte, index int, st StatusByte, ch byte)(*
 	count, flag := channelStatusDataCount[StatusByte(st)]
 	if !flag {
 		msg := "smf.getRunningStatusMessage, non-channnel status: 0x%x '%s' at index %d"
-		err = fmt.Errorf(msg, st, st, index)
+		msg = fmt.Sprintf(msg, st, st, index)
+		err = exError(msg)
 		return cmsg, index, err
 	}
 	switch count {
@@ -141,9 +161,9 @@ func getRunningStatusMessage(buffer []byte, index int, st StatusByte, ch byte)(*
 	var err2 error
 	cmsg, err2 = NewChannelMessage(st, ch, data1, data2)
 	if err2 != nil {
-		msg := fmt.Sprintf("%s\n", err2)
-		msg += fmt.Sprintf("smf.GetRunningStatusMessage, status was 0x%x '%s', index was %d", st, st, startIndex)
-		err = fmt.Errorf(msg)
+		msg := "smf.GetRunningStatusMessage, status was 0x%x '%s', index was %d"
+		msg = fmt.Sprintf(msg, st, st, startIndex)
+		err = compoundError(err2, msg)
 	}
 	return cmsg, index, err
 }
@@ -196,9 +216,9 @@ func getChannelMessage(buffer []byte, index int)(*ChannelMessage, int, error) {
 	var err2 error
 	cmsg, err2 = NewChannelMessage(st, ch, data1, data2)	
 	if err2 != nil {
-		msg := fmt.Sprintf("smf.GetRunningStatusMessage, status was 0x%x '%s', index was %d", st, st, startIndex)
-		msg += fmt.Sprintf("\n%s", err2)
-		err = fmt.Errorf(msg)
+		msg := "smf.GetRunningStatusMessage, status was 0x%x '%s', index was %d"
+		msg = fmt.Sprintf(msg, st, st, startIndex)
+		err = compoundError(err2, msg)
 	}
 	return cmsg, index, err
 }
@@ -260,8 +280,7 @@ func getSystemMessage(buffer []byte, index int)(*SystemMessage, int, error) {
 	sys, err2 = newSystemMessage(bytes)
 	if err2 != nil {
 		msg := fmt.Sprintf("smf.getSystemMessage index = %d\n", index)
-		msg += fmt.Sprintf("%s", err2)
-		err = fmt.Errorf(msg)
+		err = compoundError(err2, msg)
 		return sys, start, err
 	}
 	return sys, end+1, err

@@ -16,6 +16,25 @@ type SystemMessage struct {
 	bytes []byte
 }
 
+func (sys *SystemMessage) String() string {
+	if len(sys.bytes) == 0 {
+		return "SystemMessage <no status byte>"
+	}
+	st := StatusByte(sys.bytes[0])
+	acc := fmt.Sprintf("SystemMessage: '%s' ", st)
+	acc += "["
+	for _, b := range sys.bytes {
+		acc += fmt.Sprintf("0x%02x ", b)
+	}
+	acc += "]"
+	return acc
+}
+			
+	
+	
+	
+
+
 // newSystemMessage returns pointer to new instance of SystemMessage
 // bytes - the byte stream defining this message.
 // Returns non-nil error if status byte (bytes[0]) is not valid as a system-message.

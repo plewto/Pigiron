@@ -248,7 +248,7 @@ func getSystemMessage(buffer []byte, index int)(*SystemMessage, int, error) {
 	count, _ := systemStatusDataCount[StatusByte(status)]
 	if count == -1 {
 		// assume sysex
-		end = findNextStatusByte(buffer, start+1)
+		end = findNextStatusByte(buffer, start+1) + 1
 	} else {
 		// assume 0
 		end = start+1
@@ -267,7 +267,7 @@ func getSystemMessage(buffer []byte, index int)(*SystemMessage, int, error) {
 		err = compoundError(err2, msg)
 		return sys, start, err
 	}
-	return sys, end+1, err
+	return sys, end, err
 }
 	
 

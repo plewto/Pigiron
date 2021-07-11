@@ -1,5 +1,9 @@
 package smf
 
+import (
+	"fmt"
+)
+
 func exError(message string, more ...string) error {
 	msg := fmt.Sprintf("ERROR: %s", message)
 	for _, s := range more {

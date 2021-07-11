@@ -23,6 +23,15 @@ var (
 		0xc0, 0x80, 0x80, 0x00,                      // [27] vlq 0x08000000
 		0xff, 0xff, 0xff, 0x7f,                      // [31] vlq 0x0FFFFFFF
 	}
+
+	mockMIDIBuffer []byte = []byte {
+		0x00, 0x94, 0x01, 0x40,                      // [ 0] note-on channel 4
+		0x01,       0x02, 0x41,                      // [ 4] running status
+		0x02, 0xF8,                                  // [ 7] clock
+		0x03, 0xF0, 0x01, 0x02, 0xF7,                // [ 9] sysex
+		0x04,                                        // [14]
+		
+	}
 )
 
 
@@ -52,7 +61,7 @@ func TestGetLong(t *testing.T) {
 	var n int
 	n, err = getLong(mockBuffer, 4)
 	if err != nil || n != 0 {
-		msg := "getLong faild at index 4,  n = %d, err = %s"
+		msg := "getLong failed at index 4,  n = %d, err = %s"
 		t.Fatal(msg, n, err)
 	}
 	n, err = getLong(mockBuffer, 8)
@@ -62,7 +71,7 @@ func TestGetLong(t *testing.T) {
 	}
 	_, err = getLong(mockBuffer, 32) 
 	if err == nil {
-		t.Fatal("getLong faild to detect index out of bounds at index 32")
+		t.Fatal("getLong failed to detect index out of bounds at index 32")
 	}
 }
 
@@ -81,7 +90,7 @@ func TestGetShort(t *testing.T) {
 	}
 	_, err = getShort(mockBuffer, 34)
 	if err == nil {
-		msg := "getShort faild to detect index out of bounds, index = 34"
+		msg := "getShort failed to detect index out of bounds, index = 34"
 		t.Fatal(msg)
 	}	
 }
@@ -136,7 +145,7 @@ func TestVLQ(t *testing.T) {
 		}
 		n = vlq.Value()
 		if n != ex.value {
-			msg := "getVLQ returnd incorrect value at index %d, expected %d, got %d"
+			msg := "getVLQ returned incorrect value at index %d, expected %d, got %d"
 			s := fmt.Sprintf(msg, index, ex.value, n)
 			t.Fatal(s)
 		}
@@ -147,3 +156,126 @@ func TestVLQ(t *testing.T) {
 	}
 }
 
+func TestGetChannelMessage(t *testing.T) {
+	cmsg, index, err := getChannelMessage(mockMIDIBuffer, 1)
+	if err != nil {
+		msg := "\ngetChannelMessage false error return at index 1"
+		t.Fatal(msg)
+	}
+	if index != 4 {
+		msg := "\ngetChannelMessage returns false index update\n"
+		msg += fmt.Sprintf("Expected index 4, got, %d", index)
+		t.Fatal(msg)
+	}
+	st := cmsg.Status()
+	if st != NoteOnStatus {
+		msg := "\ngetChannelMessage returns incorrect MIDI status at index 1"
+		msg += "\nExpected status 0x%x '%s', got 0x%x '%s'"
+		t.Fatalf(msg,byte(NoteOnStatus), NoteOnStatus, byte(st), st)
+	}
+	ch := cmsg.ChannelByte()
+	if ch != 4 {
+		msg := "\ngetChannelMessage returns incorrect channel at index 1"
+		msg += "\nExpected channel 4, got %d"
+		t.Fatalf(msg, ch)
+	}
+}
+
+func TestGetRunningStatus(t *testing.T) {
+	readIndex := 5
+	cmsg, index, err := getRunningStatusMessage(mockMIDIBuffer, readIndex, NoteOnStatus, 4)
+	if err != nil {
+		msg := "\ngetRunningStatusMessage false error return at index 5"
+		t.Fatal(msg)
+	}
+	if index != 7 {
+		msg := "\ngetRunningStatusMessage returns false index update\n"
+		msg += fmt.Sprintf("Expected index 7, got, %d", index)
+		t.Fatal(msg)
+	}
+		st := cmsg.Status()
+	if st != NoteOnStatus {
+		msg := "\ngetRunningStatusMessage returns incorrect MIDI status at index 1"
+		msg += "\nExpected status 0x%x '%s', got 0x%x '%s'"
+		t.Fatalf(msg,byte(NoteOnStatus), NoteOnStatus, byte(st), st)
+	}
+	ch := cmsg.ChannelByte()
+	if ch != 4 {
+		msg := "\ngetRunningStatusMessage returns incorrect channel at index 1"
+		msg += "\nExpected channel 4, got %d"
+		t.Fatalf(msg, ch)
+	}
+}
+	
+func TestGetSystemMessage(t *testing.T) {
+	readIndex := 8
+	sys, index, err := getSystemMessage(mockMIDIBuffer, readIndex)
+	if err != nil {
+		msg := "\ngetSystemMessage returned false error at index 8"
+		msg += fmt.Sprintf("\n%s", err)
+		t.Fatal(msg)
+	}
+	if index != 9 {
+		msg := "\ngetSystemMessage index update incorrect"
+		msg += fmt.Sprintf("\nExpected index 9, got %d", index)
+		t.Fatal(msg)
+	}
+	bytes := sys.Bytes()
+	if len(bytes) != 1 {
+		msg := "\ngetSystemMessage byte count incorrect"
+		msg += fmt.Sprintf("\nExpected 1 byte, got %v\n", bytes)
+		t.Fatal(msg)
+	}
+	st := StatusByte(bytes[0])
+	if st != ClockStatus {
+		msg := "\ngetSystemMessage returned wrong status"
+		msg += "\nExpected 0x%x '%s', got 0x%x"
+		msg = fmt.Sprintf(msg, byte(ClockStatus), ClockStatus, byte(st))
+		t.Fatal(msg)
+	}
+	readIndex = 7  // should produce error
+	_, _, err = getSystemMessage(mockMIDIBuffer, readIndex)
+	if err == nil {
+		msg := "\ngetSystemMessage did not detect error"
+		msg += "\nwhen reading from incorrect index %d"
+		msg = fmt.Sprintf(msg, readIndex)
+		t.Fatal(msg)
+	}
+}
+
+func TestGetSystemExclusive(t *testing.T) {
+	readIndex := 10
+	sys, index, err := getSystemMessage(mockMIDIBuffer, readIndex)
+	if err != nil {
+		msg := "\ngetSystemMessage returned incorrect error at index 10\n"
+		msg += fmt.Sprintf("%s\n", err)
+		t.Fatal(msg)
+	}
+	if index != 14 {
+		msg := "\ngetSystemMessage returned wrong index update\n"
+		msg += fmt.Sprintf("Expected %d, got %d", 14, index)
+		t.Fatal(msg)
+	}
+	bytes := sys.Bytes()
+	if len(bytes) != 4 {
+		msg := "\ngetSystemMessage returned wrong byte count\n"
+		msg += fmt.Sprintf("Expected 4 bytes, got %v\n", bytes)
+		t.Fatal(msg)
+	}
+	if bytes[0] != byte(SysexStatus) || bytes[3] != byte(EndSysexStatus) {
+		msg := "\ngetSystemMessage did not return expected MIDI status bytes\n"
+		msg += "Expected %x, got %x,  and expected %x, got %x"
+		msg = fmt.Sprintf(msg, 0xf0, bytes[0], 0xf7, bytes[3])
+		t.Fatal(msg)
+	}
+	readIndex = 9 // should produce error
+	sys, _, err = getSystemMessage(mockMIDIBuffer, readIndex)
+	if err == nil {
+		msg := "\ngetSystemMessage did not detect error when reading at invalid location\n"
+		msg += fmt.Sprintf("index was %d", readIndex)
+		msg += fmt.Sprintf("\nResulting MIDI mesage was: %s", sys)
+		t.Fatal(msg)
+	}
+			
+
+}

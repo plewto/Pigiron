@@ -43,7 +43,7 @@ var (
 		ChannelPressureStatus: "CPRS",
 		BendStatus: "BEND",
 		MetaStatus: "META",
-		ClockStatus: "CLOK",
+		ClockStatus: "CLK",
 		StartStatus: "STRT",
 		ContinueStatus: "CONT",
 		StopStatus: "STOP",

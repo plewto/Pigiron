@@ -62,14 +62,14 @@ var (
 		BendStatus: true,
 	}
 
-	channelStatusByteCount = map[StatusByte]int {
-		NoteOffStatus: 3,
-		NoteOnStatus: 3,
-		PolyPressureStatus: 3,
-		ControllerStatus: 3,
-		ProgramStatus: 2,
-		ChannelPressureStatus: 2,
-		BendStatus: 3,
+	channelStatusDataCount = map[StatusByte]int {
+		NoteOffStatus: 2,
+		NoteOnStatus: 2,
+		PolyPressureStatus: 2,
+		ControllerStatus: 2,
+		ProgramStatus: 1,
+		ChannelPressureStatus: 1,
+		BendStatus: 2,
 	}
 	
 	systemStatusTable = map[StatusByte]bool {
@@ -80,6 +80,17 @@ var (
 		ActiveSnesingStatus: true,
 		SysexStatus: true,
 		EndSysexStatus: true,
+	}
+
+	// -1 indicates indeterminate
+	systemStatusDataCount = map[StatusByte]int {
+		ClockStatus: 0,
+		StartStatus: 0,
+		ContinueStatus: 0,
+		StopStatus: 0,
+		ActiveSnesingStatus: 0,
+		SysexStatus: -1,
+		EndSysexStatus: 0,
 	}
 	
 )

@@ -31,11 +31,11 @@ func NewChannelMessage(status StatusByte, channelByte byte, data1 byte, data2 by
 		err = fmt.Errorf(msg, byte(status), status)
 		return m, err
 	}
-	count, _ := channelStatusByteCount[status]
-	bytes := make([]byte, count)
+	count, _ := channelStatusDataCount[status]
+	bytes := make([]byte, count+1)
 	bytes[0] = byte(status) | channelByte
 	bytes[1] = data1
-	if count > 2 {
+	if count > 1 {
 		bytes[2] = data2
 	}
 	m = &ChannelMessage{bytes}
@@ -98,3 +98,5 @@ func (m *ChannelMessage) ToPortmidiEvent() (portmidi.Event, error) {
 	pme := portmidi.Event{time, status, d1, d2, sysex}
 	return pme, err
 }
+
+

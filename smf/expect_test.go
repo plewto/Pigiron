@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	mockBuffer []byte = []byte{
+	mockBuffer []byte = []byte {
 		byte('A'), byte('B'), byte('C'), byte('D'),  // [ 0] chunk ID 'ABCD'
 		0x00, 0x00, 0x00, 0x00,                      // [ 4] long 0
 		0x04, 0x03, 0x02, 0x01,                      // [ 8] long 0x4030201
@@ -31,19 +31,21 @@ func TestExpectID(t *testing.T) {
 	var target1 = [4]byte{'A','B','C','X'}
 	var target2 = [4]byte{'A','B','C','D'}
 	var err error
-	err = expectID(mockBuffer, 0, target1)
+	err = expectChunkID(mockBuffer, 0, target1)
 	if err == nil {
-		t.Fatal("expectID false positive")
+		t.Fatal("expectChunckID false positive")
 	}
-	err = expectID(mockBuffer, 0, target2)
+	err = expectChunkID(mockBuffer, 0, target2)
 	if err != nil {
-		t.Fatal("expectID false negative")
+		t.Fatal("expectChunckID false negative")
 	}
-	err = expectID(mockBuffer, 33, target1)
+	err = expectChunkID(mockBuffer, 33, target1)
 	if err == nil {
-		t.Fatal("expectID did not detect index out of bounds")
+		t.Fatal("expectChunckID did not detect index out of bounds")
 	}
 }
+
+
 
 func TestGetLong(t *testing.T) {
 	var err error
@@ -144,3 +146,4 @@ func TestVLQ(t *testing.T) {
 		t.Fatal("getVLQ did not detect index out of bounds, index = 35")
 	}
 }
+

@@ -72,3 +72,4 @@ func NewVLQ(value int) *VLQ {
 	vlq.SetValue(value)
 	return vlq
 }
+

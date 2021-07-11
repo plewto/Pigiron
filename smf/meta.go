@@ -92,77 +92,70 @@ func isMetaTextType(n byte) bool {
 // Implements MIDIMessage
 //
 type MetaMessage struct {
-	bytes []byte
+	mtype MetaType
+	data []byte
 }
 
 // Status returns meta status byte (always 0xFF).
 //
 func (m *MetaMessage) Status() StatusByte {
-	return StatusByte(m.bytes[0])
+	return MetaStatus
 }
 
 // Bytes returns the byte sequence corresponding to this MetaMessage.
 //
-func (m *MetaMessage) Bytes() []byte {
-	return m.bytes
+func (m *MetaMessage) Bytes() []byte { 
+	prefix := []byte{byte(MetaStatus), byte(m.mtype)}
+	vlq := NewVLQ(len(m.data))
+	acc := append(prefix, vlq.Bytes()...)
+	acc = append(acc, m.data...)
+	return acc
 }
 
 func (m *MetaMessage) String() string {
-	if len(m.bytes) < 2 {
-		return "MetaMessage ??"
-	} else {
-		return fmt.Sprintf("MetaMessage %s", MetaType(m.bytes[1]))
-	}
+	return fmt.Sprintf("MetaMessage %s", m.mtype)
 }
 
+
+
+
 func (m *MetaMessage) Dump() {
-	if m == nil {
-		fmt.Println("MetaMessage <nil>")
-		return
-	}
-	fmt.Printf("%s\n", m)
-	fmt.Printf("[ 0] 0x%02x   - status\n", m.bytes[0])
-	fmt.Printf("[ 1] 0x%02x   - meta type '%s'\n", m.bytes[1], MetaType(m.bytes[1]))
-	counter := 0
-	for i, b := range m.bytes[2:] {
-		fmt.Printf("[%2d] 0x%02x   - vlq-%d\n", i+2, b, i)
-		counter++
-		if b & 0x80 == 0 {
-			break
-		}
-	}
-	isText := isMetaTextType(m.bytes[1])
-	start := counter + 2
-	for i, b := range m.bytes[start:] {
-		fmt.Printf("[%2d] 0x%02x   - data-%d", i+start, b, i)
-		if isText {
-			fmt.Printf(" '%c'", b)
-		}
-		fmt.Println()
-	}
+	fmt.Printf("MetaMessage '%s'\n", m.mtype)
+	// fmt.Printf("[ 0] 0x%02x    - status", byte(MetaStatus))
+	// fmt.Printf("[ 1] 0x%02x    - type '%s'\n", byte(m.mtype), m.mtype)
+	// bytes := m.Bytes()
+	// counter := 0
+	// for i, b := range bytes[2:] {
+	// 	fmt.Printf("[%2d] 0x%02x   - VLQ-%d\n", i+2, b, counter)
+	// 	counter++
+	// 	if b & 0x80 == 0 {
+	// 		break
+	// 	}
+	// }
+	// offset := counter + 2
+	// counter = 0
+	// mtype := byte(m.MetaType())
+	// for i, b := range bytes[offset:] {
+	// 	fmt.Printf("[%2d] 0x%02x   - Data-%d", offset + i, b, counter)
+	// 	if isMetaTextType(mtype) {
+	// 		fmt.Printf(" '%c'", b)
+	// 	}
+	// 	fmt.Println()
+	// 	counter++
+	// }
 }
 			
+		
+
 // MetaType returns byte indicating the type of this MetaMessage.
 //
 func (m *MetaMessage) MetaType() MetaType {
-	return MetaType(m.bytes[1])
+	return m.mtype
 }
 
-// Data() returns only the data bytes for this MetaMessage.
-// The result is a sub-sequence of the Bytes() value and excludes the 
-// status, meta-type and vlq length bytes.
-//
+
 func (m *MetaMessage) Data() []byte {
-	index := 2
-	bytes := m.bytes
-	for index < len(bytes) {
-		b := bytes[index]
-		index++
-		if b & 0x80 == 0 {
-			break
-		}
-	}
-	return m.bytes[index:]
+	return m.data
 }
 
 func (m *MetaMessage) ToPortmidiEvent() (portmidi.Event, error) {
@@ -172,25 +165,16 @@ func (m *MetaMessage) ToPortmidiEvent() (portmidi.Event, error) {
 	err := fmt.Errorf(msg, byte(m.MetaType()), m.MetaType())
 	return pme, err
 }
-	
 
-
-func newMetaMessage(bytes []byte) (*MetaMessage, error) {
+func newMetaMessage(mtype MetaType, data []byte)(*MetaMessage, error) {
 	var err error
 	var meta *MetaMessage
-	if len(bytes) < 2 {
-		msg := "smf.newMetaMessage, bytes slice too small"
-		err = fmt.Errorf(msg)
+	if !isMetaType(byte(mtype)) {
+		msg := "smf.newMetaMessage, invalid MetaType 0x%x"
+		err = fmt.Errorf(msg, byte(mtype))
 		return meta, err
 	}
-	st := bytes[0]
-	mtype := bytes[1]
-	if !isMetaStatus(st) || !isMetaType(mtype) {
-		msg := "smf.newMetaMessage incorrect status 0x%x or type 0x%x bytes"
-		err := fmt.Errorf(msg, st, mtype)
-		return meta, err
-	}
-	// ISSUE: TODO validate data count
-	meta = &MetaMessage{bytes}
+	// ISSUE: TODO validate data
+	meta = &MetaMessage{mtype, data}
 	return meta, err
 }

@@ -29,7 +29,8 @@ var (
 		0x01,       0x02, 0x41,                      // [ 4] running status
 		0x02, 0xF8,                                  // [ 7] clock
 		0x03, 0xF0, 0x01, 0x02, 0xF7,                // [ 9] sysex
-		0x04,                                        // [14]
+		0x04, 0xFF, 0x01, 0x03, 0x41, 0x42, 0x43,    // [14] meta text "ABC"
+		                                             // [21]
 		
 	}
 )
@@ -276,6 +277,34 @@ func TestGetSystemExclusive(t *testing.T) {
 		msg += fmt.Sprintf("\nResulting MIDI mesage was: %s", sys)
 		t.Fatal(msg)
 	}
-			
-
 }
+
+func TestGetMetaMessage(t *testing.T) {
+	readIndex := 15
+	var err error
+	var index int
+	var meta *MetaMessage
+	meta, index, err = getMetaMessage(mockMIDIBuffer, readIndex)
+	if err != nil {
+		msg := fmt.Sprintf("\ngetMetaMessage returned unexpected err at index %d\n", readIndex)
+		msg += fmt.Sprintf("%s\n", err)
+		t.Fatal(msg)
+	}
+	if index != 21 {
+		msg := "\ngetMetaMessage rerurned incorrect index. Expected 21, got %d"
+		t.Fatal(fmt.Sprintf(msg, index))
+	}
+	var mtype = meta.MetaType()
+	if mtype != MetaText {
+		msg := "\ngetMetaMessage returned wrong MetaType, expected 0x01, got 0x%02x\n"
+		t.Fatal(fmt.Sprintf(msg, byte(mtype)))
+	}
+	// Check recovery from invalid readIndex
+	readIndex = 16
+	meta, index, err = getMetaMessage(mockMIDIBuffer, readIndex)
+	if err == nil {
+		msg := "\ngetMetaMessage did not detect invalid read index %d\n"
+		t.Fatalf(msg, readIndex)
+	}
+}
+	

@@ -112,15 +112,14 @@ func getVLQ(buffer []byte, index int)(*VLQ, error) {
 }
 
 
-// getRunningStatusMessage converts raw values from byte buffer to MIDI message using running status.
+// getRunningStatusMessage creates MIDI message from smf track data using 'running status'.
 // buffer - smf track data
-// index - index to first data value.  Index should point to byte immediately following the
-// delta-time.
+// index - index should point to first data byte.
 // st - MIDI status byte
 // ch - MIDI channel byte
 //
-// The 2nd return value is an updated index pointing to the start of the following event's
-// delta-time.
+// The 2nd return value is an updated index pointing to the start of the 
+// following event's delta-time.
 //
 func getRunningStatusMessage(buffer []byte, index int, st StatusByte, ch byte)(*ChannelMessage, int, error) {
 	var startIndex = index
@@ -158,12 +157,12 @@ func getRunningStatusMessage(buffer []byte, index int, st StatusByte, ch byte)(*
 	return cmsg, index, err
 }
 		
-// getChannelMessage converts raw values from byte buffer to a MIDI channel message.
+// getChannelMessage creates MIDI ChannelMessage from smf track data.
 // buffer - smf track data
 // index - location of message status byte.
 //
-// The 2nd return value is an updated index pointing to the start of the following
-// event's delta-time.
+// The 2nd return value is an updated index pointing to the start of the 
+// following event's delta-time.
 //
 func getChannelMessage(buffer []byte, index int)(*ChannelMessage, int, error) {
 	var startIndex = index
@@ -239,12 +238,12 @@ func findNextStatusByte(buffer []byte, start int) int {
 	return index
 }
 
-// getSystemMessage creates a MIDI system-message from MIDI byte buffer.
+// getSystemMessage creates a MIDI system-message from smf track bytes
 // buffer - smf track data
 // index - location of system message status byte
 //
-// The 2nd return value is an updated index pointing to the start of the following event's
-// delta-time.
+// The 2nd return value is an updated index pointing to the start of the 
+// following event's delta-time.
 //
 func getSystemMessage(buffer []byte, index int)(*SystemMessage, int, error) {
 	var start = index
@@ -288,5 +287,68 @@ func getSystemMessage(buffer []byte, index int)(*SystemMessage, int, error) {
 	}
 	return sys, end, err
 }
+
+
+// getMetaMessage creates MIDI meta message from smf track bytes.
+// buffer - smf track data
+// index - location of meta status byte
+//
+// The 2nd return value is an updated index pointing to the start of the 
+// following event's delta-time.
+//
+func getMetaMessage(buffer []byte, index int) (*MetaMessage, int, error) {
+	startIndex := index
+	var err error
+	var meta *MetaMessage
+	var st, mtype byte
+	var vlq *VLQ
+	st, err = getByte(buffer, index)
+	if err != nil {
+		msg := fmt.Sprintf("smf.getMetaMessage (status byte) index = %d", index)
+		err = compoundError(err, msg)
+		return meta, startIndex, err
+	}
+	index++
+	mtype, err = getByte(buffer, index)
+	index++
+	if err != nil {
+		msg := fmt.Sprintf("smf.getMetaMessage (meta-type byte) index = %d", index)
+		err = compoundError(err, msg)
+		return meta, startIndex, err
+	}
+	if StatusByte(st) != MetaStatus {
+		msg := "smf.getMetaMessage, expected Meta status byte 0xFF, got 0x%x"
+		err = fmt.Errorf(msg, st)
+		return meta, index, err
+	}
+	if !isMetaType(mtype) {
+		msg := "smf.getMetaMessage, expected valid MetaType, got 0x%x"
+		err = fmt.Errorf(msg, mtype)
+		return meta, index, err
+	}
+	vlq, err = getVLQ(buffer, index)
+	if err != nil {
+		msg := fmt.Sprintf("smf.getMetaMessage, index = %d", index)
+		err = compoundError(err, msg)
+		return meta, index, err
+	}
+	dataCount := vlq.Value()
+	index += vlq.Length()
+	start, end := index, index+dataCount
+	if start > end || end > len(buffer) {
+		msg := "smf.getMetaMessage, data slice index out of bounds.  "
+		msg += "start = %d, end = %s, buffer length is %d"
+		err = fmt.Errorf(msg, start, end, len(buffer))
+		return meta, index, err
+	}
+	data := buffer[start:end]
+	meta, err = newMetaMessage(MetaType(mtype), data)
+	if err != nil {
+		msg := fmt.Sprintf("smf.getMetaMessage, index = %d", startIndex)
+		err = compoundError(err, msg)
+		return meta, index, err
+	}
 	
+	return meta, end, err
+}
 

@@ -6,7 +6,7 @@ import (
 
 
 // expectChunkID checks byte buffer for specific chunk ID.
-// buffer - the data
+// buffer - smf bytes.
 // index - location in buffer to be checked.
 // target - expect ID pattern
 // Returns non-nil error if expected ID not found.
@@ -112,9 +112,15 @@ func getVLQ(buffer []byte, index int)(*VLQ, error) {
 }
 
 
-
-// index points to first data byte
-// 2nd (int) return points to new head.
+// getRunningStatusMessage converts raw values from byte buffer to MIDI message using running status.
+// buffer - smf track data
+// index - index to first data value.  Index should point to byte immediately following the
+// delta-time.
+// st - MIDI status byte
+// ch - MIDI channel byte
+//
+// The 2nd return value is an updated index pointing to the start of the following event's
+// delta-time.
 //
 func getRunningStatusMessage(buffer []byte, index int, st StatusByte, ch byte)(*ChannelMessage, int, error) {
 	var startIndex = index
@@ -123,7 +129,7 @@ func getRunningStatusMessage(buffer []byte, index int, st StatusByte, ch byte)(*
 	var data1, data2 byte
 	count, flag := channelStatusDataCount[StatusByte(st)]
 	if !flag {
-		msg := "smf.getRunningStatusMessage, non-channnel status: 0x%x '%s' at index %d"
+		msg := "smf.getRunningStatusMessage, non-channel status: 0x%x '%s' at index %d"
 		msg = fmt.Sprintf(msg, st, st, index)
 		err = exError(msg)
 		return cmsg, index, err
@@ -152,7 +158,13 @@ func getRunningStatusMessage(buffer []byte, index int, st StatusByte, ch byte)(*
 	return cmsg, index, err
 }
 		
-		
+// getChannelMessage converts raw values from byte buffer to a MIDI channel message.
+// buffer - smf track data
+// index - location of message status byte.
+//
+// The 2nd return value is an updated index pointing to the start of the following
+// event's delta-time.
+//
 func getChannelMessage(buffer []byte, index int)(*ChannelMessage, int, error) {
 	var startIndex = index
 	var err error
@@ -162,9 +174,6 @@ func getChannelMessage(buffer []byte, index int)(*ChannelMessage, int, error) {
 	sbyte, err = getByte(buffer, index)
 	index++
 	if err != nil {
-		// msg := "smf.getChannelMessage index was %d"
-		// err.Add(fmt.Sprintf(msg, startIndex))
-		// return cmsg, startIndex, err
 		msg := "%s\nsmf.getChannelMessage index was %d"
 		err = fmt.Errorf(msg, err, startIndex)
 		return cmsg, startIndex, err
@@ -173,7 +182,7 @@ func getChannelMessage(buffer []byte, index int)(*ChannelMessage, int, error) {
 	ch := sbyte & 0x0F
 	count, flag := channelStatusDataCount[st]
 	if !flag {
-		msg := "smf.getRunningStatusMessage, non-channnel status: 0x%x '%s' at index %d"
+		msg := "smf.getRunningStatusMessage, non-channel status: 0x%x '%s' at index %d"
 		err = fmt.Errorf(msg, st, st, index)
 	        return cmsg, index, err
 	}
@@ -208,8 +217,12 @@ func getChannelMessage(buffer []byte, index int)(*ChannelMessage, int, error) {
 }
 
 
-
-	
+// findNextStatusByte locates the next status byte after the starting location.
+// buffer - smf track data
+// start - index where search commences,  start should not point to a status byte.
+//
+// returns index of first status byte (bit-7 set) following start.
+// 
 func findNextStatusByte(buffer []byte, start int) int {
 	index := start
 	var b byte
@@ -226,7 +239,13 @@ func findNextStatusByte(buffer []byte, start int) int {
 	return index
 }
 
-
+// getSystemMessage creates a MIDI system-message from MIDI byte buffer.
+// buffer - smf track data
+// index - location of system message status byte
+//
+// The 2nd return value is an updated index pointing to the start of the following event's
+// delta-time.
+//
 func getSystemMessage(buffer []byte, index int)(*SystemMessage, int, error) {
 	var start = index
 	var end = start

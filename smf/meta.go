@@ -116,33 +116,30 @@ func (m *MetaMessage) String() string {
 	return fmt.Sprintf("MetaMessage %s", m.mtype)
 }
 
-
-
-
 func (m *MetaMessage) Dump() {
 	fmt.Printf("MetaMessage '%s'\n", m.mtype)
-	// fmt.Printf("[ 0] 0x%02x    - status", byte(MetaStatus))
-	// fmt.Printf("[ 1] 0x%02x    - type '%s'\n", byte(m.mtype), m.mtype)
-	// bytes := m.Bytes()
-	// counter := 0
-	// for i, b := range bytes[2:] {
-	// 	fmt.Printf("[%2d] 0x%02x   - VLQ-%d\n", i+2, b, counter)
-	// 	counter++
-	// 	if b & 0x80 == 0 {
-	// 		break
-	// 	}
-	// }
-	// offset := counter + 2
-	// counter = 0
-	// mtype := byte(m.MetaType())
-	// for i, b := range bytes[offset:] {
-	// 	fmt.Printf("[%2d] 0x%02x   - Data-%d", offset + i, b, counter)
-	// 	if isMetaTextType(mtype) {
-	// 		fmt.Printf(" '%c'", b)
-	// 	}
-	// 	fmt.Println()
-	// 	counter++
-	// }
+	fmt.Printf("[ 0] 0x%02x    - status", byte(MetaStatus))
+	fmt.Printf("[ 1] 0x%02x    - type '%s'\n", byte(m.mtype), m.mtype)
+	bytes := m.Bytes()
+	counter := 0
+	for i, b := range bytes[2:] {
+		fmt.Printf("[%2d] 0x%02x   - VLQ-%d\n", i+2, b, counter)
+		counter++
+		if b & 0x80 == 0 {
+			break
+		}
+	}
+	offset := counter + 2
+	counter = 0
+	mtype := byte(m.MetaType())
+	for i, b := range bytes[offset:] {
+		fmt.Printf("[%2d] 0x%02x   - Data-%d", offset + i, b, counter)
+		if isMetaTextType(mtype) {
+			fmt.Printf(" '%c'", b)
+		}
+		fmt.Println()
+		counter++
+	}
 }
 			
 		

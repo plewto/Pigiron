@@ -128,9 +128,9 @@ func getRunningStatusMessage(buffer []byte, index int, st StatusByte, ch byte)(*
 	var data1, data2 byte
 	count, flag := channelStatusDataCount[StatusByte(st)]
 	if !flag {
-		msg := "smf.getRunningStatusMessage, non-channel status: 0x%x '%s' at index %d"
-		msg = fmt.Sprintf(msg, st, st, index)
-		err = exError(msg)
+		msg := "smf.getRunningStatusMessage, runing-statys error\n"
+		msg += "Expected non-status byte at index %d, got 0x%x"
+		err = exError(fmt.Sprintf(msg, index, st))
 		return cmsg, index, err
 	}
 	switch count {

@@ -9,16 +9,26 @@ import (
 )
 
 
-func TestReadSMF(t *testing.T) {
-	filename, err := fileio.ResourceFilename("testFiles", "a.mid")
+func noResourcesAbort(fnName string) bool {
+	_, err := fileio.ResourceFilename("testFiles", "a.mid")
 	if err != nil {
-		fmt.Println("\nWARNING: Can not read resource file required for TestReadSMF")
+		fmt.Printf("\nWARNING: Can not read resource file required for %s\n", fnName)
 		fmt.Println("WARNING: Error from fileio.ResourceFilename was:")
 		fmt.Printf("%s\n", err)
 		fmt.Printf("WARNING: Aborting test.\n\n")
+		return true
+	}
+	return false
+}
+
+
+func TestReadSMF(t *testing.T) {
+	if noResourcesAbort("TestReadSMF") {
 		return
 	}
+	var err error
 	var smf *SMF
+	filename, _ := fileio.ResourceFilename("testFiles", "a.mid")
 	smf, err = ReadSMF(filename)
 	if err != nil {
 		msg := "smf.ReadSMF returned unexpected error for file %s\n"
@@ -64,6 +74,60 @@ func TestReadSMF(t *testing.T) {
 		msg += "track.Length() = %d, len(trk.Bytes()) = %d"
 		t.Fatalf(msg, trk.Length(), len(trk.Bytes()))
 	}
+}
 
+
+// Test various malformed header chunks.
+func TestReadSMFJunk (t *testing.T) {
+	if noResourcesAbort("TestReadSMFJunk") {
+		return
+	}
+	var err error
+
+	// File does not exists
+	filename, _ := fileio.ResourceFilename("testFiles", "does-not-exists.mid")
+	_, err = ReadSMF(filename)
+	if err == nil {
+		msg := "\nReadSMF did not return an error for non-existent file\n"
+		msg += fmt.Sprintf("filename was %s", filename)
+		t.Fatal(msg)
+	}
+
+	// File exists but has malformed header id.
+	filename, _ = fileio.ResourceFilename("testFiles", "bad1.mid")
+	_, err = ReadSMF(filename)
+	if err == nil {
+		msg := "\nReadSMF did not return an error for badly malformed MIDI file\n"
+		msg += fmt.Sprintf("filename was %s", filename)
+		t.Fatalf(msg)
+	}
+
+	// unsupported format test
+	filename, _ = fileio.ResourceFilename("testFiles", "badFormat.mid")
+	_, err = ReadSMF(filename)
+	if err == nil {
+		msg := "\nReadSMF did not return an error for unsupported format\n"
+		msg += fmt.Sprintf("filename was %s", filename)
+		t.Fatal(msg)
+	}
+
+	// no tracks
+	filename, _ = fileio.ResourceFilename("testFiles", "badNoTracks.mid")
+	_, err = ReadSMF(filename)
+	if err == nil {
+		msg := "\nReadSMF did not return an error for zero track count\n"
+		msg += fmt.Sprintf("filename was %s", filename)
+		t.Fatal(msg)
+	}
+
+	// weird division
+	filename, _ = fileio.ResourceFilename("testFiles", "badWeirdDivision.mid")
+	_, err = ReadSMF(filename)
+	if err == nil {
+		msg := "\nReadSMF did not return an error weird looking clock division"
+		msg += fmt.Sprintf("filename was %s", filename)
+		t.Fatal(msg)
+	}
 	
 }
+	

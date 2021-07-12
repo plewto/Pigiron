@@ -39,7 +39,8 @@ func ReadSMF(filename string) (*SMF, error) {
 	var header *Header
 	var file *os.File
 	file, err = os.Open(filename)
-	errmsg := fmt.Sprintf("smf.ReadSMF can not open file '%s'", filename)
+	errmsg := "smf.ReadSMF can not open MIDI file\n"
+	errmsg += fmt.Sprintf("filename is '%s'", filename)
 	if err != nil {
 		err2 := compoundError(err, errmsg)
 		return smf, err2

@@ -32,16 +32,15 @@ func CreateEventList(division int64, bytes []byte) (*EventList, error) {
 	var eventList *EventList
 	var acc []*Event = make([]*Event, 0, 512)
 	var useRunningStatus bool = false
-	var runningChannel byte = 0
-	var runningStatus StatusByte = 0
-	var currentTime float64 = 0
-
+	var runChan byte = 0
+	var runStat StatusByte = 0
+	var currentTime float64 = 0 
 	for index := 0; index < len(bytes);  {
 		var vlq *VLQ
 		vlq, err = getVLQ(bytes, index)
 		if err != nil {
-			msg := "smf.CreateEventList expected VLQ at index %d\n%s"
-			err = fmt.Errorf(msg, index, err)
+			errmsg := "smf.CreateEventList expected VLQ at index %d"
+			err = compoundError(err, fmt.Sprintf(errmsg, index))
 			return eventList, err
 		}
 		delta := eventList.getDeltaTime(vlq)
@@ -51,59 +50,68 @@ func CreateEventList(division int64, bytes []byte) (*EventList, error) {
 			break
 		}
 		status := bytes[index]
+		startIndex := index
 		switch {
 		case !isStatusByte(status):
+			var cmsg *ChannelMessage
+			errmsg := "smf.CreateEventList running-status error\n"
+			errmsg += "Expected non-status byte at index %d, got 0x%x"
+			errmsg = fmt.Sprintf(errmsg, startIndex, byte(status))
 			if !useRunningStatus {
-				msg := "smf.CreateEventList expected running status at index %d"
-				err = fmt.Errorf(msg, index)
+				err = exError(errmsg)
 				return eventList, err
 			}
-			var cmsg *ChannelMessage
-			rs, rc  := runningStatus, runningChannel
-			cmsg, index, err = getRunningStatusMessage(bytes, index, rs, rc)
+			cmsg, index, err = getRunningStatusMessage(bytes, startIndex, runStat, runChan)
 			if err != nil {
+				err = compoundError(err, errmsg)
 				return eventList, err
 			}
 			evnt := &Event{currentTime, cmsg}
 			acc = append(acc, evnt)
 		case isChannelStatus(status & 0xF0):
-			// useRunningStatus = true
-			// runningStatus = int(status & 0xF0)
-			// runningChannel = int(status & 0x0F)
-			// dataCount, _ := channelStatusByteCount[StatusByte(runningStatus)]
-			// var data1, data2 byte
-			// if dataCount == 3 {
-			// 	data1, data2 = bytes[index+1], bytes[index+2]  // issue index not checked
-			// 	index += 2
-			// } else {
-			// 	data1 = bytes[index+1] // issue index not checked
-			// 	index += 1
-			// }
-			// rs, rc := StatusByte(runningStatus), byte(runningChannel)
-			// chanmsg, _ := NewChannelMessage(rs, rc, data1, data2)
-			// evnt := &Event{currentTime, chanmsg}
-			// acc = append(acc, evnt)
+			var cmsg *ChannelMessage
+			useRunningStatus = true
+			runStat = StatusByte(status & 0xF0)
+			runChan = byte(status & 0x0F)
+			cmsg, index, err = getChannelMessage(bytes, startIndex)
+			if err != nil {
+				errmsg := "smf.CreateEventList error in switch case isChannelMessage"
+				err = compoundError(err, errmsg)
+				return eventList, err
+			}
+			evnt := &Event{currentTime, cmsg}
+			acc = append(acc, evnt)
 		case isSystemStatus(status):
-			// useRunningStatus = false
-			// index++
-			// b := bytes[index] // issue index not checked
-			// bcc := make([]byte, 0, 16)
-			// for index < len(bytes) && (b & 0x80 == 0) {
-			// 	bcc = append(bcc, b)
-			// 	index++
-			// }
-			// smsg, _ := newSystemMessage(bcc)
-			// evnt := &Event{currentTime, smsg}
-			// acc = append(acc, evnt)
-		case isMetaStatus(status):
+			var sys *SystemMessage
 			useRunningStatus = false
-			// handle meta message
+			index++  // ISSUE is index correct
+			sys, index, err = getSystemMessage(bytes, startIndex)
+			if err != nil {
+				errmsg := "smf.CreateEventList error in switch case isSystemStatus"
+				err = compoundError(err, errmsg)
+				return eventList, err
+			}
+			// ISSUE filter non-suported types? 
+			evnt := &Event{currentTime, sys}
+			acc = append(acc, evnt)
+		case isMetaStatus(status):
+			var meta *MetaMessage
+			useRunningStatus = false
+			meta, index, err = getMetaMessage(bytes, startIndex)
+			if err != nil {
+				errmsg := "smf.CreateEventList error in switch case isMetaStatus"
+				err = compoundError(err, errmsg)
+				return eventList, err
+			}
+			// ISSUE fitler non-suported types?
+			// ISSUE update tempo
+			evnt := &Event{currentTime, meta}
+			acc = append(acc, evnt)
 		default:
-			msg := "smf.CreateEventList expected staus byte at index %d, got 0x%x"
-			err = fmt.Errorf(msg, index, status)
+			errmsg := "smf.CreateEventList expected staus byte at index %d, got 0x%x"
+			err = exError(fmt.Sprintf(errmsg, index, status))
 			return eventList, err
 		}
-		
 				
 	} // end for index
 	eventList.events = acc

@@ -53,8 +53,8 @@ func readHeader(f *os.File) (*Header, error) {
 		return header, err
 	}
 	if n != 14 {
-		msg := "Expected smf Header of length 14 bytes, got %d"
-		err = exError(fmt.Sprintf(msg, n))
+		errmsg := "Expected smf Header of length 14 bytes, got %d"
+		err = exError(fmt.Sprintf(errmsg, n))
 		return header, err
 	}
 	err = expectChunkID(buffer, 0, headerID)
@@ -62,9 +62,24 @@ func readHeader(f *os.File) (*Header, error) {
 		return header, err
 	}
 	header = &Header{}
-	header.format, _ = getShort(buffer, 8)        // TODO validate
-	header.chunkCount, _ = getShort(buffer, 10)   // TODO validate
-	header.division, _ = getShort(buffer, 12)     // TODO validate
+	header.format, _ = getShort(buffer, 8)
+	if header.format < 0 || 3 <= header.format {
+		errmsg := "smf.readHeader MIDI file format %d is not supported"
+		err = exError(fmt.Sprintf(errmsg, header.format))
+		return header, err
+	}
+	header.chunkCount, _ = getShort(buffer, 10)
+	if header.chunkCount < 1 {
+		errmsg := "smf.readHeader MIDI file has no tracks"
+		err = exError(errmsg)
+		return header, err
+	}
+	header.division, _ = getShort(buffer, 12)
+	if header.division < 12 {
+		errmsg := "smf.readHeader MIDI file clock division looks weird: %d"
+		err = exError(fmt.Sprintf(errmsg, header.division))
+		return header, err
+	}
 	return header, err
 }
 

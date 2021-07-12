@@ -39,10 +39,10 @@ func ReadSMF(filename string) (*SMF, error) {
 	var header *Header
 	var file *os.File
 	file, err = os.Open(filename)
-	errmsg := fmt.Sprintf("smf.ReadSMF, can not open file '%s'", filename)
+	errmsg := fmt.Sprintf("smf.ReadSMF can not open file '%s'", filename)
 	if err != nil {
-		err = compoundError(err, errmsg)
-		return smf, err
+		err2 := compoundError(err, errmsg)
+		return smf, err2
 	}
 	defer file.Close()
 	header, err = readHeader(file)
@@ -87,5 +87,13 @@ func ReadSMF(filename string) (*SMF, error) {
 }
 				
 				
-	
+func (smf *SMF) Dump() {
+	fmt.Println("SMF")
+	fmt.Printf("filename : '%s'\n", smf.filename)
+	smf.header.Dump()
+	for i, trk := range smf.tracks {
+		fmt.Printf("---- Track [%02d]\n", i)
+		trk.Dump()
+	}
+}
 	

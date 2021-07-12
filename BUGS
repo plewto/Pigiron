@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------- 001
-BUG 001 21-june-2021 Closed
+BUG 001 21-June-2021 Closed
     OSC command /pig/q-children and pig/q-parents without arguments  causes
     a segmentation fault.
 
@@ -8,7 +8,7 @@ BUG 001 21-june-2021 Closed
     Fix: expect() test for spurious initial value in arguments.
 
 ---------------------------------------------------------------------- 002
-BUG 002 21-june-2021 Closed
+BUG 002 21-June-2021 Closed
     Configuration color specifications uses illegal escape charter.
 
     Replaced with named colors.
@@ -17,3 +17,10 @@ BUG 002 21-june-2021 Closed
 BUG 003 21-June-2021 Open
      Reading batch file from command line causes segmentation fault.
      Feature is temporarily disabled.
+
+
+---------------------------------------------------------------------- 004
+BOG 004 12-July-2021 Open
+    Executing print-forest on the REPL caused program to freeze.
+    Not sure of the exact configuration at the time.
+

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	//"time"
 	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/osc"
@@ -27,6 +28,14 @@ func printBanner() {
 	}
 	fmt.Println()
 	fmt.Printf("Version %s\n", config.Version)
+	cfig, err := os.UserConfigDir()
+	if err != nil {
+		fmt.Printf("WARNING: Can not dertermin user's config directory.\n")
+		fmt.Printf("%s\n", err)
+	} else {
+		cfig = filepath.Join(cfig, "pigiron")
+		fmt.Printf("Configuration directory is '%s'\n", cfig)
+	}
 	fmt.Println()
 }
 
@@ -35,6 +44,9 @@ func main() {
 	fmt.Print(config.GlobalParameters.TextColor)
 	printBanner()
 
+	
+
+	
 	//config.DumpGlobalParameters()
 	osc.Init()
 	op.Init()

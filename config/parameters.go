@@ -24,6 +24,7 @@ type globalParameters struct {
 	MIDIInputPollInterval int64 // ms
 	MIDIOutputBufferSize int64
 	MIDIOutputLatency int64
+	BannerColor string
 	TextColor string
 	ErrorColor string
 }
@@ -43,6 +44,7 @@ func ResetGlobalParameters() {
 	GlobalParameters.MIDIInputPollInterval = 0
 	GlobalParameters.MIDIOutputBufferSize = 1024
 	GlobalParameters.MIDIOutputLatency = 0
+	GlobalParameters.BannerColor = getColor("white")
 	GlobalParameters.TextColor = getColor("white")
 	GlobalParameters.ErrorColor = getColor("red")
 }

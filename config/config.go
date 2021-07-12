@@ -26,6 +26,10 @@ var (
 	tomlTree *toml.Tree
 )
 
+func ConfigFilename() string {
+	return configFilename
+}
+
 // subUserHome substitutes leading '~' character for user home directory.
 //
 func subUserHome(filename string) string {
@@ -147,7 +151,7 @@ func readConfigurationFile(filename string) {
 		ResetGlobalParameters()
 		return
 	} else {
-		fmt.Printf("Using configuration file: '%s'\n", filename)
+		// fmt.Printf("Using configuration file: '%s'\n", filename)
 		GlobalParameters.OSCServerRoot = readString("osc-server.root", "pig")
 		GlobalParameters.OSCServerHost = readString("osc-server.host", "127.0.0.1")
 		GlobalParameters.OSCServerPort = readInt("osc-server.port", 8020)
@@ -160,6 +164,7 @@ func readConfigurationFile(filename string) {
 		GlobalParameters.MIDIInputPollInterval = readInt("midi-input.poll-interval", 0)
 		GlobalParameters.MIDIOutputBufferSize = readInt("midi-output.buffer-size", 1024)
 		GlobalParameters.MIDIOutputLatency = readInt("midi-output.latency", 0)
+		GlobalParameters.BannerColor = getColor(readString("colors.banner", ""))
 		GlobalParameters.TextColor = getColor(readString("colors.text", ""))
 		GlobalParameters.ErrorColor = getColor(readString("colors.error", ""))
 	}

@@ -13,7 +13,7 @@ portmidi
 - OSX     : o be determined.
    
 The configuration directory location is printed on program startup,
-immediately under the version number.  
+immediately under the pigiorn banner.  
   
   
 1. Create symbolic link in the configuration directory to the pigiron 

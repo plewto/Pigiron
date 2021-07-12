@@ -23,11 +23,13 @@ var banner = []string{
 
 
 func printBanner() {
+	fmt.Printf("\n")
+	fmt.Print(config.GlobalParameters.BannerColor)
 	for _, line := range banner {
 		fmt.Println(line)
 	}
-	fmt.Println()
-	fmt.Printf("Version %s\n", config.Version)
+	fmt.Print("\n")
+	
 	cfig, err := os.UserConfigDir()
 	if err != nil {
 		fmt.Printf("WARNING: Can not dertermin user's config directory.\n")
@@ -36,18 +38,19 @@ func printBanner() {
 		cfig = filepath.Join(cfig, "pigiron")
 		fmt.Printf("Configuration directory is '%s'\n", cfig)
 	}
-	fmt.Println()
+	fmt.Printf("Configuration file: %s\n", config.ConfigFilename())
+	fmt.Printf("Version: %s\n", config.Version)
+	
+
+	fmt.Print(config.GlobalParameters.TextColor)
+	fmt.Print("\n\n")
 }
 
 
 func main() {
-	fmt.Print(config.GlobalParameters.TextColor)
+	// config.Init()
 	printBanner()
-
 	
-
-	
-	//config.DumpGlobalParameters()
 	osc.Init()
 	op.Init()
 	osc.Listen()

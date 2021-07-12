@@ -28,6 +28,7 @@
 #   Terminal colors are not avaliable on Windows.
 
 [colors]
+	banner = "green"
 	text = "gray"
 	error = "yellow"
 	

@@ -155,6 +155,10 @@ func (m *MetaMessage) Data() []byte {
 	return m.data
 }
 
+func (m *MetaMessage) ConvertsToPortmidi() bool {
+	return false
+}
+
 func (m *MetaMessage) ToPortmidiEvent() (portmidi.Event, error) {
 	var pme portmidi.Event
 	msg := "MetaMessage can not be converted to portmidi.Event. "

@@ -133,7 +133,7 @@ func (s StatusByte) String() string {
 
 
 // MIDIMessage interface universal MIDI message methods.
-// There are at least three implementing structure:
+// There are at least three implementing types:
 //   ChannelMessage
 //   SystemMessage
 //   MetaMessage
@@ -142,6 +142,7 @@ type MIDIMessage interface {
 	Status() StatusByte
 	Bytes() []byte
 	Dump()
+	ConvertsToPortmidi() bool
 	ToPortmidiEvent() (portmidi.Event, error)
 }
 	

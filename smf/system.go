@@ -30,11 +30,6 @@ func (sys *SystemMessage) String() string {
 	return acc
 }
 			
-	
-	
-	
-
-
 // newSystemMessage returns pointer to new instance of SystemMessage
 // bytes - the byte stream defining this message.
 // Returns non-nil error if status byte (bytes[0]) is not valid as a system-message.
@@ -140,7 +135,9 @@ func (sys *SystemMessage) Dump() {
 	}
 }
 	
-
+func (sys *SystemMessage) ConvertsToPortmidi() bool {
+	return true
+}
 		
 func (sys *SystemMessage) ToPortmidiEvent() (portmidi.Event, error) {
 	var err error

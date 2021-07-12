@@ -79,6 +79,11 @@ func (m *ChannelMessage) Dump() {
 	fmt.Printf("] %s\n", m)
 }
 
+func (m *ChannelMessage) ConvertsToPortmidi() bool {
+	return true
+}
+
+
 // Deportment converts ChannelMessage to equivalent portmidi.Event.
 // The event time is set to 0.
 // The error return is always nil.

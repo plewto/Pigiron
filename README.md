@@ -31,8 +31,15 @@ immediately under the version number.
 	 # where <pigiron> is the location of the main pigiron project 
 	 # directory.  IE the directory containing main.go
 	 
-	
-   
+     # The resources directory contains an example configuration file 
+	 #       ~/.config/pigiron/resources/config.toml
+     # You may wish to either copy or link to this file in the top-level
+	 # config directory.
+	 #
+	 $ cd ~/.config/pigiron
+	 $ ln -s ./resources/config.toml .
+	 
+	 
    
 
 

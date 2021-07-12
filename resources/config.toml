@@ -1,0 +1,38 @@
+# Pigiron configuration
+
+[osc-server]
+	root = "pig"
+	host = "127.0.0.1"
+	port = 8020
+
+[osc-client]
+	root = "pig-client"
+	host = "127.0.0.1"
+	port = 8021
+	file = "/home/sj/t/foo"
+
+[tree]
+	max-depth = 12
+
+[midi-input]
+	buffer-size = 1024
+	poll-interval = 1   # in ms, may be 0
+
+[midi-output]
+	buffer-size = 1024
+	latency = 0
+
+
+# Named terminal colors may be:
+#   red, green, yellow, blue, purple, cyan, gray and white
+#   Terminal colors are not avaliable on Windows.
+
+[colors]
+	text = "gray"
+	error = "yellow"
+	
+
+
+
+
+   

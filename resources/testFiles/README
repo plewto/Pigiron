@@ -10,3 +10,4 @@ Malformed files:
 
 Well formed MIDI files:
     a.mid                 Simple 1-bar contains meta, key and clock events only.
+    no-clocks.mid         Same as a.mid but without clock messages.

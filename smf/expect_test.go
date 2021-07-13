@@ -184,7 +184,7 @@ func TestGetChannelMessage(t *testing.T) {
 
 func TestGetRunningStatus(t *testing.T) {
 	readIndex := 5
-	cmsg, index, err := getRunningStatusMessage(mockMIDIBuffer, readIndex, NoteOnStatus, 4)
+	cmsg, index, err := getRunningStatus(mockMIDIBuffer, readIndex, NoteOnStatus, 4)
 	if err != nil {
 		msg := "\ngetRunningStatusMessage false error return at index 5"
 		t.Fatal(msg)

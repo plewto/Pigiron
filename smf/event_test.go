@@ -33,7 +33,7 @@ func TestCreateEventList(t *testing.T) {
 	var track *Track
 	var events *EventList
 	var division int
-	filename, _ := fileio.ResourceFilename("testFiles", "a.mid")
+	filename, _ := fileio.ResourceFilename("testFiles", "no-clocks.mid")
 	fmt.Printf("test MIDI file is %s\n", filename)
 	smf, err = ReadSMF(filename)
 	if err != nil {

@@ -8,20 +8,6 @@ import (
 	
 )
 
-
-func noResourcesAbort(fnName string) bool {
-	_, err := fileio.ResourceFilename("testFiles", "a.mid")
-	if err != nil {
-		fmt.Printf("\nWARNING: Can not read resource file required for %s\n", fnName)
-		fmt.Println("WARNING: Error from fileio.ResourceFilename was:")
-		fmt.Printf("%s\n", err)
-		fmt.Printf("WARNING: Aborting test.\n\n")
-		return true
-	}
-	return false
-}
-
-
 func TestReadSMF(t *testing.T) {
 	if noResourcesAbort("TestReadSMF") {
 		return
@@ -49,9 +35,9 @@ func TestReadSMF(t *testing.T) {
 		msg += "Expected 1, got %d"
 		t.Fatalf(msg, smf.header.chunkCount)
 	}
-	if smf.header.division != 480 {
+	if smf.header.division != 24 {
 		msg := "smf header does not have expected division.\n"
-		msg += "Expected 480, got %d"
+		msg += "Expected 24, got %d"
 		t.Fatalf(msg, smf.header.division)
 	}
 	// check consistency between header chunkCount and actual track count.

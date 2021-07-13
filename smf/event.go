@@ -103,6 +103,7 @@ func createEventList(division int, bytes []byte) (*EventList, error) {
 		status := bytes[index]
 		switch {
 		case status & 0x80 == 0:  // Use running status
+			fmt.Printf("DEBUG running status at %d\n", startIndex)
 			var cmsg *ChannelMessage
 			if !isChannelStatus(byte(runStat)) {
 				errmsg := "smf createEventList running-status error. startIndex was %d\n"

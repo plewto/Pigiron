@@ -48,31 +48,31 @@ var (
 	//
 	metaTypeTable map[MetaType]string = map[MetaType]string {
 		MetaSequenceNumber: "SEQ-NUMBER",
-		MetaText: "TEXT",
-		MetaCopyright: "COPYRIGHT",
-		MetaTrackName: "TRACK-NAME",
+		MetaText:           "TEXT",
+		MetaCopyright:      "COPYRIGHT",
+		MetaTrackName:      "TRACK-NAME",
 		MetaInstrumentName: "INSTRUMENT-NAME",
-		MetaLyric: "LYRIC",
-		MetaMarker: "MARKER",
-		MetaCuePoint: "CUE",
-		MetaChannelPrefix: "CHANNEL-PREFIX",
-		MetaEndOfTrack: "END-OF-TRACK",
-		MetaTempo: "TEMPO",
-		MetaSMPTE: "SMPTE",
-		MetaTimeSignature: "TIME-SIG",
-		MetaKeySignature: "KEY-SIG",
+		MetaLyric:          "LYRIC",
+		MetaMarker:         "MARKER",
+		MetaCuePoint:       "CUE",
+		MetaChannelPrefix:  "CHANNEL-PREFIX",
+		MetaEndOfTrack:     "END-OF-TRACK",
+		MetaTempo:          "TEMPO",
+		MetaSMPTE:          "SMPTE",
+		MetaTimeSignature:  "TIME-SIG",
+		MetaKeySignature:   "KEY-SIG",
 		MetaSequencerEvent: "SEQ-EVENT",
 	}
 )
 
-
-func (t MetaType) String() string {
-	s, flag := metaTypeTable[t]
+func (mt MetaType) String() string {
+	s, flag := metaTypeTable[mt]
 	if !flag {
-		s = "?"
+		s = "????"
 	}
 	return s
 }
+
 
 // isMetaType returns true if n is a valid meta type.
 //
@@ -112,9 +112,6 @@ func (m *MetaMessage) Bytes() []byte {
 	return acc
 }
 
-func (m *MetaMessage) String() string {
-	return fmt.Sprintf("Meta %s", m.mtype)
-}
 
 func (m *MetaMessage) Dump() {
 	fmt.Printf("MetaMessage '%s'\n", m.mtype)
@@ -148,6 +145,25 @@ func (m *MetaMessage) Dump() {
 //
 func (m *MetaMessage) MetaType() MetaType {
 	return m.mtype
+}
+
+func (mm *MetaMessage) String() string {
+	mnemonic, flag := metaTypeTable[mm.mtype]
+	if !flag {
+		mnemonic = "?"
+	}
+	acc := fmt.Sprintf("META %-15s ", mnemonic)
+	switch {
+	case !flag:
+	case isMetaTextType(byte(mm.mtype)):
+		acc += fmt.Sprintf(" : '%s'", string(mm.data))
+	default:
+		acc += fmt.Sprintf(" : ")
+		for _, b := range mm.data {
+			acc += fmt.Sprintf("%0x2X  ", b)
+		}
+	}
+	return acc
 }
 
 

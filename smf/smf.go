@@ -5,6 +5,8 @@ import (
 	"os"
 )
 
+func ignore(...interface{}){} // For testing only
+
 func exError(message string, more ...string) error {
 	msg := fmt.Sprintf("ERROR: %s", message)
 	for _, s := range more {
@@ -29,6 +31,41 @@ type SMF struct {
 	filename string
 	header *Header
 	tracks []*Track
+}
+
+
+func (smf *SMF) ClockDivision() (int, error) {
+	bytes := smf.header.Bytes()
+	division, err := getShort(bytes, 12)
+	if err != nil {
+		errmsg := "*smf.ClockDivision error"
+		err = compoundError(err, errmsg)
+		return division, err
+	}
+	if division < 12 {
+		errmsg := "*smf.ClockDivision looks weird: %d"
+		err = exError(fmt.Sprintf(errmsg, division))
+		return division, err
+	}
+	return division, err
+}
+
+func (smf *SMF) TrackCount() int {
+	return len(smf.tracks)
+}
+
+func (smf *SMF) GetTrack(n int) (*Track, error) {
+	var err error
+	var trk *Track
+	tcount := smf.TrackCount()
+	if n >= tcount {
+		errmsg := "*smf.GetTrack index out of bounds\n"
+		errmsg += "Track number %d >= track count %d"
+		err = exError(fmt.Sprintf(errmsg, n, tcount))
+		return trk, err
+	}
+	trk = smf.tracks[n]
+	return trk, err
 }
 
 

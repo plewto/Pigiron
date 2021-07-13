@@ -1,4 +1,4 @@
-# Pigiron Readme
+# Pigiron README
 
 
 ## Requirements
@@ -13,7 +13,7 @@ portmidi
 - OSX     : o be determined.
    
 The configuration directory location is printed on program startup,
-immediately under the pigiorn banner.  
+immediately under the Pigiron banner.  
   
   
 1. Create symbolic link in the configuration directory to the pigiron 

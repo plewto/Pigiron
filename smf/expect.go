@@ -112,7 +112,7 @@ func getVLQ(buffer []byte, index int)(*VLQ, error) {
 }
 
 
-// getRunningStatusMessage creates MIDI message from smf track data using 'running status'.
+// getRunningStatuscreates MIDI message from smf track data using 'running status'.
 // buffer - smf track data
 // index - index should point to first data byte.
 // st - MIDI status byte
@@ -121,14 +121,14 @@ func getVLQ(buffer []byte, index int)(*VLQ, error) {
 // The 2nd return value is an updated index pointing to the start of the 
 // following event's delta-time.
 //
-func getRunningStatusMessage(buffer []byte, index int, st StatusByte, ch byte)(*ChannelMessage, int, error) {
+func getRunningStatus(buffer []byte, index int, st StatusByte, ch byte)(*ChannelMessage, int, error) {
 	var startIndex = index
 	var err error
 	var cmsg *ChannelMessage
 	var data1, data2 byte
 	count, flag := channelStatusDataCount[StatusByte(st)]
 	if !flag {
-		msg := "smf.getRunningStatusMessage, runing-statys error\n"
+		msg := "smf getRunningStatus, runing-statys error\n"
 		msg += "Expected non-status byte at index %d, got 0x%x"
 		err = exError(fmt.Sprintf(msg, index, st))
 		return cmsg, index, err
@@ -142,7 +142,7 @@ func getRunningStatusMessage(buffer []byte, index int, st StatusByte, ch byte)(*
 		data2, err = getByte(buffer, index+1)
 		index += 2
 	default:
-		msg := "smf.GetRunningStatysMessage switch fall through, should never be here.\n"
+		msg := "smf getRunningStatus,  switch fell through, should never be here.\n"
 		msg += fmt.Sprintf("status was 0x%x '%s', index was %d", st, st, index)
 		err = fmt.Errorf(msg)
 		panic(err)
@@ -150,7 +150,7 @@ func getRunningStatusMessage(buffer []byte, index int, st StatusByte, ch byte)(*
 	var err2 error
 	cmsg, err2 = NewChannelMessage(st, ch, data1, data2)
 	if err2 != nil {
-		msg := "smf.GetRunningStatusMessage, status was 0x%x '%s', index was %d"
+		msg := "smf getRunningStatus, status was 0x%x '%s', index was %d"
 		msg = fmt.Sprintf(msg, st, st, startIndex)
 		err = compoundError(err2, msg)
 	}
@@ -181,7 +181,7 @@ func getChannelMessage(buffer []byte, index int)(*ChannelMessage, int, error) {
 	ch := sbyte & 0x0F
 	count, flag := channelStatusDataCount[st]
 	if !flag {
-		msg := "smf.getRunningStatusMessage, non-channel status: 0x%x '%s' at index %d"
+		msg := "smf getRunningStatus, non-channel status: 0x%x '%s' at index %d"
 		err = fmt.Errorf(msg, st, st, index)
 	        return cmsg, index, err
 	}
@@ -194,13 +194,13 @@ func getChannelMessage(buffer []byte, index int)(*ChannelMessage, int, error) {
 		data2, err = getByte(buffer, index+1)
 		index += 2
 	default:
-		msg := "smf.GetChannelMessage switch fall through, should never be here.\n"
+		msg := "smf getChannelMessage switch fall through, should never be here.\n"
 		msg += fmt.Sprintf("status was 0x%x '%s', index was %d", st, st, index)
 		err = fmt.Errorf(msg)
 		panic(err)
 	}
 	if err != nil {
-		msg := "smf.getRunningStatusMessage, data index %d out of bounds\n"
+		msg := "smf getChannelMessage, data index %d out of bounds\n"
 		msg += fmt.Sprintf("%s\n", err)
 		err = fmt.Errorf(msg, startIndex)
 		return cmsg, startIndex, err

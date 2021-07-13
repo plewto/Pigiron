@@ -113,7 +113,7 @@ func (m *MetaMessage) Bytes() []byte {
 }
 
 func (m *MetaMessage) String() string {
-	return fmt.Sprintf("MetaMessage %s", m.mtype)
+	return fmt.Sprintf("Meta %s", m.mtype)
 }
 
 func (m *MetaMessage) Dump() {

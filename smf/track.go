@@ -32,7 +32,7 @@ func (t *Track) Dump() {
 	lineLength := 16
 
 	xline := func(index int) (string, string) {
-		acc := fmt.Sprintf("\t[%4x] ", index) // 9
+		acc := fmt.Sprintf("\t[%6d] ", index) // 9
 		bcc := ""
 		for i, j := index, 0; i < len(t.bytes) && j < lineLength; i, j = i+1, j+1 {
 			b := t.bytes[i]

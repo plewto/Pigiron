@@ -1,0 +1,12 @@
+pigiron/resources/testFiles
+
+This directory contains various MIDI files for SMF testing.
+
+Malformed files:
+    bad1.mid              Not a MIDI file
+    badFormat.mid         Unsupported format in header.
+    badNoTracks.mid       Contains no tracks
+    badWeirdDivision.mid  Has an invalid clock division
+
+Well formed MIDI files:
+    a.mid                 Simple 1-bar contains meta, key and clock events only.

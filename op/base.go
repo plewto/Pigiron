@@ -57,7 +57,7 @@ func (op *baseOperator) setName(s string) {
 }
 
 func (op *baseOperator) String() string {
-	return fmt.Sprintf("%s  name: \"%s\"", op.opType, op.name)
+	return fmt.Sprintf("%-12s name: \"%s\"", op.opType, op.name)
 }
 
 

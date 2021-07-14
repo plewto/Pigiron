@@ -70,7 +70,7 @@ func NewMIDIOutput(name string, deviceSpec string) (*MIDIOutput, error) {
 }
 
 func (op *MIDIOutput) String() string {
-	msg := "%s  name: \"%s\"  device: \"%s\""
+	msg := "%-12s name: \"%s\"  device: \"%s\""
 	return fmt.Sprintf(msg, op.opType, op.name, op.DeviceName())
 }
 

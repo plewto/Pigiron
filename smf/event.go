@@ -11,6 +11,8 @@ type Event struct {
 	meta *MetaMessage
 }
 
+// portmidiSysExToString helper-function, formats portmidi SysEx messages.
+//
 func portmidiSysExToString(pm *portmidi.Event) string {
 	acc := "SysEx "
 	maxbytes := 12
@@ -31,6 +33,9 @@ func portmidiSysExToString(pm *portmidi.Event) string {
 	return acc
 }	
 
+
+// portmidiToString helper-function, formats portmidi events.
+//
 func portmidiToString(pm *portmidi.Event) string {
 	acc := ""
 	st := byte(pm.Status)
@@ -61,8 +66,6 @@ func portmidiToString(pm *portmidi.Event) string {
 }
 
 
-
-
 func (e *Event) String() string {
 	acc := fmt.Sprintf("t %8.4f ", e.time)
 	if e.message != nil {
@@ -73,18 +76,36 @@ func (e *Event) String() string {
 	return acc
 }
 
-
+// EventList type maintains a list of MIDI track events.
+//
 type EventList struct {
 	tempo float64   // BPM
 	division int    // clocks per quarter note
 	events []*Event
 }
 
-func (e *EventList) tickDuration() float64 { // ISSUE: Implement
-	return 0.01
+func (e *EventList) tickDuration() float64 {
+	var div int
+	if e.division & 0x8000 != 0 {
+		dflt := 24
+		fmt.Println("WARNING: MIDI file SMPTE time code not suported.")
+		fmt.Printf("WARNING: Defaulting to %d ticks per beat.", dflt)
+		div = dflt
+	} else {
+		div = e.division & 0x7FFF
+	}
+	var tempo float64 = e.tempo  // in BPM
+	var qdur float64 = 1.0      // quarter-note duration in seconds
+	if tempo == 0 {
+		dflt := 60.0
+		fmt.Println("WARNING: MIDI file tempo is 0.")
+		fmt.Printf("WARNING: Defaulting to %f BPM", dflt)
+		tempo = dflt
+	}
+	qdur = 60.0/tempo
+	return qdur/float64(div)
 }
-	
-
+			
 func (e *EventList) getDeltaTime(vlq *VLQ) float64 {
 	tick := e.tickDuration()
 	return tick * float64(vlq.Value())
@@ -93,19 +114,18 @@ func (e *EventList) getDeltaTime(vlq *VLQ) float64 {
 func (events *EventList) Dump() {
 	tab := " "
 	fmt.Println("EventList")
-	fmt.Printf("%s tempo    : %f BPM\n", tab, events.tempo)
-	fmt.Printf("%s division : %d\n", tab, events.division)
+	fmt.Printf("%s tempo         : %f BPM\n", tab, events.tempo)
+	fmt.Printf("%s division      : %d\n", tab, events.division)
+	fmt.Printf("%s tick duration : %f sec\n", tab, events.tickDuration())
 	fmt.Printf("%s event count : %d\n", tab, len(events.events))
 	for i, ev := range events.events {
 		fmt.Printf("%s [#%4d] %s\n", tab, i, ev)
 	}
 }
 
-
-
 func createEventList(division int, bytes []byte) (*EventList, error) {
 	var err error
-	var eventList *EventList
+	var eventList *EventList = &EventList{60.0, division, make([]*Event, 0)}
 	var acc []*Event = make([]*Event, 0, 1024)
 	var runStat StatusByte = 0
 	var runChan byte = 0
@@ -120,7 +140,7 @@ func createEventList(division int, bytes []byte) (*EventList, error) {
 			err = compoundError(err, fmt.Sprintf(errmsg, index))
 			return eventList, err
 		}
-		//currentTime += ????   // TODO: update currentTime
+		currentTime += eventList.getDeltaTime(vlq)
 		index += vlq.Length()
 		if index >= len(bytes) {
 			break
@@ -183,6 +203,13 @@ func createEventList(division int, bytes []byte) (*EventList, error) {
 				err = compoundError(err, fmt.Sprintf(errmsg, startIndex))
 				return eventList, err
 			}
+			if meta.mtype == MetaTempo {
+				bpm, err := getMetaTempo(meta)
+				if err != nil {
+					fmt.Printf("%s, using default %f\n", err, bpm)
+				}
+				eventList.tempo = bpm
+			}
 			evnt := &Event{currentTime, nil, meta}
 			acc = append(acc, evnt)
 		default:
@@ -191,7 +218,7 @@ func createEventList(division int, bytes []byte) (*EventList, error) {
 			return eventList, err	
 		} // end switch	
 	} // end outer for
-	eventList = &EventList{60, division, acc}  // TODO replace 60 with actual tempo
+	eventList.events = acc
 	return eventList, err
 } // end createEventList
 

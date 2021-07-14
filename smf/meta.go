@@ -120,6 +120,34 @@ func (m *MetaMessage) MetaType() MetaType {
 	return m.mtype
 }
 
+func getMetaTempo(mm *MetaMessage) (float64, error) {
+	var err error
+	var dflt float64 = 60.0
+	var bpm float64 = dflt
+	if mm.mtype != MetaTempo {
+		errmsg := "Expected Meta tempo message, got 0x%X, '%s'"
+		errmsg = fmt.Sprintf(errmsg, byte(mm.mtype), mm.mtype)
+		err = exError(errmsg)
+		return bpm, err
+	}
+	if len(mm.data) != 3 {
+		errmsg := "Malformed meta tempo, expected 3 data bytes, got %d"
+		errmsg = fmt.Sprintf(errmsg, len(mm.data))
+		err = exError(errmsg)
+		return bpm, err
+	}
+	usec, _ := get3Bytes(mm.data, 0)
+	if usec == 0 {
+		errmsg := "Malformed meta tempo = 0"
+		err = exError(errmsg)
+		return bpm, err
+	}
+	bpm = 60000000.0 / float64(usec)
+	return bpm, err
+}
+	
+	
+
 
 func metaTempoToString(mm *MetaMessage) string {
 	acc := ""

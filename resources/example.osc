@@ -1,0 +1,19 @@
+# example.osc
+#
+# Typical osc batch file creates MIDI process graph
+#
+#     MIDIInput -> MIDIPlayer -> Monitor -> MIDIOutput
+#
+# MIDI device 0 is selected for both input and output,
+# If the resources directory is linked to the configuration directory, this
+# file may be loaded from the repl prompt by
+#
+#    /pig batch !/resources/example.osc
+#
+
+new MIDIInput, in, 0
+new MIDIPlayer, player
+new Monitor, mon
+new MIDIOutput, out, 0
+connect in, player, mon, out
+

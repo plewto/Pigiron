@@ -109,6 +109,11 @@ func isChannelStatus(s byte) bool {
 	return flag
 }
 
+func isKeyedStatus(s byte) bool {
+	sb := StatusByte(s)
+	return sb == NoteOffStatus || sb == NoteOnStatus || sb == PolyPressureStatus
+}
+
 // isSystemStatus returns true iff argument is a system-message status byte.
 //
 func isSystemStatus(s byte) bool {

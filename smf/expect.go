@@ -51,6 +51,21 @@ func getLong(buffer []byte, index int) (int, error) {
 	return acc, err
 }
 
+func get3Bytes(buffer []byte, index int)  (int, error) {
+	var err error
+	if index > len(buffer) + 3 {
+		msg := "smf.get3Bytes index out of range: index = %d, buffer length = %d"
+		err = exError(fmt.Sprintf(msg, index, len(buffer)))
+		return 0, err
+	}
+	acc := 0
+		for i, j, shift := index, 0, 16; j < 3; i, j, shift = i+1, j+1, shift-8 {
+		n := int(buffer[i])
+		acc += int(n << shift)
+	}
+	return acc, err
+}
+
 // getShort extracts 2-byte value from buffer starting at index.
 //
 func getShort(buffer []byte, index int) (int, error) {

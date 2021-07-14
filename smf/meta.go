@@ -7,6 +7,7 @@ package smf
 
 import (
 	"fmt"
+	"math"
 	"github.com/rakyll/portmidi"
 )
 
@@ -47,21 +48,21 @@ var (
 	// metaTypeTable maps MetaType to string mnemonic.
 	//
 	metaTypeTable map[MetaType]string = map[MetaType]string {
-		MetaSequenceNumber: "SEQ-NUMBER",
-		MetaText:           "TEXT",
-		MetaCopyright:      "COPYRIGHT",
-		MetaTrackName:      "TRACK-NAME",
-		MetaInstrumentName: "INSTRUMENT-NAME",
-		MetaLyric:          "LYRIC",
-		MetaMarker:         "MARKER",
-		MetaCuePoint:       "CUE",
-		MetaChannelPrefix:  "CHANNEL-PREFIX",
-		MetaEndOfTrack:     "END-OF-TRACK",
-		MetaTempo:          "TEMPO",
-		MetaSMPTE:          "SMPTE",
-		MetaTimeSignature:  "TIME-SIG",
-		MetaKeySignature:   "KEY-SIG",
-		MetaSequencerEvent: "SEQ-EVENT",
+		MetaSequenceNumber: "SeqNum ",
+		MetaText:           "Text   ",
+		MetaCopyright:      "CpyRite",
+		MetaTrackName:      "TrkName",
+		MetaInstrumentName: "InsName",
+		MetaLyric:          "Lyric  ",
+		MetaMarker:         "Marker ",
+		MetaCuePoint:       "Cue    ",
+		MetaChannelPrefix:  "ChanPre",
+		MetaEndOfTrack:     "EOT    ",
+		MetaTempo:          "Tempo  ",
+		MetaSMPTE:          "SMPTE  ",
+		MetaTimeSignature:  "TSig   ",
+		MetaKeySignature:   "KSig   ",
+		MetaSequencerEvent: "SeqEvnt",
 	}
 )
 
@@ -111,34 +112,6 @@ func (m *MetaMessage) Bytes() []byte {
 	acc = append(acc, m.data...)
 	return acc
 }
-
-
-func (m *MetaMessage) Dump() {
-	fmt.Printf("MetaMessage '%s'\n", m.mtype)
-	fmt.Printf("[ 0] 0x%02x    - status", byte(MetaStatus))
-	fmt.Printf("[ 1] 0x%02x    - type '%s'\n", byte(m.mtype), m.mtype)
-	bytes := m.Bytes()
-	counter := 0
-	for i, b := range bytes[2:] {
-		fmt.Printf("[%2d] 0x%02x   - VLQ-%d\n", i+2, b, counter)
-		counter++
-		if b & 0x80 == 0 {
-			break
-		}
-	}
-	offset := counter + 2
-	counter = 0
-	mtype := byte(m.MetaType())
-	for i, b := range bytes[offset:] {
-		fmt.Printf("[%2d] 0x%02x   - Data-%d", offset + i, b, counter)
-		if isMetaTextType(mtype) {
-			fmt.Printf(" '%c'", b)
-		}
-		fmt.Println()
-		counter++
-	}
-}
-			
 		
 
 // MetaType returns byte indicating the type of this MetaMessage.
@@ -147,25 +120,67 @@ func (m *MetaMessage) MetaType() MetaType {
 	return m.mtype
 }
 
-func (mm *MetaMessage) String() string {
-	mnemonic, flag := metaTypeTable[mm.mtype]
-	if !flag {
-		mnemonic = "?"
+
+func metaTempoToString(mm *MetaMessage) string {
+	acc := ""
+	if len(mm.data) != 3 {
+		acc += fmt.Sprintf("<malformed, expected 3 data bytes, got %d>", len(mm.data))
+		return acc
 	}
-	acc := fmt.Sprintf("META %-15s ", mnemonic)
-	switch {
-	case !flag:
-	case isMetaTextType(byte(mm.mtype)):
-		acc += fmt.Sprintf(" : '%s'", string(mm.data))
-	default:
-		acc += fmt.Sprintf(" : ")
-		for _, b := range mm.data {
-			acc += fmt.Sprintf("%0x2X  ", b)
-		}
+	usec, _ := get3Bytes(mm.data, 0)
+	acc += fmt.Sprintf("%d μSec,   ", usec)
+	if usec != 0 {
+		bpm := 60000000.0 / float64(usec)
+		acc += fmt.Sprintf("%7.3f BPM", bpm)
 	}
 	return acc
 }
 
+func metaTimeSigToString(mm *MetaMessage) string {
+	acc := ""
+	if len(mm.data) != 4 {
+		acc += fmt.Sprintf("<malformed, expected 4 data bytes, got %d>", len(mm.data))
+		return acc
+	}
+	num := mm.data[0]
+	exp := float64(mm.data[1])
+	den := int(math.Pow(2, exp))
+	acc += fmt.Sprintf("%d/%d", num, den)
+	return acc
+}
+
+
+func (mm *MetaMessage) String() string {
+	mtype := mm.mtype
+	mnemonic, flag := metaTypeTable[mtype]
+	if !flag {
+		mnemonic = "?????  "
+	}
+	acc := fmt.Sprintf("META %s : ", mnemonic)
+	if len(mm.data) > 0 {
+		maxbytes := 8
+		acc += "["
+		for i := 0; i < len(mm.data) && i < maxbytes; i++ {
+			acc += fmt.Sprintf("%02X ", mm.data[i])
+		}
+		if len(mm.data) > maxbytes {
+			acc += fmt.Sprintf("... %d more] ", len(mm.data) - maxbytes)
+		} else {
+			acc += "] "
+		}
+	}
+	switch {
+	case isMetaTextType(byte(mtype)):
+		acc += fmt.Sprintf("\"%s\"", string(mm.data))
+	case mtype == MetaTempo:
+		acc += metaTempoToString(mm)
+	case mtype == MetaTimeSignature:
+		acc += metaTimeSigToString(mm)
+	default:
+		// ignore
+	}
+	return acc
+}
 
 func (m *MetaMessage) Data() []byte {
 	return m.data

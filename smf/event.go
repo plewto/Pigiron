@@ -11,37 +11,62 @@ type Event struct {
 	meta *MetaMessage
 }
 
-func pmString(pm *portmidi.Event) string {
-	acc := "PM   "
+func portmidiSysExToString(pm *portmidi.Event) string {
+	acc := "SysEx "
+	maxbytes := 12
+	data := pm.SysEx
+	if len(data) == 0 {
+		acc += "<malformed, no data bytes>"
+		return acc
+	}
+	acc += "["
+	for i := 0; i < len(data) && i < maxbytes; i++ {
+		acc += fmt.Sprintf("%2X ", data[i])
+	}
+	if len(data) > maxbytes {
+		acc += fmt.Sprintf("... %d more]", len(data) - maxbytes)
+	} else {
+		acc += "]"
+	}
+	return acc
+}	
+
+func portmidiToString(pm *portmidi.Event) string {
+	acc := ""
 	st := byte(pm.Status)
 	mn, _ := statusTable[StatusByte(st)]
 	switch {
 	case len(pm.SysEx) > 0:
-		acc += "SYSEX "
+		acc += portmidiSysExToString(pm)
 	case isSystemStatus(st):
-		acc += fmt.Sprintf("SYS   %s", mn)
+		acc += fmt.Sprintf("SYS  %s", mn)
 	case isChannelStatus(st):
-		acc += fmt.Sprintf("CHAN  %s", mn)
 		ch := (st & 0x0F) + 1
-		acc += fmt.Sprintf(" %2d+ ", ch)
+		d1, d2 := pm.Data1, pm.Data2
+		acc += fmt.Sprintf("CHAN+ %2d %s %02X", ch, mn, d1)
 		count, _ := channelStatusDataCount[StatusByte(st)]
-		
-		acc += fmt.Sprintf("%02X ", pm.Data1)
 		if count > 1 {
-			acc += fmt.Sprintf("%02X ", pm.Data2)
+			acc += fmt.Sprintf(" %02X", d2)
 		}
-	default:
-		acc += "????  "
+		if isKeyedStatus(st) {
+			keys := []string{"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"}
+			pc := d1 % 12
+			oct := d1/12
+			acc += fmt.Sprintf("   key %s%d", keys[pc], oct)
+		}
+		default:
+		acc += "<malformed, invalid status type>"
 	}
 	return acc
 }
 
 
 
+
 func (e *Event) String() string {
 	acc := fmt.Sprintf("t %8.4f ", e.time)
 	if e.message != nil {
-		acc += pmString(e.message)
+		acc += portmidiToString(e.message)
 	} else {
 		acc += fmt.Sprintf("%s", e.meta)
 	}

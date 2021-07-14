@@ -39,13 +39,39 @@ func sleep(n int) {
 	time.Sleep(time.Duration(n) * time.Millisecond)
 }
 
+// SubUserHome replaces special characters in filename.
+//
+// Two special cases are defined:
+//
+// 1) If the first filename character is '~', the filename is returned
+//    relative to the user's home directory.
+// 2) If the first character is '!', the filename is returned relative to
+//    the configuration directory
+//
+//    foo    --> foo
+//    ~/foo  --> /home/<user>/foo
+//    !/foo  --> /home/<user>/.config/pigiron/foo
+//    
+//   
 func SubUserHome(filename string) string {
-	if len(filename) > 0 && filename[0] == byte('~') {
+	if len(filename) == 0 {
+		return filename
+	}
+	prefix := filename[0]
+	switch prefix {
+	case byte('~'):
 		home, _ := os.UserHomeDir()
 		filename = filepath.Join(home, filename[1:])
+	case byte('!'):
+		cfig, _ := os.UserConfigDir()
+		filename = filepath.Join(cfig, "pigiron", filename[1:])
+	default:
+		// ignore
 	}
 	return filename
+
 }
+
 
 func Prompt() {
 	root := config.GlobalParameters.OSCServerRoot

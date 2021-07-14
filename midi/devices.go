@@ -3,7 +3,7 @@ package midi
 import (
 	"fmt"
 	"strings"
-	"errors"
+	"strconv"
 	
 	"github.com/rakyll/portmidi"
 )
@@ -25,7 +25,7 @@ func init() {
 }
 
 
-// Cleanup terminates portamidi.
+// Cleanup terminates portmidi.
 // Only call on application exit.
 //
 func Cleanup() {
@@ -125,54 +125,84 @@ func DumpDevices() {
 	dumpOutputs()
 }
 
-
-// GetInputID searches for specific portmidi input DeviceID.
-// pattern is matched against the device name, The id for the first device
-// whose name contains pattern as a sub-string is returned.
+// getDeviceIdByIndex returns portmidi DeviceID by location in device list.
 //
-// If there are no matching devices, the default id is returned with a
-// non-nil error.
+// Returns non-nil error if string s can not be parsed as an int, or if it is
+// out of bounds.
+//
+func getDeviceIdByIndex(s string, idList []portmidi.DeviceID) (portmidi.DeviceID, error) {
+	var err error
+	var index int
+	var limit = len(idList)
+	var id portmidi.DeviceID
+	index, err = strconv.Atoi(s)
+	if err != nil {
+		return id, err
+	}
+	if limit < 0 || limit >= limit {
+		err := fmt.Errorf("device id index out of bounds: %d", index)
+		return id, err
+	}
+	id = idList[index]
+	return id, err
+}
+
+// getDeviceIdByPattern returns first id from list with matching pattern.
+// The first id for which contains pattern as a sub-string is a match.
+// Returns non-nil error if no matches are found.
+//
+func getDeviceIdByPattern(pattern string, idList []portmidi.DeviceID) (portmidi.DeviceID, error) {
+	var err error
+	var id portmidi.DeviceID
+	for _, item := range idList {
+		name := portmidi.Info(item).Name
+		if strings.Contains(name, pattern) {
+			id = item
+			return id, err
+		}
+	}
+	err = fmt.Errorf("Pattern '%s' did not match any MIDI device name", pattern)
+	return id, err
+}
+		
+// GetInputID selects portmidi input DeviceID by either name or index.
+// pattern may either be an integer index, or a sub-string of a device name.
+// If no matches are found returns the default id and a non-nil error.
 //
 func GetInputID(pattern string) (portmidi.DeviceID, error) {
-	var result portmidi.DeviceID
 	var err error
-	for _, id := range InputIDs() {
-		info := portmidi.Info(id)
-		name := info.Name
-		if strings.Contains(name, pattern) {
-			result = id
-			return result, err
+	var id portmidi.DeviceID
+	var idList = InputIDs()
+	id, err = getDeviceIdByIndex(pattern, idList)
+	if err != nil {
+		id, err = getDeviceIdByPattern(pattern, idList)
+		if err != nil {
+			errmsg := "Pattern '%s' did not match any MIDI input, using default"
+			err = fmt.Errorf(errmsg, pattern)
+			id = portmidi.DefaultInputDeviceID()
 		}
 	}
-	msg := fmt.Sprintf("MIDI input device \"%s\" does not exists, using default.", pattern)
-	err = errors.New(msg)
-	result = portmidi.DefaultInputDeviceID()
-	return result, err
+	return id, err
 }
 
-
-// GetOutputID searches for specific portmidi output DeviceID.
-// pattern is matched against the device name, The id for the first device
-// whose name contains pattern as a sub-string is returned.
-//
-// If there are no matching devices, the default id is returned with a
-// non-nil error.
-//
-func GetOutputID(pattern string) (portmidi.DeviceID, error) {
-	var result portmidi.DeviceID
-	var err error
-	for _, id := range OutputIDs() {
-		info := portmidi.Info(id)
-		name := info.Name
-		if strings.Contains(name, pattern) {
-			result = id
-			return result, err
-		}
-	}
-	msg := fmt.Sprintf("MIDI output device \"%s\" does not exists, using default.", pattern)
-	err = errors.New(msg)
-	result = portmidi.DefaultOutputDeviceID()
-	return result, err
-}
 	
-		
+// GetOutputID selects portmidi output DeviceID by either name or index.
+// pattern may either be an integer index, or a sub-string of a device name.
+// If no matches are found returns the default id and a non-nil error.
+//
+
+func GetOutputID(pattern string) (portmidi.DeviceID, error) {
+	var err error
+	var id portmidi.DeviceID
+	var idList = OutputIDs()
+	id, err = getDeviceIdByIndex(pattern, idList)
+	if err != nil {
+		id, err = getDeviceIdByPattern(pattern, idList)
+		if err != nil {
+			errmsg := "Pattern '%s' did not match any MIDI output, using default"
+			err = fmt.Errorf(errmsg, pattern)
+			id = portmidi.DefaultOutputDeviceID()
+		}
+	}
+	return id, err
+}

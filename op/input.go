@@ -62,7 +62,6 @@ func NewMIDIInput(name string, deviceSpec string) (*MIDIInput, error) {
 }
 
 
-
 func notInputError(op *MIDIInput, err error) bool {
 	if err != nil {
 		fmt.Println("%s %s\n", op, err)
@@ -88,6 +87,11 @@ func ProcessInputs() {
 			}
 		}
 	}
+}
+
+func (op *MIDIInput) String() string {
+	msg := "%s  name: \"%s\"  device: \"%s\""
+	return fmt.Sprintf(msg, op.opType, op.name, op.DeviceName())
 }
 
 func (op *MIDIInput) DeviceID() portmidi.DeviceID {

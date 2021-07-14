@@ -68,7 +68,12 @@ func NewMIDIOutput(name string, deviceSpec string) (*MIDIOutput, error) {
 	}
 	return op, err
 }
-			
+
+func (op *MIDIOutput) String() string {
+	msg := "%s  name: \"%s\"  device: \"%s\""
+	return fmt.Sprintf(msg, op.opType, op.name, op.DeviceName())
+}
+
 func (op *MIDIOutput) DeviceID() portmidi.DeviceID {
 	return op.devID
 }

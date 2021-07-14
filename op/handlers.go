@@ -130,8 +130,8 @@ func remoteBatchLoad(msg *goosc.Message)([]string, error) {
 
 
 // osc /pig/new optype name
-//     /pig/new MidiInput name device
-//     /pig/new MidiOutput name device
+//     /pig/new MIDIInput name device
+//     /pig/new MIDIOutput name device
 // -> name
 //
 func remoteNewOperator(msg *goosc.Message)([]string, error) {
@@ -439,7 +439,8 @@ func remoteQueryOperators(msg *goosc.Message)([]string, error) {
 	ops := Operators()
 	acc := make([]string, len(ops))
 	for i, op := range ops {
-		acc[i] = fmt.Sprintf("%s, %s", op.OperatorType(), op.Name())
+		//acc[i] = fmt.Sprintf("%s, %s", op.OperatorType(), op.Name())
+		acc[i] = fmt.Sprintf("%s", op)
 	}
 	return acc, err
 }

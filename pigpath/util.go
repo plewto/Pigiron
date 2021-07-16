@@ -12,8 +12,15 @@ import (
 	"path/filepath"
 )
 
+func UserHomeDir() string {
+	dir, _ := os.UserHomeDir()
+	return dir
+}
 
-
+func PigironConfigDir() string {
+	dir, _ := os.UserConfigDir()
+	return filepath.Join(dir, "pigiron")
+}
 
 
 // ResourceFilename returns filename relative to the resources directory.
@@ -29,25 +36,6 @@ func ResourceFilename(elements ...string) string {
 		acc = filepath.Join(acc, e)
 	}
 	return acc
-}
-
-// func ResourceFilename(elements ...string) string {
-// 	parts := []string{"resources"}
-// 	parts = append(parts, elements...)
-// 	return Join(PigironConfigDir(), elements...)
-// }
-
-
-
-
-func UserHomeDir() string {
-	dir, _ := os.UserHomeDir()
-	return dir
-}
-
-func PigironConfigDir() string {
-	dir, _ := os.UserConfigDir()
-	return filepath.Join(dir, "pigiron")
 }
 
 

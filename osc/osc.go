@@ -6,6 +6,7 @@ import (
 	//"github.com/rakyll/portmidi"
 	//"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
+	"github.com/plewto/pigiron/pigpath"
 )
 
 var (
@@ -26,7 +27,7 @@ func Init() {
 	host := config.GlobalParameters.OSCClientHost
 	port := int(config.GlobalParameters.OSCClientPort)
 	root := config.GlobalParameters.OSCClientRoot
-	filename := config.GlobalParameters.OSCClientFilename
+	filename := pigpath.SubSpecialDirectories(config.GlobalParameters.OSCClientFilename)
 	globalResponder = NewBasicResponder(host, port, root, filename)
 	replResponder = NewREPLResponder()
 	

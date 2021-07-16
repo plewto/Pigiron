@@ -30,6 +30,8 @@ func ConfigFilename() string {
 	return configFilename
 }
 
+
+// TODO: Move to filename
 // subUserHome substitutes leading '~' character for user home directory.
 //
 func subUserHome(filename string) string {

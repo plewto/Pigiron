@@ -8,14 +8,14 @@ package smf
 import (
 	"testing"
 	"fmt"
-	"github.com/plewto/pigiron/fileio"
+	"github.com/plewto/pigiron/pigpath"
 )
 
 func noResourcesAbort(fnName string) bool {
-	_, err := fileio.ResourceFilename("testFiles", "a.mid")
+	_, err := pigpath.ResourceFilename("testFiles", "a.mid")
 	if err != nil {
 		fmt.Printf("\nWARNING: Can not read resource file required for %s\n", fnName)
-		fmt.Println("WARNING: Error from fileio.ResourceFilename was:")
+		fmt.Println("WARNING: Error from pigpath.ResourceFilename was:")
 		fmt.Printf("%s\n", err)
 		fmt.Printf("WARNING: Aborting test.\n\n")
 		return true
@@ -33,7 +33,7 @@ func TestCreateEventList(t *testing.T) {
 	var track *Track
 	var events *EventList
 	var division int
-	filename, _ := fileio.ResourceFilename("testFiles", "no-clocks.mid")
+	filename, _ := pigpath.ResourceFilename("testFiles", "no-clocks.mid")
 	fmt.Printf("test MIDI file is %s\n", filename)
 	smf, err = ReadSMF(filename)
 	if err != nil {

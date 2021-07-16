@@ -51,11 +51,11 @@ func UserConfigDir() string {
 }
 
 
-// subSpecialDirectories replaces leading ~ and ! characters in filename
+// SubSpecialDirectories replaces leading ~ and ! characters in filename
 // '~' is replaced with user's home dir.
 // '!' is replaced with pigiron configuration dir.
 //
-func subSpecialDirectories (filename string) string {
+func SubSpecialDirectories (filename string) string {
 	result := filename
 	if len(filename) > 0 {
 		switch {
@@ -80,7 +80,7 @@ func subSpecialDirectories (filename string) string {
 // 
 func Join(base string, elements ...string) string {
 	var acc = make([]string,1,12)
-	acc[0] = subSpecialDirectories(base)
+	acc[0] = SubSpecialDirectories(base)
 	for _, e := range elements {
 		acc = append(acc, e)
 	}

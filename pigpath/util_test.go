@@ -14,13 +14,13 @@ func TestPigpath(t *testing.T) {
 	config := UserConfigDir()
 
 	a := "~/foo"
-	b := subSpecialDirectories(a)
+	b := SubSpecialDirectories(a)
 	if b[0:len(home)] != home {
 		t.Fatalf("Expected filename start to be user's home: got '%s'", b)
 	}
 
 	a = "!/foo"
-	b = subSpecialDirectories(a)
+	b = SubSpecialDirectories(a)
 
 	if b[0:len(config)] != config {
 	 	t.Fatalf("Expected filename start to be configuration directory, got '%s'", b)

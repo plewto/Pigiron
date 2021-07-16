@@ -3,6 +3,7 @@ package smf
 import (
 	"fmt"
 	"os"
+	"github.com/plewto/pigiron/pigpath"
 )
 
 func ignore(...interface{}){} // For testing only
@@ -72,7 +73,7 @@ func (smf *SMF) GetTrack(n int) (*Track, error) {
 func ReadSMF(filename string) (*SMF, error) {
 	var err error
 	var smf = &SMF{}
-	smf.filename = filename
+	smf.filename = pigpath.SubSpecialDirectories(filename)
 	var header *Header
 	var file *os.File
 	file, err = os.Open(filename)
@@ -124,7 +125,11 @@ func ReadSMF(filename string) (*SMF, error) {
 	return smf, err
 }
 				
-				
+func (smf *SMF) Filename() string {
+	return smf.filename
+}
+
+
 func (smf *SMF) Dump() {
 	fmt.Println("SMF")
 	fmt.Printf("filename : '%s'\n", smf.filename)

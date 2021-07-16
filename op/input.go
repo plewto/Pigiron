@@ -64,7 +64,7 @@ func NewMIDIInput(name string, deviceSpec string) (*MIDIInput, error) {
 
 func notInputError(op *MIDIInput, err error) bool {
 	if err != nil {
-		fmt.Println("%s %s\n", op, err)
+		fmt.Printf("%s %s\n", op, err)
 		return false
 	}
 	return true

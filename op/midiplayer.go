@@ -4,6 +4,7 @@ import (
 	"fmt"
 	
 	"github.com/plewto/pigiron/midi"
+	"github.com/plewto/pigiron/smf"
 )
 
 
@@ -11,13 +12,19 @@ import (
 
 type MIDIPlayer struct {
 	baseOperator
-	currentFilename string
+	smf *smf.SMF
+	noteQueue *midi.NoteQueue
+	isPlaying bool
+	currentTime float64
+	
 }
 
 func newMIDIPlayer(name string) *MIDIPlayer {
 	op := new(MIDIPlayer)
 	initOperator(&op.baseOperator, "MIDIPlayer", name, midi.NoChannel)
-	op.currentFilename = ""
+	op.noteQueue = midi.MakeNoteQueue()
+	op.isPlaying = false
+	op.currentTime = 0.0
 	return op
 }
 
@@ -30,11 +37,11 @@ func (op *MIDIPlayer) Info() string {
 	
 func (op *MIDIPlayer) Reset() {
 	op.Stop()
-	op.currentFilename = ""
 }
 
-func (op *MIDIPlayer) Panic() {
+func (op *MIDIPlayer) Panic() { // TODO: transmit all notes off
 	op.Stop()
+	
 }
 
 func (op *MIDIPlayer) Stop() { // TODO Implement
@@ -55,7 +62,11 @@ func (op *MIDIPlayer) LoasMedia(filename string) error { // TODO Implement
 	return err
 }
 
-func (op *MIDIPlayer) MediaFilename() string { // TODO Implement
-	return op.currentFilename
+func (op *MIDIPlayer) MediaFilename() string { 
+	if op.smf != nil {
+		return op.smf.Filename()
+	} else {
+		return ""
+	}
 }
 

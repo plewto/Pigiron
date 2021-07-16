@@ -1,5 +1,9 @@
 pigiron TODO
 
+I. Rewrite smf Message stricktly in terms of portmidi.Event
+   It is ne3edlesly complex to have an intermediate message type.
+
+
 I. SMF test
    A.  sysex message
    B.  running status

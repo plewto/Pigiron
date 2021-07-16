@@ -245,12 +245,12 @@ func (op *baseOperator) SelectChannel(channel midi.MIDIChannel) error {
 	return op.channelSelector.SelectChannel(channel)
 }
 
-func (op *baseOperator) SelectedChannelIndexes() []midi.MIDIChannelIndex {
+func (op *baseOperator) SelectedChannelIndexes() []midi.MIDIChannelNibble {
 	return op.channelSelector.SelectedChannelIndexes()
 }
 
 
-func (op *baseOperator) ChannelIndexSelected(ci midi.MIDIChannelIndex ) bool {
+func (op *baseOperator) ChannelIndexSelected(ci midi.MIDIChannelNibble ) bool {
 	return op.channelSelector.ChannelIndexSelected(ci)
 }
 

@@ -80,7 +80,7 @@ func (r *BasicResponder) String() string {
 	root := r.root
 	filename := r.filename
 	acc := "BasicResponder "
-	acc += fmt.Sprintf("root: %s,  IP %s:%s, filename '%s'", root, host, port, filename)
+	acc += fmt.Sprintf("root: %s,  IP %s:%d, filename '%s'", root, host, port, filename)
 	return acc
 }
 	

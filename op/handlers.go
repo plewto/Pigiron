@@ -402,7 +402,7 @@ func remoteInvertChannelSelection(msg *goosc.Message)([]string, error) {
 	}
 	op := args[0].O
 	for i:=0; i<16; i++ {
-		flag := op.ChannelIndexSelected(midi.MIDIChannelIndex(i))
+		flag := op.ChannelIndexSelected(midi.MIDIChannelNibble(i))
 		op.EnableChannel(midi.MIDIChannel(i+1), flag)
 	}
 	clist := op.SelectedChannelIndexes()
@@ -424,7 +424,7 @@ func remoteQueryChannelSelected(msg *goosc.Message)([]string, error) {
 	}
 	op := args[0].O
 	c := args[1].C
-	ci := midi.MIDIChannelIndex(c-1)
+	ci := midi.MIDIChannelNibble(c-1)
 	flag := op.ChannelIndexSelected(ci)
 	acc := []string{fmt.Sprintf("%v", flag)}
 	return acc, err

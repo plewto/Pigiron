@@ -8,7 +8,7 @@ import (
 const (
 	CHANNEL_MASK (int64) = 0xF0
 	STATUS_MASK (int64) = 0x0F
-	SYSEX (int64) = 0xF0
+	// SYSEX (int64) = 0xF0
 )
 
 var mnemonics = make(map[int64]string)
@@ -57,11 +57,11 @@ func StatusChannelCommand(s int64) int64 {
 	return s & CHANNEL_MASK
 }
 
-func StatusChannelIndex(s int64) MIDIChannelIndex {
-	return MIDIChannelIndex(s & STATUS_MASK)
+func StatusChannelIndex(s int64) MIDIChannelNibble {
+	return MIDIChannelNibble(s & STATUS_MASK)
 }
 
-func SetStatusChannelIndex(s int64, ci MIDIChannelIndex) int64 {
+func SetStatusChannelIndex(s int64, ci MIDIChannelNibble) int64 {
 	return StatusChannelCommand(s) | int64(ci)
 }
 
@@ -78,7 +78,7 @@ func ChannelEventToString(event portmidi.Event) string {
 func SystemEventToString(event portmidi.Event) string {
 	s := event.Status
 	acc := fmt.Sprintf("%s ", mnemonics[s])
-	if s == SYSEX {
+	if s == int64(SYSEX) {
 		bytes := event.SysEx
 		for i:=0; i<len(bytes) && i<10; i++ {
 			acc += fmt.Sprintf("%02x ", bytes[i])

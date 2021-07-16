@@ -1,13 +1,15 @@
 package midi
 
 import (
-	"errors"
 	"fmt"
 )
-	
 
-type MIDIChannel int       // 1..16
-type MIDIChannelIndex int  // 0..15
+// ChannelMode enum indicates the manner in which MIDI channels are selected.
+// There are three possible values:
+//    NoChannel
+//    SingleChannel
+//    MultiChannel
+//
 
 type ChannelMode int
 
@@ -21,31 +23,14 @@ func (m ChannelMode) String() string {
 	return [...]string{"NoChannel", "SingleChannel", "MultiChannel"}[m]
 }
 
-func ValidateMIDIChannel(c MIDIChannel) error {
-	var err error
-	if c < 1 || c > 16 {
-		msg := fmt.Sprintf("Illegal MIDIChannel: %d", c)
-		err = errors.New(msg)
-	}
-	return err
-}
-
-func ValidateMIDIChannelIndex(ci MIDIChannelIndex) error {
-	var err error
-	if ci < 0 || ci > 15 {
-		msg := fmt.Sprintf("Illegal MIDIChannelIndex: %d", ci)
-		err = errors.New(msg)
-	}
-	return err
-}
-
-
+// ChannelSelector interface defines MIDI channel selection.
+//
 type ChannelSelector interface {
 	ChannelMode() ChannelMode
 	EnableChannel(c MIDIChannel, flag bool) error
 	SelectChannel(c MIDIChannel) error
-	SelectedChannelIndexes() []MIDIChannelIndex
-	ChannelIndexSelected(ci MIDIChannelIndex) bool
+	SelectedChannelIndexes() []MIDIChannelNibble
+	ChannelIndexSelected(ci MIDIChannelNibble) bool
 	DeselectAllChannels()
 	SelectAllChannels()
 }
@@ -82,12 +67,12 @@ func (ncs *NullChannelSelector) SelectChannel(c MIDIChannel) error {
 	return err
 }
 
-func (ncs *NullChannelSelector) SelectedChannelIndexes() []MIDIChannelIndex {
-	ary := make([]MIDIChannelIndex, 0, 0)
+func (ncs *NullChannelSelector) SelectedChannelIndexes() []MIDIChannelNibble {
+	ary := make([]MIDIChannelNibble, 0, 0)
 	return ary
 }
 
-func (ncs *NullChannelSelector) ChannelIndexSelected(ci MIDIChannelIndex) bool {
+func (ncs *NullChannelSelector) ChannelIndexSelected(ci MIDIChannelNibble) bool {
 	return false
 }
 
@@ -103,7 +88,7 @@ func (ncs *NullChannelSelector) SelectAllChannels() {}
  */
 
 type SingleChannelSelector struct {
-	channelIndex MIDIChannelIndex
+	channelIndex MIDIChannelNibble
 }
 
 func NewSingleChannelSelector() *SingleChannelSelector {
@@ -124,7 +109,7 @@ func (scs *SingleChannelSelector) ChannelMode() ChannelMode {
 func (scs *SingleChannelSelector) EnableChannel(c MIDIChannel, _ bool) error {
 	err := ValidateMIDIChannel(c)
 	if err == nil {
-		scs.channelIndex = MIDIChannelIndex(c - 1)
+		scs.channelIndex = MIDIChannelNibble(c - 1)
 	}
 	return err
 }
@@ -133,13 +118,13 @@ func (scs *SingleChannelSelector) SelectChannel(c MIDIChannel) error {
 	return scs.EnableChannel(c, true)
 }
 
-func (scs *SingleChannelSelector) SelectedChannelIndexes() []MIDIChannelIndex {
-	acc := make([]MIDIChannelIndex, 1, 1)
+func (scs *SingleChannelSelector) SelectedChannelIndexes() []MIDIChannelNibble {
+	acc := make([]MIDIChannelNibble, 1, 1)
 	acc[0] = scs.channelIndex
 	return acc
 }
 
-func (scs *SingleChannelSelector) ChannelIndexSelected(ci MIDIChannelIndex) bool {
+func (scs *SingleChannelSelector) ChannelIndexSelected(ci MIDIChannelNibble) bool {
 	return ci == scs.channelIndex
 }
 
@@ -147,10 +132,11 @@ func (scs *SingleChannelSelector) DeselectAllChannels() {}
 
 func (scs *SingleChannelSelector) SelectAllChannels() {}
 
+
 /*
  * MultiChannelSelector selects an arbitary set of MIDI channels.
  *
-*/
+ */
 
 type MultiChannelSelector struct {
 	flags [16]bool
@@ -194,18 +180,18 @@ func (mcs *MultiChannelSelector) SelectChannel(c MIDIChannel) error {
 	return mcs.EnableChannel(c, true)
 }
 
-func (mcs *MultiChannelSelector) SelectedChannelIndexes() []MIDIChannelIndex {
-	acc := make([]MIDIChannelIndex, 0, 16)
+func (mcs *MultiChannelSelector) SelectedChannelIndexes() []MIDIChannelNibble {
+	acc := make([]MIDIChannelNibble, 0, 16)
 	for i, flag := range mcs.flags {
 		if flag {
-			acc = append(acc, MIDIChannelIndex(i))
+			acc = append(acc, MIDIChannelNibble(i))
 		}
 	}
 	return acc
 }
 
-func (mcs *MultiChannelSelector) ChannelIndexSelected(ci MIDIChannelIndex) bool {
-	err := ValidateMIDIChannelIndex(ci)
+func (mcs *MultiChannelSelector) ChannelIndexSelected(ci MIDIChannelNibble) bool {
+	err := ValidateMIDIChannelNibble(ci)
 	if err == nil {
 		return mcs.flags[ci]
 	} else {

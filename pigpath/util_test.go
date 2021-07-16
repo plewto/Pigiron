@@ -11,7 +11,7 @@ func TestPigpath(t *testing.T) {
 	fmt.Print("")
 	
 	home := UserHomeDir()
-	config := UserConfigDir()
+	config := PigironConfigDir()
 
 	a := "~/foo"
 	b := SubSpecialDirectories(a)

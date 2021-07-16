@@ -7,31 +7,25 @@
 package pigpath
 
 import (
-	"fmt"
+	// "fmt"
 	"os"
 	"path/filepath"
 )
 
 
-// issuer: Refactor
-// ResourceFilename returns filename relative to the resources directory.
-// The resources directory is located at <config>/resources/
-// On Linux this location is ~/.config/pigiron/resources/
-//
-// Returns non-nil error if resources directory can not be determined.
-//
-// Example:
-// ResourceFilename("foo", "bar.txt") --> ~/.config/pigiron/resources/foo/bar.txt
-//
+// // issuer: Refactor
+// // ResourceFilename returns filename relative to the resources directory.
+// // The resources directory is located at <config>/resources/
+// // On Linux this location is ~/.config/pigiron/resources/
+// //
+// // Returns non-nil error if resources directory can not be determined.
+// //
+// // Example:
+// // ResourceFilename("foo", "bar.txt") --> ~/.config/pigiron/resources/foo/bar.txt
+// //
 func ResourceFilename(elements ...string) (string, error) {
-	cfigdir, err := os.UserConfigDir()
-	if err != nil {
-		msg := "ERROR: Resource filename can not be determined.\n"
-		msg += "ERROR: Can not determine configuration directory location.\n"
-		msg += fmt.Sprintf("ERROR: %s\n", err)
-		err = fmt.Errorf(msg)
-		return "", err
-	}
+	cfigdir := PigironConfigDir()
+	var err error   // ISSUE DEPRECIATED 
 	acc := filepath.Join(cfigdir, "pigiron", "resources")
 	for _, e := range elements {
 		acc = filepath.Join(acc, e)
@@ -40,12 +34,14 @@ func ResourceFilename(elements ...string) (string, error) {
 }
 
 
+
+
 func UserHomeDir() string {
 	dir, _ := os.UserHomeDir()
 	return dir
 }
 
-func UserConfigDir() string {
+func PigironConfigDir() string {
 	dir, _ := os.UserConfigDir()
 	return filepath.Join(dir, "pigiron")
 }
@@ -63,7 +59,7 @@ func SubSpecialDirectories (filename string) string {
 			home := UserHomeDir()
 			result = filepath.Join(home, filename[1:])
 		case filename[0] == '!':
-			cnfig := UserConfigDir()
+			cnfig := PigironConfigDir()
 			result = filepath.Join(cnfig, filename[1:])
 		default:
 			// ignore

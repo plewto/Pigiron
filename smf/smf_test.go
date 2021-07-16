@@ -9,12 +9,9 @@ import (
 )
 
 func TestReadSMF(t *testing.T) {
-	if noResourcesAbort("TestReadSMF") {
-		return
-	}
 	var err error
 	var smf *SMF
-	filename, _ := pigpath.ResourceFilename("testFiles", "a.mid")
+	filename := pigpath.ResourceFilename("testFiles", "a.mid")
 	smf, err = ReadSMF(filename)
 	if err != nil {
 		msg := "smf.ReadSMF returned unexpected error for file %s\n"
@@ -65,13 +62,10 @@ func TestReadSMF(t *testing.T) {
 
 // Test various malformed header chunks.
 func TestReadSMFJunk (t *testing.T) {
-	if noResourcesAbort("TestReadSMFJunk") {
-		return
-	}
 	var err error
 
-	// File does not exists
-	filename, _ := pigpath.ResourceFilename("testFiles", "does-not-exists.mid")
+	// test with non-existing file
+	filename := pigpath.ResourceFilename("testFiles", "does-not-exists.mid")
 	_, err = ReadSMF(filename)
 	if err == nil {
 		msg := "\nReadSMF did not return an error for non-existent file\n"
@@ -80,7 +74,7 @@ func TestReadSMFJunk (t *testing.T) {
 	}
 
 	// File exists but has malformed header id.
-	filename, _ = pigpath.ResourceFilename("testFiles", "bad1.mid")
+	filename = pigpath.ResourceFilename("testFiles", "bad1.mid")
 	_, err = ReadSMF(filename)
 	if err == nil {
 		msg := "\nReadSMF did not return an error for badly malformed MIDI file\n"
@@ -89,7 +83,7 @@ func TestReadSMFJunk (t *testing.T) {
 	}
 
 	// unsupported format test
-	filename, _ = pigpath.ResourceFilename("testFiles", "badFormat.mid")
+	filename = pigpath.ResourceFilename("testFiles", "badFormat.mid")
 	_, err = ReadSMF(filename)
 	if err == nil {
 		msg := "\nReadSMF did not return an error for unsupported format\n"
@@ -98,7 +92,7 @@ func TestReadSMFJunk (t *testing.T) {
 	}
 
 	// no tracks
-	filename, _ = pigpath.ResourceFilename("testFiles", "badNoTracks.mid")
+	filename = pigpath.ResourceFilename("testFiles", "badNoTracks.mid")
 	_, err = ReadSMF(filename)
 	if err == nil {
 		msg := "\nReadSMF did not return an error for zero track count\n"
@@ -107,7 +101,7 @@ func TestReadSMFJunk (t *testing.T) {
 	}
 
 	// weird division
-	filename, _ = pigpath.ResourceFilename("testFiles", "badWeirdDivision.mid")
+	filename = pigpath.ResourceFilename("testFiles", "badWeirdDivision.mid")
 	_, err = ReadSMF(filename)
 	if err == nil {
 		msg := "\nReadSMF did not return an error weird looking clock division"

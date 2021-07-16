@@ -13,25 +13,29 @@ import (
 )
 
 
-// // issuer: Refactor
-// // ResourceFilename returns filename relative to the resources directory.
-// // The resources directory is located at <config>/resources/
-// // On Linux this location is ~/.config/pigiron/resources/
-// //
-// // Returns non-nil error if resources directory can not be determined.
-// //
-// // Example:
-// // ResourceFilename("foo", "bar.txt") --> ~/.config/pigiron/resources/foo/bar.txt
-// //
-func ResourceFilename(elements ...string) (string, error) {
-	cfigdir := PigironConfigDir()
-	var err error   // ISSUE DEPRECIATED 
-	acc := filepath.Join(cfigdir, "pigiron", "resources")
+
+
+
+// ResourceFilename returns filename relative to the resources directory.
+// The resources directory is located at <config>/resources/
+// On Linux this location is ~/.config/pigiron/resources/
+//
+// Example:
+// ResourceFilename("foo", "bar.txt") --> ~/.config/pigiron/resources/foo/bar.txt
+//
+func ResourceFilename(elements ...string) string {
+	acc := filepath.Join(PigironConfigDir(), "resources")
 	for _, e := range elements {
 		acc = filepath.Join(acc, e)
 	}
-	return acc, err
+	return acc
 }
+
+// func ResourceFilename(elements ...string) string {
+// 	parts := []string{"resources"}
+// 	parts = append(parts, elements...)
+// 	return Join(PigironConfigDir(), elements...)
+// }
 
 
 

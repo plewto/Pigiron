@@ -11,29 +11,26 @@ import (
 	"github.com/plewto/pigiron/pigpath"
 )
 
-func noResourcesAbort(fnName string) bool {
-	_, err := pigpath.ResourceFilename("testFiles", "a.mid")
-	if err != nil {
-		fmt.Printf("\nWARNING: Can not read resource file required for %s\n", fnName)
-		fmt.Println("WARNING: Error from pigpath.ResourceFilename was:")
-		fmt.Printf("%s\n", err)
-		fmt.Printf("WARNING: Aborting test.\n\n")
-		return true
-	}
-	return false
-}
+// func noResourcesAbort(fnName string) bool {
+// 	_, err := pigpath.ResourceFilename("testFiles", "a.mid")
+// 	if err != nil {
+// 		fmt.Printf("\nWARNING: Can not read resource file required for %s\n", fnName)
+// 		fmt.Println("WARNING: Error from pigpath.ResourceFilename was:")
+// 		fmt.Printf("%s\n", err)
+// 		fmt.Printf("WARNING: Aborting test.\n\n")
+// 		return true
+// 	}
+// 	return false
+// }
 
 
 func TestCreateEventList(t *testing.T) {
-	if noResourcesAbort("TestReadSMF") {
-		return
-	}
 	var err error
 	var smf *SMF
 	var track *Track
 	var events *EventList
 	var division int
-	filename, _ := pigpath.ResourceFilename("testFiles", "no-clocks.mid")
+	filename := pigpath.ResourceFilename("testFiles", "no-clocks.mid")
 	fmt.Printf("test MIDI file is %s\n", filename)
 	smf, err = ReadSMF(filename)
 	if err != nil {

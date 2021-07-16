@@ -14,9 +14,10 @@ import (
 	toml "github.com/pelletier/go-toml"
 	"strings"
 	"strconv"
+	"github.com/plewto/pigiron/pigpath"
 )
 
-const Version = "0.0.1"
+const Version = "0.0.1 pre-alpha"
 	
 
 var (
@@ -29,20 +30,6 @@ var (
 func ConfigFilename() string {
 	return configFilename
 }
-
-
-// TODO: Move to filename
-// subUserHome substitutes leading '~' character for user home directory.
-//
-func subUserHome(filename string) string {
-	result := filename
-	if len(filename) > 0 && string(filename[0]) == "~" {
-		home, _ := os.UserHomeDir()
-		result = filepath.Join(home, filename[1:])
-	}
-	return result
-}
-
 
 // parseCommandLine deciphers command line arguments.
 //
@@ -62,11 +49,11 @@ func parseCommandLine() {
 	// config filename
 	defaultFile := filepath.Join(configDir, "pigiron", "config.toml")
 	flag.StringVar(&configFilename, "config", defaultFile, "Sets configuration file.")
-	configFilename = subUserHome(configFilename)
+	configFilename = pigpath.SubSpecialDirectories(configFilename)
 	// batch filename
 	defaultFile = ""
 	flag.StringVar(&BatchFilename, "batch", defaultFile, "Sets initial OSC batch file.")
-	BatchFilename = subUserHome(BatchFilename)
+	BatchFilename = pigpath.SubSpecialDirectories(BatchFilename)
 	
 	flag.Parse()
 }

@@ -14,7 +14,8 @@ type MIDIChannel byte
 //
 type MIDIChannelNibble byte
 
-
+// ValidateMIDIChannel returns nil error iff 1 <= channel <= 16.
+//
 func ValidateMIDIChannel(c MIDIChannel) error {
 	var err error
 	if c < 1 || c > 16 {
@@ -23,6 +24,8 @@ func ValidateMIDIChannel(c MIDIChannel) error {
 	return err
 }
 
+// ValidateMIDIChannelNibble returns nil iff 0 <= nibble <= 15.
+//
 func ValidateMIDIChannelNibble(ci MIDIChannelNibble) error {
 	var err error
 	if ci < 0 || ci > 15 {
@@ -32,9 +35,14 @@ func ValidateMIDIChannelNibble(ci MIDIChannelNibble) error {
 }
 
 
+// StatusByte type represents a MIDI status byte.  
+// For channel messages the lower 4-bits should be masked out.
+//
 type StatusByte byte
-type MetaType byte
 
+// MetaType type represents a META message type.
+//
+type MetaType byte
 
 const (
 	NOTE_OFF StatusByte = 0x80
@@ -68,7 +76,7 @@ const (
  	META_TIME_SIGNATURE MetaType = 0x58
  	META_KEY_SIGNATURE MetaType = 0x59    
  	META_SEQUENCER_EVENT MetaType = 0x7f
-	META_NONE MetaType = 0xFF
+	NOT_META MetaType = 0xFF
 )
 
 var (
@@ -102,7 +110,7 @@ var (
 		BEND: 2,
 	}
 
-	// -1 indicates indeterminate
+	// -1 indicates indeterminate.
 	systemStatusDataCount = map[StatusByte]int {
 		CLOCK: 0,
 		START: 0,
@@ -132,7 +140,7 @@ var (
 		META_TIME_SIGNATURE:  "TSig   ",
 		META_KEY_SIGNATURE:   "KSig   ",
 		META_SEQUENCER_EVENT: "SeqEvnt",
-		META_NONE:            "<none> ",
+		NOT_META:            "<none> ",
 	}
 
 	metaTextTypes map[MetaType]bool = map[MetaType]bool{
@@ -148,19 +156,26 @@ var (
 
 
 
-// NOTE: Use care with channel status, the lower 4-bits must be masked out
-// 
+
+// isStatusByte returns true iff argument is a valid MIDI status byte.
+// For channel types, the lower 4-bits must be masked out.
+//
 func isStatusByte(s byte) bool {
 	_, flag := statusMnemonics[StatusByte(s)]
 	return flag
 }
 
+// isChannelStatus returns true iff argument is a valid MIDI channel status byte.
+// The lower 4-bits are ignored.
+//
 func isChannelStatus(s byte) bool {
-	cs := byte(s & 0x0F)
+	cs := byte(s & 0xF0)
 	return isStatusByte(cs)
 }
 
-
+// isKeyedStatus returns true iff argument is NOTE_OFF, NOTE_ON or POLY_PRESSURE.
+// The lower 4-bits are ignored.
+//
 func isKeyedStatus(s byte) bool {
 	sb := StatusByte(s)
 	return sb == NOTE_OFF || sb == NOTE_ON || sb == POLY_PRESSURE
@@ -180,8 +195,20 @@ func isMetaStatus(s byte) bool {
 	return StatusByte(s) == META
 }
 
+// isMetaType returns true iff argument is a valid META type -AND- it is not equal to NOT_META.
+//
+func isMetaType(s byte) bool {
+	_, flag := metaMnemonics[MetaType(s)]
+	flag = flag && !(MetaType(s) == NOT_META)
+	return flag
+}
 
-
+// isMetaTextType returns true iff argument is one of the META text types.
+//
+func isMetaTextType(mt byte) bool {
+	_, flag := metaTextTypes[MetaType(mt)]
+	return flag
+}
 
 func (s StatusByte) String() string {
 	c, flag := statusMnemonics[s]

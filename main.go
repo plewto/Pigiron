@@ -9,7 +9,7 @@ import (
 	"github.com/plewto/pigiron/osc"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/op"
-	_ "github.com/plewto/pigiron/smf"
+	_ "github.com/plewto/pigiron/midi"
 )
 
 

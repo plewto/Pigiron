@@ -63,13 +63,11 @@ func debugHexDump(index int, bytes []byte) {
 }
 
 
-func convertTrackBytes(division int, tempo float64, bytes []byte) (track *SMFTrack, err error) {
+func convertTrackBytes(bytes []byte) (track *SMFTrack, err error) {
 	var events = make([]*UniversalEvent, 0, 1024)
 	var runningStatus StatusByte = StatusByte(0)
 	var runningChannel MIDIChannelNibble
-	var currentTime float64 = 0
 	var index int = 0 // FOR error report only
-	var tkDuration = tickDuration(division, tempo)
 	track = &SMFTrack{make([]*UniversalEvent, 0, 512)}
 	for len(bytes) > 0 {
 		// debugHexDump(index, bytes)
@@ -81,8 +79,6 @@ func convertTrackBytes(division int, tempo float64, bytes []byte) (track *SMFTra
 		}
 		index += vlq.Length()
 		deltaTime := vlq.Value()
-		currentTime += float64(deltaTime) * tkDuration
-		fmt.Printf("DEBUG delta %d, time %f\n", deltaTime, currentTime)
 		var status byte
 		status, bytes, err = takeByte(bytes)
 		if err != nil {
@@ -120,7 +116,7 @@ func convertTrackBytes(division int, tempo float64, bytes []byte) (track *SMFTra
 				// TODO error message
 				return
 			}
-			ue.time = currentTime
+			ue.deltaTime = deltaTime
 			events = append(events, ue)
 		case isChannelStatus(status):
 			runningStatus = StatusByte(status & 0xF0)
@@ -147,7 +143,7 @@ func convertTrackBytes(division int, tempo float64, bytes []byte) (track *SMFTra
 				// TODO error message
 				return
 			}
-			ue.time = currentTime
+			ue.deltaTime = deltaTime
 			events = append(events, ue)
 		case isSystemStatus(status):
 			var ue *UniversalEvent
@@ -164,7 +160,7 @@ func convertTrackBytes(division int, tempo float64, bytes []byte) (track *SMFTra
 				}
 				index++
 			}
-			ue.time = currentTime
+			ue.deltaTime = deltaTime
 			events = append(events, ue)
 		case isMetaStatus(status):
 			var mtype byte
@@ -192,7 +188,7 @@ func convertTrackBytes(division int, tempo float64, bytes []byte) (track *SMFTra
 			case byte(META_END_OF_TRACK):
 				ue, _ = MakeMetaEvent(META_END_OF_TRACK, []byte{})
 				bytes = []byte{}
-				ue.time = currentTime
+				ue.deltaTime = deltaTime
 				events = append(events, ue)
 				break
 			default:
@@ -203,9 +199,8 @@ func convertTrackBytes(division int, tempo float64, bytes []byte) (track *SMFTra
 					// TODO error message
 					return
 				}
-				// TODO update tkDuration for tempo events
 				index += count
-				ue.time = currentTime
+				ue.deltaTime = deltaTime
 				events = append(events, ue)
 			}
 		default:

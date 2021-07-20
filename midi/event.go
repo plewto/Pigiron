@@ -13,7 +13,7 @@ import (
 // is co-opted for the meta message data.
 //
 type UniversalEvent struct {
-	time float64
+	deltaTime int
 	metaType MetaType
 	message portmidi.Event
 }
@@ -43,7 +43,7 @@ func MakeMetaEvent(mtype MetaType, data []byte) (*UniversalEvent, error) {
 	if err != nil {
 		return ue, err
 	}
-	ue.time = 0.0
+	ue.deltaTime = 0.0
 	ue.metaType = mtype
 	ue.message = portmidi.Event{0, int64(META), 0, 0, data}
 	return ue, err
@@ -82,7 +82,7 @@ func MakeMetaTextEvent(mtype MetaType, text string) (*UniversalEvent, error) {
 func MakeSysExEvent(data []byte) (*UniversalEvent, error) {
 	var err error
 	var ue = &UniversalEvent{}
-	ue.time = 0.0
+	ue.deltaTime = 0.0
 	ue.metaType = NOT_META
 	ue.message = portmidi.Event{0, int64(SYSEX), 0, 0, data}
 	return ue, err
@@ -112,7 +112,7 @@ func MakeSystemEvent(status StatusByte) (*UniversalEvent, error) {
 	if err != nil {
 		return ue, err
 	}
-	ue.time = 0.0
+	ue.deltaTime = 0.0
 	ue.metaType = NOT_META
 	ue.message = portmidi.Event{0, int64(status), 0, 0, []byte{}}
 	return ue, err
@@ -139,7 +139,7 @@ func MakeChannelEvent(status StatusByte, ch MIDIChannelNibble, data1 byte, data2
 		status = NOTE_OFF
 	}
 	var cstatus int64 = int64(status) | int64(ch)
-	ue.time = 0.0
+	ue.deltaTime = 0.0
 	ue.metaType = NOT_META
 	ue.message = portmidi.Event{0, cstatus, int64(data1), int64(data2), []byte{}}
 	return ue, err
@@ -248,7 +248,7 @@ func (ue *UniversalEvent) metaTimesig() (num byte, den byte, err error) {
 
 func (ue *UniversalEvent) String() string {
 	s := StatusByte(ue.message.Status)
-	acc := fmt.Sprintf("%8.4f ", ue.time)
+	acc := fmt.Sprintf("%8.4f ", ue.deltaTime)
 	switch {
 	case isChannelStatus(byte(s)):
 		c := byte(s & 0x0F) + 1

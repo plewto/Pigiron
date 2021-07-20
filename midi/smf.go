@@ -62,7 +62,7 @@ func ReadSMF(filename string) (smf *SMF, err error) {
 			pigerr.NewWarning(fmt.Sprintf(errmsg, i, id, filename))
 			continue
 		}
-		track, err = convertTrackBytes(smf.header.division, 60.0, bytes)
+		track, err = convertTrackBytes(bytes)
 		if err != nil {
 			errmsg := "Error wile converting track %d, filename = %s"
 			err = pigerr.CompoundError(err, fmt.Sprintf(errmsg, i, filename))

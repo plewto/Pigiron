@@ -44,7 +44,9 @@ func NewWarning(message string, more ...string) Warning {
 	for _, s := range more {
 		msg += fmt.Sprintf("\nWARNING: %s", s)
 	}
-	return &baseWarning{msg}
+	warn := baseWarning{msg}
+	fmt.Printf("%s\n", warn)
+	return &warn
 }
 
 

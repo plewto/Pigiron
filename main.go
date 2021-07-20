@@ -10,7 +10,6 @@ import (
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/op"
 	_ "github.com/plewto/pigiron/midi" // for testing only
-	_ "github.com/plewto/pigiron/pigerr" // for testing only
 )
 
 

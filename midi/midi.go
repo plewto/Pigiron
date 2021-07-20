@@ -169,8 +169,8 @@ func isStatusByte(s byte) bool {
 // The lower 4-bits are ignored.
 //
 func isChannelStatus(s byte) bool {
-	cs := byte(s & 0xF0)
-	return isStatusByte(cs)
+	_, flag := channelStatusDataCount[StatusByte(s & 0xF0)]
+	return flag
 }
 
 // isKeyedStatus returns true iff argument is NOTE_OFF, NOTE_ON or POLY_PRESSURE.

@@ -1,10 +1,10 @@
 package op
 
 import (
-	"fmt"
+	// "fmt"
 	
 	"github.com/plewto/pigiron/midi"
-	"github.com/plewto/pigiron/smf"
+	
 )
 
 
@@ -12,7 +12,7 @@ import (
 
 type MIDIPlayer struct {
 	baseOperator
-	smf *smf.SMF
+	smf *midi.SMF
 	noteQueue *midi.NoteQueue
 	isPlaying bool
 	currentTime float64
@@ -30,43 +30,43 @@ func newMIDIPlayer(name string) *MIDIPlayer {
 
 func (op *MIDIPlayer) Info() string {
 	acc := op.commonInfo()
-	acc += fmt.Sprintf("\tfilename  : \"%s\"\n", op.MediaFilename())
-	acc += fmt.Sprintf("\tIsPlaying : %v\n", op.IsPlaying())
+	//acc += fmt.Sprintf("\tfilename  : \"%s\"\n", op.MediaFilename())
+	//acc += fmt.Sprintf("\tIsPlaying : %v\n", op.IsPlaying())
 	return acc
 }
 	
-func (op *MIDIPlayer) Reset() {
-	op.Stop()
-}
+// func (op *MIDIPlayer) Reset() {
+// 	op.Stop()
+// }
 
-func (op *MIDIPlayer) Panic() { // TODO: transmit all notes off
-	op.Stop()
+// func (op *MIDIPlayer) Panic() { // TODO: transmit all notes off
+// 	op.Stop()
 	
-}
+// }
 
-func (op *MIDIPlayer) Stop() { // TODO Implement
-}
+// func (op *MIDIPlayer) Stop() { // TODO Implement
+// }
 
-func (op *MIDIPlayer) Play() { // TODO Implement
-}
+// func (op *MIDIPlayer) Play() { // TODO Implement
+// }
 
-func (op *MIDIPlayer) Continue() { // TODO Implement
-}
+// func (op *MIDIPlayer) Continue() { // TODO Implement
+// }
 
-func (op *MIDIPlayer) IsPlaying() bool { // TODO Implement
-	return false
-}
+// func (op *MIDIPlayer) IsPlaying() bool { // TODO Implement
+// 	return false
+// }
 
-func (op *MIDIPlayer) LoasMedia(filename string) error { // TODO Implement
-	var err error
-	return err
-}
+// func (op *MIDIPlayer) LoasMedia(filename string) error { // TODO Implement
+// 	var err error
+// 	return err
+// }
 
-func (op *MIDIPlayer) MediaFilename() string { 
-	if op.smf != nil {
-		return op.smf.Filename()
-	} else {
-		return ""
-	}
-}
+// func (op *MIDIPlayer) MediaFilename() string { 
+// 	if op.smf != nil {
+// 		return op.smf.Filename()
+// 	} else {
+// 		return ""
+// 	}
+// }
 

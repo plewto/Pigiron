@@ -6,6 +6,11 @@ import (
 	"github.com/plewto/pigiron/pigpath"
 )
 
+func init (
+	fmt.Println("*** smf package has been depreciated. ****")
+)
+
+
 func ignore(...interface{}){} // For testing only
 
 func exError(message string, more ...string) error {

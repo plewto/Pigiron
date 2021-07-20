@@ -59,7 +59,7 @@ func ReadSMF(filename string) (smf *SMF, err error) {
 		}
 		if !id.eq(trackID) {
 			errmsg := "Ignoring non-track chunk number %d, type %s, filename = %s"
-			pigerr.NewWarning(fmt.Sprintf(errmsg, i, id, filename))
+			pigerr.Warning(fmt.Sprintf(errmsg, i, id, filename))
 			continue
 		}
 		track, err = convertTrackBytes(bytes)

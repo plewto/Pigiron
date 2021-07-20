@@ -40,7 +40,7 @@ func tickDuration(division int, tempo float64) float64 {
 	if tempo == 0 {
 		dflt := 60.0
 		errmsg := "MIDI tempo is 0, using default %f"
-		pigerr.NewWarning(fmt.Sprintf(errmsg, dflt))
+		pigerr.Warning(fmt.Sprintf(errmsg, dflt))
 		tempo = dflt
 	}
 	var qdur float64 = 60.0/tempo

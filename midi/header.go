@@ -79,7 +79,7 @@ func readSMFHeader(f *os.File) (header *SMFHeader, err error) {
 	if len(data) > 6 {
 		errmsg1 := "readSMFHeader received spurius varues, expected 6 bytes, got %d"
 		errmsg2 := "Ignoring extra bytes"
-		pigerr.NewWarning(fmt.Sprintf(errmsg1, len(data)), errmsg2)
+		pigerr.Warning(fmt.Sprintf(errmsg1, len(data)), errmsg2)
 	}
 	var format, trackCount, division int
 	format, data, _ = takeShort(data)
@@ -89,7 +89,7 @@ func readSMFHeader(f *os.File) (header *SMFHeader, err error) {
 	if format < 0 || 2 < format {
 		dflt := 0
 		errmsg := "MIDI file has unsported format value: %d, using default %d"
-		pigerr.NewWarning(fmt.Sprintf(errmsg, format, dflt))
+		pigerr.Warning(fmt.Sprintf(errmsg, format, dflt))
 		header.format = dflt
 	}
 	if division < 24 || 960 < division {
@@ -97,7 +97,7 @@ func readSMFHeader(f *os.File) (header *SMFHeader, err error) {
 		errmsg1 := "MIDI file has out of bounds clock division"
 		errmsg2 := fmt.Sprintf("Expected division between 24 and 960, got %d\n", division)
 		errmsg3 := fmt.Sprintf("Using default %d\n", dflt)
-		pigerr.NewWarning(errmsg1, errmsg2, errmsg3)
+		pigerr.Warning(errmsg1, errmsg2, errmsg3)
 		header.division = dflt
 	}
 	return

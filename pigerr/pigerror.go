@@ -26,7 +26,7 @@ func CompoundError(err1 error, message string, more ...string) error {
 }
 
 
-type Warning interface {
+type warning interface {
 	String() string
 }
 
@@ -39,8 +39,8 @@ func (w *baseWarning) String() string {
 }
 
 
-func NewWarning(message string, more ...string) Warning {
-	msg := fmt.Sprintf("WARNING: %s", message)
+func Warning(message string, more ...string) warning {
+	msg := fmt.Sprintf("\nWARNING: %s", message)
 	for _, s := range more {
 		msg += fmt.Sprintf("\nWARNING: %s", s)
 	}

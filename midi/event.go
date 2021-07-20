@@ -248,7 +248,7 @@ func (ue *UniversalEvent) metaTimesig() (num byte, den byte, err error) {
 
 func (ue *UniversalEvent) String() string {
 	s := StatusByte(ue.message.Status)
-	acc := fmt.Sprintf("%8.4f ", ue.deltaTime)
+	acc := fmt.Sprintf("%d ", ue.deltaTime)
 	switch {
 	case isChannelStatus(byte(s)):
 		c := byte(s & 0x0F) + 1

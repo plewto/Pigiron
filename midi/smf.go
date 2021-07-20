@@ -21,6 +21,7 @@ func (smf *SMF) Dump() {
 	fmt.Printf("  filename : %s\n", smf.filename)
 	fmt.Printf("  format   : %d\n", smf.header.format)
 	fmt.Printf("  tracks   : %d\n", smf.header.trackCount)
+	fmt.Printf("  division : %d\n", smf.header.division)
 	for i, trk := range smf.tracks {
 		fmt.Printf("  TRACK: %d  events: %d\n", i, trk.Length())
 		for j, evnt := range trk.events {
@@ -41,6 +42,10 @@ func ReadSMF(filename string) (smf *SMF, err error) {
 	smf = &SMF{}
 	smf.filename = filename
 	smf.header, err = readSMFHeader(file)
+	// Due to the possible presence of non-track chunks, the
+	// header.trackCount may initially be too high.
+	// The count is adjusted once all chunks have been read.
+	// non-track chunks are not-supported and are discarded.
 	if err != nil {
 		errmsg := "MIDI file header mallformed, filename =  %s"
 		err = pigerr.CompoundError(err, fmt.Sprintf(errmsg, filename))

@@ -71,15 +71,10 @@ func readSMFHeader(f *os.File) (header *SMFHeader, err error) {
 		err = pigerr.New(fmt.Sprintf(errmsg, headerID, id))
 		return
 	}
-	if len(data) < 6 {
+	if len(data) != 6 {
 		errmsg := "readSMFHeader expected header chunk length of 6 byte, got %d"
 		err = pigerr.New(fmt.Sprintf(errmsg, len(data)))
 		return
-	}
-	if len(data) > 6 {
-		errmsg1 := "readSMFHeader received spurius varues, expected 6 bytes, got %d"
-		errmsg2 := "Ignoring extra bytes"
-		pigerr.Warning(fmt.Sprintf(errmsg1, len(data)), errmsg2)
 	}
 	var format, trackCount, division int
 	format, data, _ = takeShort(data)

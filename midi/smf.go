@@ -30,6 +30,28 @@ func (smf *SMF) Dump() {
 	}
 }
 
+func (smf *SMF) Filename() string {
+	return smf.filename
+}
+
+func (smf *SMF) Format() int {
+	return smf.header.format
+}
+
+func (smf *SMF) TrackCount() int {
+	return len(smf.tracks)
+}
+
+func (smf *SMF) Track(n int) (track *SMFTrack, err error) {
+	if n < 0 || smf.TrackCount() <= n {
+		errmsg := "SMF track number out of bounds %d, track count is %d"
+		err = pigerr.New(fmt.Sprintf(errmsg, n, smf.TrackCount()))
+		return
+	}
+	track = smf.tracks[n]
+	return
+}
+
 func ReadSMF(filename string) (smf *SMF, err error) {
 	var file *os.File
 	file, err = os.Open(filename)
@@ -76,6 +98,7 @@ func ReadSMF(filename string) (smf *SMF, err error) {
 		smf.tracks = append(smf.tracks, track)
 	}
 	smf.header.trackCount = len(smf.tracks)
+	smf.filename = filename
 	return
 }
 

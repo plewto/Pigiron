@@ -3,23 +3,103 @@ package midi
 import (
 	"testing"
 	"fmt"
+	"os"
+	"github.com/plewto/pigiron/pigpath"
 )
 
 
 func TestReadSMFHeader(t *testing.T) {
-	fmt.Print()
-	file, filename := openTestFile(t, "a.mid")
-	_, err := readSMFHeader(file)
+
+	fmt.Println("*** EXPECT TO SEE WARNINGS ***")
+	openTestFile := func(name string) (*os.File, string) {
+		filename := pigpath.ResourceFilename("testFiles", name)
+		file, err := os.Open(filename)
+		if err != nil {
+			errmsg := "\nCan not open test file: '%s'"
+			errmsg += "\n%s\n"
+			t.Fatalf(errmsg, filename, err)
+		}
+		fmt.Printf("Using test file '%s'\n", filename)
+		return file, filename
+	}
+		
+	file, filename := openTestFile("a1.mid")
+	defer file.Close()
+	header, err := readSMFHeader(file)
 	if err != nil {
-		errmsg := "\nreadSMFHeader(\"%s\") returnd unexpected error"
+		errmsg := "\nreadSMFHeader(\"%s\") returned unexpected error"
 		errmsg += "\n%s\n"
 		t.Fatalf(errmsg, filename, err)
 	}
-	file, filename = openTestFile(t, "bad1.mid")
+	if header.format != 1 {
+		errmsg := "\nexpected format 2, got %d"
+		t.Fatalf(errmsg, header.format)
+	}
+	if header.trackCount != 1 {
+		errmsg := "\nexpected trackCount 1, got %d"
+		t.Fatalf(errmsg, header.trackCount)
+	}
+	if header.division != 24 {
+		errmsg := "\nexpected division 24, got %d"
+		t.Fatalf(errmsg, header.division)
+	}
+
+	
+	// Malformed files
+
+	file, filename = openTestFile("b1.mid")  
+	defer file.Close()
 	_, err = readSMFHeader(file)
 	if err == nil {
-		errmsg := "\nreadSMFHeader did not return error for known bad file."
-		t.Fatalf(errmsg)
+		errmsg := "\nreadSMFHeader did not return error for non-midi file"
+		errmsg += "\nfilename was %s\n"
+		t.Fatalf(errmsg, filename)
 	}
-	
+
+	file, filename = openTestFile("b2.mid")
+	defer file.Close()
+	_, err = readSMFHeader(file)
+	if err == nil {
+		errmsg := "\nreadSMFHeader did not return error for unexpected header id."
+		errmsg += "\nfilename was %s\n"
+		t.Fatalf(errmsg, filename)
+	}
+
+	file, filename = openTestFile("b3.mid")
+	defer file.Close()
+	_, err = readSMFHeader(file)
+	if err == nil {
+		errmsg := "\nreadSMFHeader did not detect wrong chunk length."
+		errmsg += "\nfilename was %s\n"
+		t.Fatalf(errmsg, filename)
+	}
+
+	// malformed & recoverable
+	file, filename = openTestFile("c1.mid")
+	defer file.Close()
+	header, err = readSMFHeader(file)
+	if err != nil {
+		errmsg := "\nreadSMFHeader returned error for recoverable file, invalid format."
+		errmsg += "\nfilename was %s\n"
+		t.Fatalf(errmsg, filename)
+	}
+	if header.format != 0 {
+		errmsg := "\nreadSMFHeader did not correct invalid format to default"
+		errmsg += "\nfilename was %s\n"
+		t.Fatalf(errmsg, filename)
+	}
+
+	file, filename = openTestFile("c2.mid")
+	defer file.Close()
+	header, err = readSMFHeader(file)
+	if err != nil {
+		errmsg := "\nreadSMFHeader returned error for recoverable file, invalid division."
+		errmsg += "\nfilename was %s\n"
+		t.Fatalf(errmsg, filename)
+	}
+	if header.division != 24 {
+		errmsg := "\nreadSMFHeader did not correct invalid division to default"
+		errmsg += "\nfilename was %s\n"
+		t.Fatalf(errmsg, filename)
+	}
 }

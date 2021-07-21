@@ -21,7 +21,7 @@ func openTestFile(t *testing.T, name string) (*os.File, string) {
 
 
 func TestReadChuckPreamble(t *testing.T) {
-	file, filename := openTestFile(t, "a.mid")
+	file, filename := openTestFile(t, "a1.mid")
 	defer file.Close()
 	id, length, err := readChunkPreamble(file)
 	if err != nil {
@@ -43,7 +43,7 @@ func TestReadChuckPreamble(t *testing.T) {
 
 
 func TestReadRawChunk(t *testing.T) {
-	file, filename := openTestFile(t, "a.mid")
+	file, filename := openTestFile(t, "a1.mid")
 	defer file.Close()
 	// read header
 	id, data, err := readRawChunk(file)

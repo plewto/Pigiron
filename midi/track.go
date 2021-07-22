@@ -35,22 +35,6 @@ func (trk *SMFTrack) Dump() {
 	}
 }
 
-func tickDuration(division int, tempo float64) float64 {
-	division = division & 0x7FFF
-	if tempo == 0 {
-		dflt := 60.0
-		errmsg := "MIDI tempo is 0, using default %f"
-		pigerr.Warning(fmt.Sprintf(errmsg, dflt))
-		tempo = dflt
-	}
-	var qdur float64 = 60.0/tempo
-	return qdur/float64(division)
-}
-
-
-
-
-
 func convertTrackBytes(bytes []byte) (track *SMFTrack, err error) {
 	var events = make([]*UniversalEvent, 0, 1024)
 	var runningStatus StatusByte = StatusByte(0)

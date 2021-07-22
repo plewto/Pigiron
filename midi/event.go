@@ -18,6 +18,31 @@ type UniversalEvent struct {
 	message portmidi.Event
 }
 
+func (ue *UniversalEvent) PortmidiEvent() portmidi.Event {
+	return ue.message
+}
+
+func (ue *UniversalEvent) DeltaTime() int {
+	return ue.deltaTime
+}
+
+func (ue *UniversalEvent) IsMetaEvent() bool {
+	return ue.metaType != NOT_META
+}
+
+func (ue *UniversalEvent) IsChannelEvent() bool {
+	s := byte(ue.message.Status)
+	return isChannelStatus(s)
+}
+
+func (ue *UniversalEvent) IsSystemEvent() bool {
+	s := byte(ue.message.Status)
+	return isSystemStatus(s)
+}
+
+func (ue *UniversalEvent) MetaType() MetaType {
+	return ue.metaType
+}
 
 // validateMetaType returns error if argument is not a valid MetaType.
 //
@@ -145,6 +170,13 @@ func MakeChannelEvent(status StatusByte, ch MIDIChannelNibble, data1 byte, data2
 	return ue, err
 }
 
+func MakeControllerEvent(ch MIDIChannelNibble, controllerNumber byte, value byte) *UniversalEvent {
+	controllerNumber = controllerNumber & 0x7F
+	value = value & 0x7F
+	ev, _ := MakeChannelEvent(CONTROLLER, ch, controllerNumber, value)
+	return ev
+}
+
 // bytesToString, helper function returns hex-string representation of byte slice.
 // The output may be truncated.
 //
@@ -263,7 +295,7 @@ func (ue *UniversalEvent) String() string {
 		acc += fmt.Sprintf("META %s ", ue.metaType)
 		acc += ue.bytesToString()
 		switch {
-		case isMetaTextType(byte(mt)):
+		case IsMetaTextType(byte(mt)):
 			acc += fmt.Sprintf("  \"%s\"", string(ue.message.SysEx))
 		case mt == META_TEMPO:
 			μ, _ := ue.metaTempoMicroSeconds()

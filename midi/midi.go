@@ -203,9 +203,9 @@ func isMetaType(s byte) bool {
 	return flag
 }
 
-// isMetaTextType returns true iff argument is one of the META text types.
+// IsMetaTextType returns true iff argument is one of the META text types.
 //
-func isMetaTextType(mt byte) bool {
+func IsMetaTextType(mt byte) bool {
 	_, flag := metaTextTypes[MetaType(mt)]
 	return flag
 }

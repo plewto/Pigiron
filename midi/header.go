@@ -21,6 +21,10 @@ func (h *SMFHeader) ID() chunkID {
 	return headerID
 }
 
+func (h *SMFHeader) Division() int {
+	return h.division
+}
+
 func (h *SMFHeader) Length() int {
 	return 6
 }
@@ -39,6 +43,8 @@ func (h *SMFHeader) Bytes() []byte {
 	acc[12], acc[13] = msb(h.division), lsb(h.division)
 	return acc
 }
+
+
 
 func (h *SMFHeader) Dump() {
 	bytes := h.Bytes()

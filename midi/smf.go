@@ -42,6 +42,13 @@ func (smf *SMF) TrackCount() int {
 	return len(smf.tracks)
 }
 
+func (smf *SMF) Division() int {
+	return smf.header.Division()
+}
+
+
+
+
 func (smf *SMF) Track(n int) (track *SMFTrack, err error) {
 	if n < 0 || smf.TrackCount() <= n {
 		errmsg := "SMF track number out of bounds %d, track count is %d"
@@ -51,6 +58,42 @@ func (smf *SMF) Track(n int) (track *SMFTrack, err error) {
 	track = smf.tracks[n]
 	return
 }
+
+func TickDuration(division int, tempo float64) float64 {
+	division = division & 0x7FFF
+	if tempo == 0 {
+		dflt := 60.0
+		errmsg := "MIDI tempo is 0, using default %f"
+		pigerr.Warning(fmt.Sprintf(errmsg, dflt))
+		tempo = dflt
+	}
+	var qdur float64 = 60.0/tempo
+	return qdur/float64(division)
+}
+
+func (smf *SMF) Duration() float64 {
+	if len(smf.tracks) == 0 {
+		return 0.0
+	}
+	var tempo float64 = 120
+	var tick = TickDuration(smf.Division(), tempo)
+	var acc float64 = 0.0
+	track := smf.tracks[0]
+	for _, evnt := range track.events {
+		if byte(evnt.metaType) == byte(META_TEMPO) {
+			t, err := evnt.metaTempoBPM()
+			if err != nil {
+				break
+			}
+			tempo = t
+			tick = TickDuration(smf.Division(), tempo)
+		}
+		acc += float64(evnt.deltaTime) * tick
+	}
+	return acc
+}
+
+
 
 func ReadSMF(filename string) (smf *SMF, err error) {
 	var file *os.File
@@ -103,6 +146,9 @@ func ReadSMF(filename string) (smf *SMF, err error) {
 }
 
 		
+
+
+
 	
 	
 

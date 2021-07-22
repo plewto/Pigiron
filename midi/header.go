@@ -63,10 +63,34 @@ func (h *SMFHeader) Dump() {
 	dumpLine(12, 2, "Division")
 }
 
+
+	
 func readSMFHeader(f *os.File) (header *SMFHeader, err error) {
 	var id chunkID
-	var data []byte
-	id, data, err = readRawChunk(f)
+	var length int
+	id, length, err = readChunkPreamble(f)
+	if err != nil {
+		return
+	}
+	if !id.eq(headerID) {
+		errmsg := "Expected header chunk id '%s', got '%s'"
+		err = pigerr.New(fmt.Sprintf(errmsg, headerID, id))
+		return
+	}
+	var data = make([]byte, length)
+	var count = 0
+	count, err = f.Read(data)
+	if count != length {
+		errmsg := "smf.readRawChunk read value count inconsistenet.\n"
+		errmsg += "Expected %d bytes, read %d"
+		err = pigerr.New(fmt.Sprintf(errmsg, length, count))
+		return
+	}
+	// DO NOT replace above lines with readRawChunk()
+	// It may not detect non-smf files and may attempt to 
+	// load huges amounts of data, freezing the applicatin.
+	// id, data, err = readRawChunk(f)
+	//
 	if err != nil {
 		errmsg := "readSMFHeader Could not read SMF header chunk"
 		err = pigerr.CompoundError(err, errmsg)
@@ -102,9 +126,7 @@ func readSMFHeader(f *os.File) (header *SMFHeader, err error) {
 		header.division = dflt
 	}
 	return
-}
-	
-	
+}	
 	
 	
 	

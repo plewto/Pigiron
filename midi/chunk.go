@@ -36,10 +36,7 @@ func (id chunkID) eq(other chunkID) bool {
 type Chunk interface {
 	ID() chunkID
 	Length() int
-	// Bytes() []byte
-	// Dump()
 }
-
 
 // readChunkPreamble reads the next 8-bytes from an opern file as the start of a chunk.
 // Returns:
@@ -90,8 +87,6 @@ func readRawChunk(f *os.File) (id chunkID, data []byte, err error) {
 	}
 	return
 }
-
-
 
 func msb(n int) byte {
 	hi := (n & 0xFF00) >> 8

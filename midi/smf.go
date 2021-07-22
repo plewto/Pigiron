@@ -96,6 +96,7 @@ func (smf *SMF) Duration() float64 {
 
 
 func ReadSMF(filename string) (smf *SMF, err error) {
+	fmt.Printf("DEBUG ReadSMF(%s)\n", filename)
 	var file *os.File
 	file, err = os.Open(filename)
 	if err != nil {

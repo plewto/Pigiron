@@ -81,14 +81,14 @@ func readSMFHeader(f *os.File) (header *SMFHeader, err error) {
 	var count = 0
 	count, err = f.Read(data)
 	if count != length {
-		errmsg := "smf.readRawChunk read value count inconsistenet.\n"
+		errmsg := "smf.readRawChunk read value count inconsistent.\n"
 		errmsg += "Expected %d bytes, read %d"
 		err = pigerr.New(fmt.Sprintf(errmsg, length, count))
 		return
 	}
 	// DO NOT replace above lines with readRawChunk()
 	// It may not detect non-smf files and may attempt to 
-	// load huges amounts of data, freezing the applicatin.
+	// load huge amounts of data, freezing the application.
 	// id, data, err = readRawChunk(f)
 	//
 	if err != nil {
@@ -97,7 +97,7 @@ func readSMFHeader(f *os.File) (header *SMFHeader, err error) {
 		return
 	}
 	if !id.eq(headerID) {
-		errmsg := "readSMFHeader encounterd wrong chunk id, expected %s, got %s"
+		errmsg := "readSMFHeader encountered wrong chunk id, expected %s, got %s"
 		err = pigerr.New(fmt.Sprintf(errmsg, headerID, id))
 		return
 	}
@@ -113,7 +113,7 @@ func readSMFHeader(f *os.File) (header *SMFHeader, err error) {
 	header = &SMFHeader{format, trackCount, division}
 	if format < 0 || 2 < format {
 		dflt := 0
-		errmsg := "MIDI file has unsported format value: %d, using default %d"
+		errmsg := "MIDI file has unsupported format value: %d, using default %d"
 		pigerr.Warning(fmt.Sprintf(errmsg, format, dflt))
 		header.format = dflt
 	}

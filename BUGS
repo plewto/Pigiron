@@ -44,6 +44,10 @@ BUG 006 23-July-2021 Open
     The failing command was entered after a long stream of transport test commands
     without a loaded MIDI file.
 
+    Program froze in similar manner after entering 'op p, q-position'.
+    Again this was after approx half-dozen transport test commands.
+    This time there was a valid MIDI file loaded and it had just been played.
+    
 
 
 

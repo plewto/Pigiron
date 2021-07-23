@@ -3,6 +3,7 @@ package op
 import (
 	"fmt"
 	"time"
+	"github.com/rakyll/portmidi"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/pigerr"
 	"github.com/plewto/pigiron/pigpath"
@@ -21,6 +22,7 @@ type MIDIPlayer struct {
 	tickDuration float64
 	currentTime int // msec
 	delayStart int  // msec
+	enableMIDITransport bool
 	
 }
 
@@ -177,7 +179,7 @@ func (op *MIDIPlayer) playloop() {
 		event := events[op.eventIndex]
 		delay := time.Duration((op.tickDuration * float64(event.DeltaTime())) * 1000) // msec
 		time.Sleep(delay * time.Millisecond)
-		fmt.Printf("event [%3d]  δ %4d  delay = %4d msec  running %6d  %s\n", int(event.DeltaTime()), op.eventIndex, delay, op.currentTime, event)
+		// fmt.Printf("event [%3d]  δ %4d  delay = %4d msec  running %6d  %s\n", int(event.DeltaTime()), op.eventIndex, delay, op.currentTime, event)
 		switch {
 		case event.IsChannelEvent():
 			pe := event.PortmidiEvent()
@@ -214,11 +216,29 @@ func (op *MIDIPlayer) playloop() {
 }
 
 	
-
+func (op *MIDIPlayer) EnableMIDITransport(flag bool) {
+	op.enableMIDITransport = flag
+}
 	
-
+func (op *MIDIPlayer) MIDITransportEnabled() bool {
+	return op.enableMIDITransport
+}
 			
-		
+func (op *MIDIPlayer) Send(event portmidi.Event) {
+	op.distribute(event)
+	if op.enableMIDITransport {
+		switch int(event.Status) {
+		case 0xFA:
+			op.Play()
+		case 0xFB:
+			op.Continue()
+		case 0xFC:
+			op.Stop()
+		default:
+			// ignore
+		}
+	}
+}
 
 		
 	

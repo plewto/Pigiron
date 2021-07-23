@@ -15,6 +15,8 @@ type Transport interface {
 	MediaFilename() string
 	Duration() int // msec
 	Position() int // msec
+	EnableMIDITransport(flag bool)
+	MIDITransportEnabled() bool
 	addCommandHandler(command string, handler func(*goosc.Message)([]string, error))
 }
 
@@ -25,6 +27,8 @@ func initTransportHandlers(transport Transport) {
 	// play
 	// continue
 	// load
+	// enable-midi-transport flag
+	// q-midi-transport-enabled
 	// q-is-playing
 	// q-duration
 	// q-position
@@ -58,6 +62,23 @@ func initTransportHandlers(transport Transport) {
 		return []string{filename}, err
 	}
 
+	// op <id>, enable-midi-transport, <bool>
+	remoteEnableMIDITransport := func(msg *goosc.Message) ([]string, error) {
+		value, err := ExpectMsg("osb", msg)
+			if err != nil {
+			return empty, err
+			}
+		flag := value[2].B
+		transport.EnableMIDITransport(flag)
+		return empty, err
+	}
+
+	remoteQueryMIDITransport := func(msg *goosc.Message) ([]string, error) {
+		var err error
+		flag := fmt.Sprintf("%v", transport.MIDITransportEnabled)
+		return []string{flag}, err
+	}
+	
 	remoteQueryIsPlaying := func(msg *goosc.Message) ([]string, error) {
 		var err error
 		flag := fmt.Sprintf("%v", transport.IsPlaying())
@@ -81,11 +102,17 @@ func initTransportHandlers(transport Transport) {
 		name := transport.MediaFilename()
 		return []string{name}, err
 	}
+
+	
 	
 	transport.addCommandHandler("stop", remoteStop)
 	transport.addCommandHandler("play", remotePlay)
 	transport.addCommandHandler("continue", remoteContinue)
 	transport.addCommandHandler("load", remoteLoad)
+
+	transport.addCommandHandler("enable-midi-transport", remoteEnableMIDITransport)
+	transport.addCommandHandler("q-midi-transport-enabled", remoteQueryMIDITransport)
+		
 	transport.addCommandHandler("q-is-playing", remoteQueryIsPlaying)
 	transport.addCommandHandler("q-duration", remoteQueryDuration)
 	transport.addCommandHandler("q-position", remoteQueryPosition)

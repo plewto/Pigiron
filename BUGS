@@ -24,3 +24,7 @@ BOG 004 12-July-2021 Open
     Executing print-forest on the REPL caused program to freeze.
     Not sure of the exact configuration at the time.
 
+---------------------------------------------------------------------- 005
+BUG 005 22-July-2021 Open
+    When sending OSC command /pig/op <operator-name>, ...., the operator-name is being rejected by expect.
+    The same command from the REPL is accepted. 

@@ -35,6 +35,6 @@ BUG 005 22-July-2021 Closed
     The REPL sends 'foo' to expect
     The remote command is sending 'foo,'
 
-    FIX: Added explicit string triming function to Expect values.
+    FIX: Added explicit string trimming function to Expect values.
     
 

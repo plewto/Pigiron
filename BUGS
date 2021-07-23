@@ -39,7 +39,7 @@ BUG 005 22-July-2021 Closed
     
 ---------------------------------------------------------------------- 006
 BUG 006 23-July-2021 Open
-    Program frooze after entering 'op p, load, !/resources/testFiles/a2.mid'
+    Program froze after entering 'op p, load, !/resources/testFiles/a2.mid'
     p was name of MIDIPlayer operator and named file was valid MIDI file.
     The failing command was entered after a long stream of transport test commands
     without a loaded MIDI file.

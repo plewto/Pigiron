@@ -1,12 +1,5 @@
 pigiron TODO
 
-I. Rewrite smf Message stricktly in terms of portmidi.Event
-   It is ne3edlesly complex to have an intermediate message type.
-
-
-I. SMF test
-   A.  sysex message
-   B.  running status
-   C.  tempo changes
-
-II. Implement MIDI player
+I. Implement MIDI player
+    Add remote stop/start via MIDI
+    

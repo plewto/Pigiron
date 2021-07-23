@@ -68,7 +68,8 @@ func parse(s string)(string, []string) {
 	command, rawArgs := splitCommand(s)
 	acc := make([]string, 0, len(rawArgs))
 	for _, a := range strings.Split(rawArgs, ",") {
-		acc = append(acc, strings.TrimSpace(a))
+		arg := strings.TrimSpace(a)
+		acc = append(acc, arg)
 	}
 	return command, acc
 }

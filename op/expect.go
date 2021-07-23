@@ -8,6 +8,7 @@ package op
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/midi"
 )
@@ -49,6 +50,11 @@ type ExpectValue struct {
 	O Operator}
 
 
+// func trimArg(value interface{}) string {
+// 	s := fmt.Sprintf("%v", value)
+// 	return strings.Trim(strings.TrimSpace(s), ",")
+// }
+
 // Expect validates a list of values for appropriate type.
 // Each character in the template indicates the expected value for the
 // corresponding position of the values list.
@@ -69,6 +75,12 @@ type ExpectValue struct {
 // for each element.
 //
 func Expect(template string, values []interface{})([]ExpectValue, error) {
+
+	// BUGFIX BUG 005
+	trim := func(s string) string {
+		return strings.Trim(strings.TrimSpace(s), ",")
+	}
+	
 	var err error
 	var acc []ExpectValue = make([]ExpectValue, len(template))
 	if len(template) > len(values) {
@@ -76,13 +88,14 @@ func Expect(template string, values []interface{})([]ExpectValue, error) {
 		err = fmt.Errorf(msg, len(template), len(values))
 		return acc, err
 	}
+
 	for i, xtype := range template {
 		arg := values[i]
 		switch xtype {
 		case 's':
-			acc[i].S = arg.(string)
+			acc[i].S = trim(arg.(string))
 		case 'i':
-			var s string = fmt.Sprintf("%d", arg)
+			var s string = trim(fmt.Sprintf("%d", arg))
 			var n int64 = 0
 			n, err = strconv.ParseInt(s, 10, 64)
 			if err != nil {
@@ -92,7 +105,7 @@ func Expect(template string, values []interface{})([]ExpectValue, error) {
 			}
 			acc[i].I = n
 		case 'f':
-			var s string = fmt.Sprintf("%f", arg)
+			var s string = trim(fmt.Sprintf("%f", arg))
 			var n float64 = 0.0
 			n, err = strconv.ParseFloat(s, 64)
 			if err != nil {
@@ -102,7 +115,7 @@ func Expect(template string, values []interface{})([]ExpectValue, error) {
 			}
 			acc[i].F = n
 		case 'b':
-			var s string = fmt.Sprintf("%s", arg)
+			var s string = trim(fmt.Sprintf("%s", arg))
 			var v bool = false
 			v, err = strconv.ParseBool(s)
 			if err != nil {
@@ -112,7 +125,7 @@ func Expect(template string, values []interface{})([]ExpectValue, error) {
 			}
 			acc[i].B = v
 		case 'c':
-			var s string = fmt.Sprintf("%d", arg)
+			var s string = trim(fmt.Sprintf("%d", arg))
 			var n int64 = 0
 			n, err = strconv.ParseInt(s, 10, 64)
 			if err != nil || n < 1 || 16 < n {
@@ -122,7 +135,7 @@ func Expect(template string, values []interface{})([]ExpectValue, error) {
 			}
 			acc[i].C = midi.MIDIChannel(n)
 		case 'o':
-			var s string = fmt.Sprintf("%s", arg)
+			var s string = trim(fmt.Sprintf("%s", arg))
 			var op Operator
 			op, err = GetOperator(s)
 			if err != nil {

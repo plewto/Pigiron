@@ -1,10 +1,6 @@
 package osc
 
 import (
-	//"fmt"
-	// goosc "github.com/hypebeast/go-osc/osc"
-	//"github.com/rakyll/portmidi"
-	//"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/pigpath"
 )

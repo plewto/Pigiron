@@ -25,6 +25,16 @@ BOG 004 12-July-2021 Open
     Not sure of the exact configuration at the time.
 
 ---------------------------------------------------------------------- 005
-BUG 005 22-July-2021 Open
-    When sending OSC command /pig/op <operator-name>, ...., the operator-name is being rejected by expect.
-    The same command from the REPL is accepted. 
+BUG 005 22-July-2021 Closed
+    OSC command /pig/op <name>, ...., is being rejected by expect.
+    The operator name is rejected when it arrives via OSC.
+    The same command from the REPL is accepted.
+
+    There is an inconsistency in how argument strings are being split
+    REPL and remote commands.   For the command /pig/op foo, ping
+    The REPL sends 'foo' to expect
+    The remote command is sending 'foo,'
+
+    FIX: Added explicit string triming function to Expect values.
+    
+

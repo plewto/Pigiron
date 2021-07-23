@@ -7,10 +7,11 @@ Files named b?.mid are malformed
 Files named c?.mid are mallformed but should be recoverable
 
 a1.mid
-    very basic, single track, division 24, 1-bar 4-notes on channel 1.
+    very basic, single track, division 24, 1-bar 4 quarter notes on channel 1.
+    tempo 60 BPM
 
-
-
+a2.mid
+    same as a1.mid except 4-bars long, note a t start of each bar.
 
 
 b1.mid

@@ -19,7 +19,8 @@ type MIDIPlayer struct {
 	eventIndex int
 	tempo float64
 	tickDuration float64
-	currentTime float64
+	currentTime int // msec
+	delayStart int  // msec
 	
 }
 
@@ -31,7 +32,8 @@ func newMIDIPlayer(name string) *MIDIPlayer {
 	op.eventIndex = 0
 	op.tempo = 120.0
 	op.tickDuration = midi.TickDuration(24, op.tempo)
-	op.currentTime = 0.0
+	op.currentTime = 0.0  // milliseconds
+	op.delayStart = 200   // milliseconds
 	initTransportHandlers(op)
 	return op
 }
@@ -60,6 +62,7 @@ func (op *MIDIPlayer) Panic() {
 }
 
 func (op *MIDIPlayer) Stop() {
+	fmt.Printf("\nMIDIPlayer %s Stop()\n", op.Name())
 	op.isPlaying = false
 	for ci := 0; ci < 16; ci++ {
 		ch := midi.MIDIChannelNibble(ci)
@@ -73,6 +76,7 @@ func (op *MIDIPlayer) Stop() {
 }
 
 func (op *MIDIPlayer) killActiveNotes() {
+	fmt.Printf("MIDIPlayer %s killActiveNotes\n", op.Name())
 	counter := 0
 	for _, pme := range op.noteQueue.OffEvents() {
 		op.distribute(*pme)
@@ -86,6 +90,7 @@ func (op *MIDIPlayer) killActiveNotes() {
 	
 
 func (op *MIDIPlayer) Play() error {
+	fmt.Printf("MIDIPlayer %s Play()\n", op.Name())
 	var err error
 	if op.isPlaying {
 		return err
@@ -106,6 +111,7 @@ func (op *MIDIPlayer) Play() error {
 }
 
 func (op *MIDIPlayer) Continue() error {
+	fmt.Printf("MIDIPlayer %s Continue()", op.Name())
 	var err error
 	if op.isPlaying {
 		return err
@@ -145,18 +151,20 @@ func (op *MIDIPlayer) MediaFilename() string {
 	return op.smf.Filename()
 }
 
-func (op *MIDIPlayer) Duration() float64 {
+func (op *MIDIPlayer) Duration() int {
 	if op.smf == nil {
 		return 0.0
 	}
-	return op.smf.Duration()
+	return int(1000 * op.smf.Duration())
 }
 
-func (op *MIDIPlayer) Position() float64 {
+func (op *MIDIPlayer) Position() int {
 	return op.currentTime
 }
 
 func (op *MIDIPlayer) playloop() {
+	time.Sleep(time.Duration(op.delayStart) * time.Millisecond)
+	fmt.Printf("MIDIPlayer %s playing\n", op.Name())
 	var err error
 	var track *midi.SMFTrack
 	track, err = op.smf.Track(0)
@@ -167,8 +175,9 @@ func (op *MIDIPlayer) playloop() {
 	op.noteQueue.Reset()
 	for op.isPlaying && op.eventIndex < len(events) {
 		event := events[op.eventIndex]
-		delay := time.Duration(op.tickDuration * float64(event.DeltaTime()))
-		time.Sleep(delay)
+		delay := time.Duration((op.tickDuration * float64(event.DeltaTime())) * 1000) // msec
+		time.Sleep(delay * time.Millisecond)
+		fmt.Printf("event [%3d]  δ %4d  delay = %4d msec  running %6d  %s\n", int(event.DeltaTime()), op.eventIndex, delay, op.currentTime, event)
 		switch {
 		case event.IsChannelEvent():
 			pe := event.PortmidiEvent()
@@ -181,24 +190,31 @@ func (op *MIDIPlayer) playloop() {
 			mtype := byte(event.MetaType())
 			switch {
 			case mtype == byte(midi.META_TEMPO):
-				// TODO update tempo
+				bpm, _ := event.MetaTempoBPM()
+				op.tempo = bpm
+				fmt.Printf("tempo = %f\n", op.tempo)
 			case midi.IsMetaTextType(mtype):
-				// TODO print text
+				bytes, err := event.MetaData()
+				if err == nil {
+					fmt.Printf("time %8d  %s : %s\n", op.currentTime, midi.MetaType(mtype), string(bytes))
+				}
 			case mtype == byte(midi.META_END_OF_TRACK):
 				op.isPlaying = false
 			default:
 				// ignore
 			}
 		}
-		op.currentTime += float64(delay)
+		op.currentTime += int(delay)
 		op.eventIndex++
 	}
 	op.isPlaying = false
+	fmt.Printf("MIDIPlayer %s play-stop\n", op.Name())
 	op.killActiveNotes()
 	return
 }
 
 	
+
 	
 
 			

@@ -81,7 +81,7 @@ func (smf *SMF) Duration() float64 {
 	track := smf.tracks[0]
 	for _, evnt := range track.events {
 		if byte(evnt.metaType) == byte(META_TEMPO) {
-			t, err := evnt.metaTempoBPM()
+			t, err := evnt.MetaTempoBPM()
 			if err != nil {
 				break
 			}

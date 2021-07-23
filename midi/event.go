@@ -234,11 +234,11 @@ func (ue *UniversalEvent) metaTempoMicroSeconds() (int64, error) {
 	return acc, err
 }
 
-// metaTempoBPM returns the tempo in BPM for a META_TEMPO event.
+// MetaTempoBPM returns the tempo in BPM for a META_TEMPO event.
 // Returns error if event is not a tempo event or it is malformed.
 // If an error is detected, the returned tempo defaults to 60.0
 //
-func (ue *UniversalEvent) metaTempoBPM() (float64, error) {
+func (ue *UniversalEvent) MetaTempoBPM() (float64, error) {
 	μ, err := ue.metaTempoMicroSeconds()
 	if err != nil {
 		return 60.0, err
@@ -299,7 +299,7 @@ func (ue *UniversalEvent) String() string {
 			acc += fmt.Sprintf("  \"%s\"", string(ue.message.SysEx))
 		case mt == META_TEMPO:
 			μ, _ := ue.metaTempoMicroSeconds()
-			bpm, err := ue.metaTempoBPM()
+			bpm, err := ue.MetaTempoBPM()
 			if err != nil {
 				acc += " <malformed tempo event, using 60.0>"
 			} else {

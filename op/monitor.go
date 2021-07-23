@@ -54,7 +54,7 @@ func formatSysex(event portmidi.Event) string {
 
 func formatEvent(event portmidi.Event) string {
 	st := event.Status
-	var acc = midi.StatusMnemonic(st)
+	var acc = "MON " + midi.StatusMnemonic(st)
 	if st >= 0xF0 {
 		switch st {
 		case 0xF0:
@@ -65,7 +65,7 @@ func formatEvent(event portmidi.Event) string {
 	} else {
 		st, ci := st & 0xF0, st & 0x0F
 		d1, d2 := event.Data1, event.Data2
-		acc += fmt.Sprintf(" chan %2d ", ci+1)
+		acc += fmt.Sprintf("chan %2d ", ci+1)
 		switch st {
 		case 0x80:
 			acc += fmt.Sprintf("key %3d %4s, vel %3d", d1, midi.KeyName(d1), d2)

@@ -13,8 +13,8 @@ type Transport interface {
 	IsPlaying() bool
 	LoadMedia(filename string) error
 	MediaFilename() string
-	Duration() float64
-	Position() float64
+	Duration() int // msec
+	Position() int // msec
 	addCommandHandler(command string, handler func(*goosc.Message)([]string, error))
 }
 

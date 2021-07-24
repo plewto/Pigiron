@@ -5,8 +5,3 @@ I. Possible features:
     2) scripts directory
          automatically load by simple-name from REPL
 
-II. Command logging
-
-
-III. delay (sleep) command, useful for testing 
-

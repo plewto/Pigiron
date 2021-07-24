@@ -7,11 +7,12 @@ import (
 	"bufio"
 	"time"
 	"io/ioutil"
-	// "path/filepath"
 	
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/pigpath"
+	"github.com/plewto/pigiron/piglog"
+	
 	
 )
 
@@ -117,7 +118,8 @@ func BatchLoad(filename string) error {
 	fmt.Printf("Loading batch file  '%s'\n", filename)
 	lines := strings.Split(string(raw), "\n")
 	for i, line := range lines {
-		fmt.Printf("Batch [%3d]  %s\n", i+1, line)
+		// fmt.Printf("Batch [%3d]  %s\n", i+1, line)
+		piglog.Log(fmt.Sprintf("BATCH: [line %3d] %s", i, line))
 		command, args := parse(line)
 		Eval(command, args)
 		sleep(10)
@@ -136,6 +138,7 @@ func REPL() {
 		fmt.Print(config.GlobalParameters.TextColor)
 		Prompt()
 		raw := Read()
+		piglog.Log(fmt.Sprintf("CMD  : %s", raw))
 		command, args := parse(raw)
 		Eval(command, args)
 		time.Sleep(10 * time.Millisecond)

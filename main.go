@@ -9,6 +9,7 @@ import (
 	"github.com/plewto/pigiron/osc"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/op"
+	"github.com/plewto/pigiron/piglog"
 	_ "github.com/plewto/pigiron/midi" // for testing only
 )
 
@@ -29,7 +30,6 @@ func printBanner() {
 		fmt.Println(line)
 	}
 	fmt.Print("\n")
-	
 	cfig, err := os.UserConfigDir()
 	if err != nil {
 		fmt.Printf("WARNING: Can not dertermin user's config directory.\n")
@@ -39,6 +39,11 @@ func printBanner() {
 		fmt.Printf("Configuration directory is '%s'\n", cfig)
 	}
 	fmt.Printf("Configuration file: %s\n", config.ConfigFilename())
+	if config.GlobalParameters.EnableLogging {
+		fmt.Printf("Logging to: %s\n", piglog.Logfile())
+	} else {
+		fmt.Printf("Logging disabled\n")
+	}
 	fmt.Printf("Version: %s\n", config.Version)
 	
 
@@ -48,9 +53,9 @@ func printBanner() {
 
 
 func main() {
-	// config.Init()
+	piglog.Log("-------- Pigiron main()")
 	printBanner()
-	
+	piglog.Log(config.ConfigInfo())
 	osc.Init()
 	op.Init()
 	osc.Listen()
@@ -79,5 +84,5 @@ func Cleanup() {
 	midi.Cleanup()
 	op.Cleanup()
 	osc.Cleanup()
-	
+	piglog.Close()
 }

@@ -5,6 +5,8 @@ import (
 	"os"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/config"
+	"github.com/plewto/pigiron/piglog"
+	
 )
 
 type Responder interface {
@@ -49,10 +51,12 @@ func (r *BasicResponder) Ack(sourceAddress string, args []string) {
 	acc := fmt.Sprintf("ACK\n%s\n", sourceAddress)
 	msg := goosc.NewMessage(address)
 	msg.Append(sourceAddress)
-	for _, a := range args {
+	for i, a := range args {
 		s := fmt.Sprintf("%s", a)
 		msg.Append(s)
 		acc += fmt.Sprintf("%s\n", s)
+		piglog.Log(fmt.Sprintf("-> ACK [%3d] %s", i, a))
+		
 	}
 	r.send(msg)
 	r.writeResponseFile(sourceAddress, acc)
@@ -65,10 +69,12 @@ func (r *BasicResponder) Error(sourceAddress string, args []string, err error) {
 	msg.Append(sourceAddress)
 	msg.Append(fmt.Sprintf("%s\n", err))
 	acc += fmt.Sprintf("%s\n", err)
-	for _, a := range args {
+	piglog.Log(fmt.Sprintf("-> %s", acc))
+	for i, a := range args {
 		s := fmt.Sprintf("%s", a)
 		msg.Append(s)
 		acc += fmt.Sprintf("%s\n", s)
+		piglog.Log(fmt.Sprintf("-> ERR [%3d] %s", i, a))
 	}
 	r.send(msg)
 	r.writeResponseFile(sourceAddress, acc)

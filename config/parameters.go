@@ -12,6 +12,8 @@ import (
 // globalParameters struct holds application wide configuration values.
 //
 type globalParameters struct {
+	EnableLogging bool
+	Logfile string
 	OSCServerRoot string
 	OSCServerHost string
 	OSCServerPort int64
@@ -32,6 +34,8 @@ type globalParameters struct {
 // ResetGlobalParameters sets all global configuration parameter to default values."
 //
 func ResetGlobalParameters() {
+	GlobalParameters.EnableLogging = true
+	GlobalParameters.Logfile = "!/log"
 	GlobalParameters.OSCServerRoot = "pig"
 	GlobalParameters.OSCServerHost = "127.0.0.1"
 	GlobalParameters.OSCServerPort = 8020
@@ -55,19 +59,28 @@ func ResetGlobalParameters() {
 // DumpGlobalParameters prints the global configuration values.
 //
 func PrintConfig() {
-	fmt.Println("Global configuration values")
-	fmt.Printf("\tpigiron version: %s\n", Version)
-	fmt.Printf("\tconfig file was \"%s\"\n", configFilename)
-	fmt.Printf("\tOSCServerRoot         : %v\n", GlobalParameters.OSCServerRoot)
-	fmt.Printf("\tOSCServerHost         : %v\n", GlobalParameters.OSCServerHost)
-	fmt.Printf("\tOSCServerPort         : %v\n", GlobalParameters.OSCServerPort)
-	fmt.Printf("\tOSCClientRoot         : %v\n", GlobalParameters.OSCClientRoot)
-	fmt.Printf("\tOSCClientHost         : %v\n", GlobalParameters.OSCClientHost)
-	fmt.Printf("\tOSCClientPort         : %v\n", GlobalParameters.OSCClientPort)
-	fmt.Printf("\tOSCClientFilename     : %v\n", GlobalParameters.OSCClientFilename)
-	fmt.Printf("\tMaxTreeDepth          : %v\n", GlobalParameters.MaxTreeDepth)
-	fmt.Printf("\tMIDIInputBufferSize   : %v\n", GlobalParameters.MIDIInputBufferSize)
-	fmt.Printf("\tMIDIInputPollInterval : %v\n", GlobalParameters.MIDIInputPollInterval)
-	fmt.Printf("\tMIDIOutputBufferSize  : %v\n", GlobalParameters.MIDIOutputBufferSize)
-	fmt.Printf("\tMIDIOutputLatency     : %v\n", GlobalParameters.MIDIOutputLatency)
+	fmt.Println(ConfigInfo())
 }
+
+func ConfigInfo() string {
+	acc := "Global configuration values\n"
+	acc += fmt.Sprintf("\tpigiron version: %s\n", Version)
+	acc += fmt.Sprintf("\tconfig file was \"%s\"\n", configFilename)
+	acc += fmt.Sprintf("\tEnableLogging         : %v\n", GlobalParameters.EnableLogging)
+	acc += fmt.Sprintf("\tLogfile               : %v\n", GlobalParameters.Logfile)
+	acc += fmt.Sprintf("\tOSCServerRoot         : %v\n", GlobalParameters.OSCServerRoot)
+	acc += fmt.Sprintf("\tOSCServerHost         : %v\n", GlobalParameters.OSCServerHost)
+	acc += fmt.Sprintf("\tOSCServerPort         : %v\n", GlobalParameters.OSCServerPort)
+	acc += fmt.Sprintf("\tOSCClientRoot         : %v\n", GlobalParameters.OSCClientRoot)
+	acc += fmt.Sprintf("\tOSCClientHost         : %v\n", GlobalParameters.OSCClientHost)
+	acc += fmt.Sprintf("\tOSCClientPort         : %v\n", GlobalParameters.OSCClientPort)
+	acc += fmt.Sprintf("\tOSCClientFilename     : %v\n", GlobalParameters.OSCClientFilename)
+	acc += fmt.Sprintf("\tMaxTreeDepth          : %v\n", GlobalParameters.MaxTreeDepth)
+	acc += fmt.Sprintf("\tMIDIInputBufferSize   : %v\n", GlobalParameters.MIDIInputBufferSize)
+	acc += fmt.Sprintf("\tMIDIInputPollInterval : %v\n", GlobalParameters.MIDIInputPollInterval)
+	acc += fmt.Sprintf("\tMIDIOutputBufferSize  : %v\n", GlobalParameters.MIDIOutputBufferSize)
+	acc += fmt.Sprintf("\tMIDIOutputLatency     : %v\n", GlobalParameters.MIDIOutputLatency)
+	return acc
+}
+
+	

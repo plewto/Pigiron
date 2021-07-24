@@ -141,6 +141,8 @@ func readConfigurationFile(filename string) {
 		return
 	} else {
 		// fmt.Printf("Using configuration file: '%s'\n", filename)
+		GlobalParameters.EnableLogging = true  // TODO: implement readBool
+		GlobalParameters.Logfile = "/home/sj/.config/pigiron/log" // TODO replace hardcode 
 		GlobalParameters.OSCServerRoot = readString("osc-server.root", "pig")
 		GlobalParameters.OSCServerHost = readString("osc-server.host", "127.0.0.1")
 		GlobalParameters.OSCServerPort = readInt("osc-server.port", 8020)

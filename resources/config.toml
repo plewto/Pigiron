@@ -1,4 +1,11 @@
 # Pigiron configuration
+# !/ --> alias for config directory
+# ~/ --> alias for user home
+#
+
+[log]
+	enable = false       # NOTE: Not currently being read
+	logfile = "!/log"
 
 [osc-server]
 	root = "pig"

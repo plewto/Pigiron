@@ -118,7 +118,7 @@ func BatchLoad(filename string) error {
 	fmt.Printf("Loading batch file  '%s'\n", filename)
 	lines := strings.Split(string(raw), "\n")
 	for i, line := range lines {
-		// fmt.Printf("Batch [%3d]  %s\n", i+1, line)
+		fmt.Printf("Batch [%3d]  %s\n", i+1, line)
 		piglog.Log(fmt.Sprintf("BATCH: [line %3d] %s", i, line))
 		command, args := parse(line)
 		Eval(command, args)

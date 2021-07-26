@@ -1,9 +1,9 @@
 package midi
 
 /*
- * expect.go defines functions for extracting values from byte slices.
- *
- */
+** take.go defines functions for extracting values from byte slices.
+**
+*/
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 )
 
 
-// requireBufferLength returns error if buffer is not at least count bytes long.
+// requireBufferLength() returns error if buffer is not at least count bytes long.
 //
 func requireBufferLength(buffer []byte, count int) error {
 	var err error
@@ -22,11 +22,11 @@ func requireBufferLength(buffer []byte, count int) error {
 	return err
 }
 		
-// takeByte returns first byte in buffer.
+// takeByte() returns first byte in buffer.
 // Returns:
 //   value - the first byte of the buffer
 //   newBuffer - slice of buffer starting after first byte.
-//   error - if buffer is empty.
+//   error - non-nil if buffer is empty.
 //
 func takeByte(buffer []byte) (value byte, newBuffer []byte, err error) {
 	err = requireBufferLength(buffer, 1)
@@ -37,11 +37,11 @@ func takeByte(buffer []byte) (value byte, newBuffer []byte, err error) {
 }
 
 
-// takeShort returns first two buffer bytes as 16-bit int.
+// takeShort() returns first two buffer bytes as 16-bit int.
 // Returns:
 //   value - 16-bit 'short' value
 //   newBuffer - slice of buffer starting at index 2
-//   error - if buffer length is less then 2.
+//   error - non-nil if buffer length is less then 2.
 //
 func takeShort(buffer []byte) (value int, newBuffer []byte, err error) {
 	err = requireBufferLength(buffer, 2)
@@ -54,11 +54,11 @@ func takeShort(buffer []byte) (value int, newBuffer []byte, err error) {
 }
 
 
-// takeLong returns first four buffer bytes as 32-bit int.
+// takeLong() returns first four buffer bytes as 32-bit int.
 // Returns:
 //    value - 32-bit 'long' value
 //    newBuffer - slice of buffer starting after index 4
-//    error - if buffer is not at least 4-bytes long.
+//    error - non-nil if buffer is not at least 4-bytes long.
 //
 func takeLong(buffer []byte) (value int, newBuffer []byte, err error) {
 	err = requireBufferLength(buffer, 4)
@@ -73,12 +73,12 @@ func takeLong(buffer []byte) (value int, newBuffer []byte, err error) {
 	return value, buffer[4:], err
 }
 
-// takeVLQ returns variable length value from start of buffer.
+// takeVLQ() returns variable length value from start of buffer.
 // The maximum number of bytes consumed is 4.
 // Returns:
 //    vlq - the 'value'
 //    newBuffer - slice of buffer after final vlq byte.
-//    error - if vlq is not terminated after reading 4 bytes.
+//    error - non-nil if vlq is not terminated after reading 4 bytes.
 //
 func takeVLQ(buffer[] byte) (vlq *VLQ, newBuffer []byte, err error) {
 	vlq = new(VLQ)

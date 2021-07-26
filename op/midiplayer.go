@@ -10,8 +10,8 @@ import (
 )
 
 
-// Implements Operator and Transport interfaces
-
+// Implements Operator and Transport interfaces for MIDI file playback.
+//
 type MIDIPlayer struct {
 	baseOperator
 	smf *midi.SMF
@@ -63,6 +63,8 @@ func (op *MIDIPlayer) Panic() {
 	op.Reset()
 }
 
+// op.Stop() see Transport interface.
+//
 func (op *MIDIPlayer) Stop() {
 	fmt.Printf("\nMIDIPlayer %s Stop()\n", op.Name())
 	op.isPlaying = false
@@ -77,6 +79,8 @@ func (op *MIDIPlayer) Stop() {
 	op.killActiveNotes()
 }
 
+// killActiveNotes() transmits MIDI note-off messages for all unresolved note-on events.
+//
 func (op *MIDIPlayer) killActiveNotes() {
 	fmt.Printf("MIDIPlayer %s killActiveNotes\n", op.Name())
 	counter := 0
@@ -91,6 +95,8 @@ func (op *MIDIPlayer) killActiveNotes() {
 }
 	
 
+// op.Play() see Transport interface.
+//
 func (op *MIDIPlayer) Play() error {
 	fmt.Printf("MIDIPlayer %s Play()\n", op.Name())
 	var err error
@@ -112,6 +118,8 @@ func (op *MIDIPlayer) Play() error {
 	return err
 }
 
+// op.Continue() see Transport interface.
+//
 func (op *MIDIPlayer) Continue() error {
 	fmt.Printf("MIDIPlayer %s Continue()", op.Name())
 	var err error
@@ -127,6 +135,8 @@ func (op *MIDIPlayer) Continue() error {
 	return err
 }
 
+// op.IsPlaying() see Transport interface.
+//
 func (op *MIDIPlayer) IsPlaying() bool {
 	return op.isPlaying
 }
@@ -146,6 +156,8 @@ func (op *MIDIPlayer) LoadMedia(filename string) error {
 	return err
 }
 
+// op.MediaFilename() see Transport interface.
+//
 func (op *MIDIPlayer) MediaFilename() string {
 	if op.smf == nil {
 		return ""
@@ -153,6 +165,8 @@ func (op *MIDIPlayer) MediaFilename() string {
 	return op.smf.Filename()
 }
 
+// op.Duration() see Transport interface.
+//
 func (op *MIDIPlayer) Duration() int {
 	if op.smf == nil {
 		return 0.0
@@ -160,6 +174,8 @@ func (op *MIDIPlayer) Duration() int {
 	return int(1000 * op.smf.Duration())
 }
 
+// op.Position() see Transport interface.
+//
 func (op *MIDIPlayer) Position() int {
 	return op.currentTime
 }
@@ -179,7 +195,6 @@ func (op *MIDIPlayer) playloop() {
 		event := events[op.eventIndex]
 		delay := time.Duration((op.tickDuration * float64(event.DeltaTime())) * 1000) // msec
 		time.Sleep(delay * time.Millisecond)
-		// fmt.Printf("event [%3d]  δ %4d  delay = %4d msec  running %6d  %s\n", int(event.DeltaTime()), op.eventIndex, delay, op.currentTime, event)
 		switch {
 		case event.IsChannelEvent():
 			pe := event.PortmidiEvent()
@@ -198,7 +213,8 @@ func (op *MIDIPlayer) playloop() {
 			case midi.IsMetaTextType(mtype):
 				bytes, err := event.MetaData()
 				if err == nil {
-					fmt.Printf("time %8d  %s : %s\n", op.currentTime, midi.MetaType(mtype), string(bytes))
+					fs := "time %8d  %s : %s\n"
+					fmt.Printf(fs, op.currentTime, midi.MetaType(mtype), string(bytes))
 				}
 			case mtype == byte(midi.META_END_OF_TRACK):
 				op.isPlaying = false
@@ -216,10 +232,14 @@ func (op *MIDIPlayer) playloop() {
 }
 
 	
+// op.EnableMIDITransport() see Transport interface.
+//
 func (op *MIDIPlayer) EnableMIDITransport(flag bool) {
 	op.enableMIDITransport = flag
 }
 	
+// op.MIDITransportEnabled() see Transport interface.
+//
 func (op *MIDIPlayer) MIDITransportEnabled() bool {
 	return op.enableMIDITransport
 }
@@ -239,6 +259,3 @@ func (op *MIDIPlayer) Send(event portmidi.Event) {
 		}
 	}
 }
-
-		
-	

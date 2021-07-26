@@ -12,6 +12,7 @@ func OperatorTypes(sansIO bool) []string {
 	acc = append(acc, "Monitor")
 	acc = append(acc, "ChannelFilter")
 	acc = append(acc, "Distributor")
+	acc = append(acc, "MIDIPlayer")
 	if !sansIO {
 		acc = append(acc, "MIDIInput")
 		acc = append(acc, "MIDIOutput")
@@ -50,7 +51,7 @@ func splitStem(s string) (string, string) {
 	return head, tail
 }
 
-// assignName(op) reassigns the operator's name so that it is unique.
+// assignName() reassigns the operator's name so that it is unique.
 // If the registry does not contain an operator by the same name, the
 // original name is preserved.   Otherwise the name is modified by
 // appending a unique index.
@@ -70,7 +71,7 @@ func assignName(op Operator) string {
 	return op.Name()
 }
 
-// register adds an operator to the registry.
+// register() adds an operator to the registry.
 // If needed, the operator's name is changed to make it unique.
 // Returns the actual operator's name.
 //
@@ -90,17 +91,15 @@ func DumpRegistry() {
 }
 
 
-// NewOperator(opType, name) creates a new Operator and adds it to the registry.
+// NewOperator() creates a new Operator and adds it to the registry.
 // All operators should be created by NewOperator.
 //
-// opType indicates the type of Operator, valid options are: 
-//    Null
-//    ...
+// opType indicates the type of Operator
 // name is the proposed name for the operator.  
 // The actual name may be different if name is already in use.
 //
 // Returns the new Operator and an error.
-// The error is non nil if opType was invalid.
+// The error is non-nil if opType was invalid.
 //
 func NewOperator(opType string, name string) (Operator, error) {
 	var err error
@@ -162,8 +161,9 @@ func ClearRegistry() {
 
 
 // GetOperator() returns named operator.
-// An error is returned as the second value and is non nil if no such
-// operator exists.
+// Returns:
+//   1. The operator
+//   2. non-nil error if the operator does not exists.
 //
 func GetOperator(name string) (Operator, error) {
 	var op Operator

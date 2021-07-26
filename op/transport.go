@@ -6,6 +6,56 @@ import (
 )
 
 
+// Transport interface defines all media players.
+//
+// All types which implement Transport should call initTransportHandlers()
+// during construction.
+//
+//   t.Name() The operators name.
+//
+//   t.Stop() halts playback.
+//      osc command  /pig/op <name>, stop
+//
+//   t.Play() commence playback starting at beginning.
+//       Returns non-nil error if no media has been loaded.
+//       osc command /pig/op <name>, play
+//
+//   t.Continue() continues playback from current position.
+//       Returns non-nil error if no media has been loaded.
+//       osc command /pig/op <name>, continue
+//
+//   t.IsPlaying() returns true if playback is current in progress.
+//       osc command /pig/op <name>, q-is-playing
+//       osc returns bool
+//
+//   t.LoadMedia() loads named media file.
+//       Returns non-nil error if file could not be loaded.
+//       osc command /pig/op <name>, load, <filename>
+//       osc returns error if file could not be loaded.
+//
+//  t.MediaFilename() returns filename for currently loaded media.
+//       Returns empty-string if no media is loaded.
+//       osc command /pig/op <name>, q-media-filename
+//       osc returns filename
+//
+//  t.Duration() returns approximate media length in milliseconds.
+//       osc command /pig/op <name>, q-duration
+//       osc returns int time in milliseconds.
+//
+//  t.Position() returns current playback position in milliseconds.
+//       osc command /pig/op <name>, q-position
+//       osc returns int time in milliseconds.
+//
+//  t.EnableMIDITransport() enable/disable MIDI transport control.
+//       If enabled the player will stop/start/continue on reception
+//       of corresponding MIDI system commands.
+//       osc command /pig/op <name>, enable-midi-transport, <bool>
+//       osc returns ACK
+//
+//  t.MIDITransportEnabled() returns true if MIDItransport is enabled.
+//      osc command /pig/op <name>, q-midi-transport-enabled
+//      osc returns bool
+//
 type Transport interface {
 	Name() string
 	Stop()
@@ -21,7 +71,10 @@ type Transport interface {
 	addCommandHandler(command string, handler func(*goosc.Message)([]string, error))
 }
 
-
+// initTransportHandlers() adds transport OSC handlers.
+// All type implementing Transport should call initTransportHandlers()
+// during construction.
+//
 func initTransportHandlers(transport Transport) {
 
 
@@ -137,8 +190,6 @@ func initTransportHandlers(transport Transport) {
 		return formatResponse("q-media-name", name), err
 	}
 
-	
-	
 	transport.addCommandHandler("stop", remoteStop)
 	transport.addCommandHandler("play", remotePlay)
 	transport.addCommandHandler("continue", remoteContinue)

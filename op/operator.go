@@ -12,8 +12,12 @@ import (
 // children (outputs).  When an Operator receives a MIDI message via it's
 // Send method, it selectively forwards it to all of it's child Operators.
 // The message may be modified prior to rebroadcasting it.
-// 
-
+//
+// The baseOperator struct implements the Operator interface and all
+// Operator like types should extend baseOperator.
+//
+// Method documentation is provided by baseOperator.
+//
 type Operator interface {
 	midi.ChannelSelector
 	OperatorType() string

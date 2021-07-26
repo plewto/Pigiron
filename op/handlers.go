@@ -1,8 +1,8 @@
 package op
 
 /*
- * Defines global OSC handler functions.
- *
+** Defines global OSC handler functions.
+**
 */
 
 import (
@@ -56,14 +56,12 @@ func Init() {
 	osc.AddHandler(server, "q-parents", remoteQueryParents)
 	osc.AddHandler(server, "print-info", remotePrintInfo)
 	osc.AddHandler(server, "print-config", remotePrintConfig)
-
-
-	
 	osc.AddHandler(server, "op", dispatchExtendedCommand)
 }
 
-// osc /pig/ping -> ACK
+// remotePing() handler for /pig/ping
 // diagnostic function.
+// osc returns ACK
 //
 func remotePing(msg *goosc.Message)([]string, error) {
 	var err error
@@ -72,8 +70,8 @@ func remotePing(msg *goosc.Message)([]string, error) {
 }
 
 
-// osc /pig/exit -> ACK
-// Terminate application
+// remoteExit() handler for /pig/exit
+// osc returns ACK
 //
 func remoteExit(msg *goosc.Message)([]string, error) {
 	var err error
@@ -81,8 +79,8 @@ func remoteExit(msg *goosc.Message)([]string, error) {
 	return empty, err
 }
 
-// osc /pig/q-midi-inputs
-// -> ACK list of MIDI input devices
+// remoteQueryMIDIInputs() handler for /pig/q-midi-inputs
+// osc returns list of MIDI input devices
 //
 func remoteQueryMIDIInputs(msg *goosc.Message)([]string, error) {
 	var err error
@@ -96,8 +94,8 @@ func remoteQueryMIDIInputs(msg *goosc.Message)([]string, error) {
 }
 
 
-// osc /pig/q-midi-outputs
-// -> ACK list of MIDI output devices
+// remoteQueryMIDIOutputs() handler for /pig/q-midi-outputs
+// osc returns list of MIDI output devices
 //
 func remoteQueryMIDIOutputs(msg *goosc.Message)([]string, error) {
 	var err error
@@ -111,9 +109,9 @@ func remoteQueryMIDIOutputs(msg *goosc.Message)([]string, error) {
 }
 
 
-// osc /pig/batch filename
+// remoteBatchLoad() handler for /pig/batch
+// /pig/batch <filename>
 // 
-//
 func remoteBatchLoad(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("s", msg)
 	if err != nil {
@@ -129,10 +127,25 @@ func remoteBatchLoad(msg *goosc.Message)([]string, error) {
 }
 
 
-// osc /pig/new optype name
-//     /pig/new MIDIInput name device
-//     /pig/new MIDIOutput name device
-// -> name
+
+// remoteNewOperator() handler for /pig/new
+// Creates new Operator
+//
+// This command has two forms:
+//
+// General form for non-io operators.
+//
+//     /pig/new <operator-type>, <name>
+//
+// For MIDIInput and MIDIOutput operators, a device must be specified.
+//
+//     /pig/new MIDIInput, <name>, <device>
+//     /pig/new MIDIOutput, <name>, <device>
+//
+//     The device may either be an integer index or a sub-string of
+//     the device's name.
+//
+// osc returns actual operator's name.
 //
 func remoteNewOperator(msg *goosc.Message)([]string, error) {
 	if len(msg.Arguments) > 2 {
@@ -174,16 +187,17 @@ func makeIOOperator(args []ExpectValue)([]string, error) {
 		}
 		return []string{op.Name()}, err
 	default:
-		msg := "Expected opertor type at index 0, got %s"
+		msg := "Expected operator type at index 0, got %s"
 		err := fmt.Errorf(msg, optype)
 		return empty, err
 	}
 }
 
 
-
-// osc /pig/del-operator name
-// -> ACK
+// remoteDeleteOperator() handler for /pig/op-del
+// Delete operator
+// osc /pig/op-del <name>
+// osc returns ACK
 //
 func remoteDeleteOperator(msg *goosc.Message)([]string, error) {
 	var err error
@@ -197,8 +211,10 @@ func remoteDeleteOperator(msg *goosc.Message)([]string, error) {
 
 
 
-// osc /pig/reset-op name
-// -> ACK
+// remoteReset() handler for /pig/reset-op 
+// Resets operator.
+// osc /pig/reset-op <name>
+// osc returns ACK
 //
 func remoteReset (msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("o", msg)
@@ -212,8 +228,10 @@ func remoteReset (msg *goosc.Message)([]string, error) {
 
 
 
+// remoteResetAll() handler for /pig/reset-all
+// Resets all operators.
 // osc /pig/reset-all
-// -> ACK
+// osc returns ACK
 //
 func remoteResetAll(msg *goosc.Message)([]string, error) {
 	var err error
@@ -226,8 +244,10 @@ func remoteResetAll(msg *goosc.Message)([]string, error) {
 
 
 
-// osc /pig/enable-midi name bool
-// -> bool
+// remoteEnableMIDI() handler for /pig/enable-midi
+// Enables/disables operator MIDI output.
+// osc /pig/enable-midi <name>, <bool>
+// osc returns bool.
 //
 func remoteEnableMIDI(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("ob", msg)
@@ -244,8 +264,10 @@ func remoteEnableMIDI(msg *goosc.Message)([]string, error) {
 
 
 
-// osc /pig/q-midi-enabled name
-// -> bool
+// remoteQueryMIDIEnabled() handler for /pig/q-midi-enabled
+// Gets state of operator midi-enabled flag.
+// osc /pig/q-midi-enabled <name>
+// osc returns bool
 //
 func remoteQueryMIDIEnabled(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("o", msg)
@@ -258,8 +280,9 @@ func remoteQueryMIDIEnabled(msg *goosc.Message)([]string, error) {
 }
 
 
-// osc /pig/q-midi-channel-mode name
-// -> mode
+// remoteQueryChannelMode() handler for /pig/q-midi-channel-mode
+// osc /pig/q-midi-channel-mode <name>
+// osc returns the ChannelSelector mode
 //
 func remoteQueryChannelMode(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("o", msg)
@@ -272,10 +295,9 @@ func remoteQueryChannelMode(msg *goosc.Message)([]string, error) {
 }
 
 
-
-
+// remoteQuerySelectedChannels() handler for /pig/q-channels
 // osc /pig/q-channels name
-// -> list
+// osc returns list of enabled MIDI channels.
 //
 func remoteQuerySelectedChannels(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("o", msg)
@@ -292,8 +314,9 @@ func remoteQuerySelectedChannels(msg *goosc.Message)([]string, error) {
 }
 
 
-// osc /pig/select-channels name [channels ....]
-// -> list of enabled channels
+// remoteSelectChannels() handler for /pig/select-channels
+// osc /pig/select-channels <name>, <channels, ....>
+// osc returns list of enabled channels.
 //
 func remoteSelectChannels(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("oi", msg)
@@ -306,13 +329,11 @@ func remoteSelectChannels(msg *goosc.Message)([]string, error) {
 		n, err := strconv.Atoi(s)
 		if err != nil {
 			msg := "Expected MIDI channel, got '%v'"
-			//err = errors.New(fmt.Sprintf(msg, s))
 			err = fmt.Errorf(msg, s)
 			return empty, err
 		}
 		if n < 1 || 16 < n {
 			msg := "Expected MIDI channel, got '%v'"
-			//err = errors.New(fmt.Sprintf(msg, s))
 			err = fmt.Errorf(msg, s)
 			return empty, err
 		}
@@ -326,8 +347,9 @@ func remoteSelectChannels(msg *goosc.Message)([]string, error) {
 	return acc, err
 }
 
-// osc /pig/deselect-channels name [channels ....]
-// -> list of enabled channels
+// remoteDeselectChannels() handler for /pig/deselect-channels 
+// osc /pig/deselect-channels <name>, <channels, ....>
+// osc returns list of enabled channels.
 //
 func remoteDeselectChannels(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("oi", msg)
@@ -359,8 +381,9 @@ func remoteDeselectChannels(msg *goosc.Message)([]string, error) {
 }
 
 
-// osc /pig/select-all-channels name
-// -> ACK
+// remoteSelectAllChannels() handler for /pig/select-all-channels
+// osc /pig/select-all-channels <name>
+// osc returns ACK
 //
 func remoteSelectAllChannels(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("o", msg)
@@ -376,8 +399,9 @@ func remoteSelectAllChannels(msg *goosc.Message)([]string, error) {
 
 
 
-// osc /pig/deselect-all-channels name
-// -> ACK
+// remoteDeselectAllChannels() handler for /pig/deselect-all-channels
+// osc /pig/deselect-all-channels <name>
+// osc returns ACK
 //
 func remoteDeselectAllChannels(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("o", msg)
@@ -392,8 +416,10 @@ func remoteDeselectAllChannels(msg *goosc.Message)([]string, error) {
 }
 
 
-// osc /pig/invert-channels name
-// -> list of selected channels
+// remoteInvertChannelSelection() handler for /pig/invert-channels
+// Inverts MIDI channel selection.
+// osc /pig/invert-channels <name>
+// osc returns list of enabled channel
 //
 func remoteInvertChannelSelection(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("o", msg)
@@ -414,8 +440,10 @@ func remoteInvertChannelSelection(msg *goosc.Message)([]string, error) {
 }
 
 
-// osc /pig/q-channel-selected name c
-// -> bool
+// remoteQueryChannelSelected() handler for /pig/q-channel-selected
+// Checks if specific MIDI channel is selected.
+// osc /pig/q-channel-selected <name>,  <channel>
+// osc returns bool
 //
 func remoteQueryChannelSelected(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("oc", msg)
@@ -431,23 +459,24 @@ func remoteQueryChannelSelected(msg *goosc.Message)([]string, error) {
 }
 	
 
+// remoteQueryOperators() handler for /pig/q-operators
 // osc /pig/q-operators
-// -> list
+// osc returns list of all operator names.
 //
 func remoteQueryOperators(msg *goosc.Message)([]string, error) {
 	var err error
 	ops := Operators()
 	acc := make([]string, len(ops))
 	for i, op := range ops {
-		//acc[i] = fmt.Sprintf("%s, %s", op.OperatorType(), op.Name())
 		acc[i] = fmt.Sprintf("%s", op)
 	}
 	return acc, err
 }
 
 
+// remoteQueryRoots() handler for /pig/q-roots
 // osc /pig/q-roots
-// -> list
+// osc returns names for all root operators.
 //
 func remoteQueryRoots(msg *goosc.Message)([]string, error) {
 	var err error
@@ -459,16 +488,19 @@ func remoteQueryRoots(msg *goosc.Message)([]string, error) {
 	return acc, err
 }
 	
+// remoteQueryOperatorTypes() handler for /pig/q-operator-types
 // osc /pig/q-operator-types
-// -> list
+// osc returns list of available operator types.
 //
 func remoteQueryOperatorTypes(msg *goosc.Message)([]string, error) {
 	var err error
 	return OperatorTypes(false), err
 }
 
-// osc /pig/del-all-operators
-// -> ACK
+// remoteDeleteAllOperators() handler for /pig/del-all
+// Deletes all operators.
+// osc /pig/del-all
+// osc returns ACK.
 //
 func remoteDeleteAllOperators(msg *goosc.Message)([]string, error) {
 	var err error
@@ -478,8 +510,13 @@ func remoteDeleteAllOperators(msg *goosc.Message)([]string, error) {
 
 
 		
-// osc /pig/connect parent child [more...]
-// -> ACK
+// remoteConnect() handler for /pig/connect
+// Connects two or more operators
+// osc /pig/connect <parent>, <child-1> <,child-2, child-3, ...>
+// osc returns ACK
+//
+// If more then one child is specified, they are connected in sequence.
+// parent -> child-1 -> child-2 ... -> child-n
 //
 func remoteConnect(msg *goosc.Message)([]string, error) {
 	var err error
@@ -505,8 +542,9 @@ func remoteConnect(msg *goosc.Message)([]string, error) {
 
 
 
-// osc /pig/disconnect-child parent child
-// -> ACK
+// remoteDisconnect() handler for /pig/disconnect-child
+// osc /pig/disconnect-child <parent>, <child>
+// osc returns ACK
 //
 func remoteDisconnect(msg *goosc.Message)([]string, error) {
 	var err error
@@ -523,8 +561,10 @@ func remoteDisconnect(msg *goosc.Message)([]string, error) {
 }
 
 
-// osc /pig/disconnect-all parent
-// -> ACK | ERROR
+// remoteDisconnectAll() handler for /pig/disconnect-all
+// Disconnects all children from parent.
+// osc /pig/disconnect-all <parent>
+// osc returns ACK
 //
 func remoteDisconnectAll(msg *goosc.Message)([]string, error) {
 	var err error
@@ -538,8 +578,10 @@ func remoteDisconnectAll(msg *goosc.Message)([]string, error) {
 }
 
 
-// osc /pig/disconnect-parents name
-// -> ACK | ERROR
+// remoteDisconnectParents() handler for /pig/disconnect-parents
+// Disconnects all parents from operator.
+// osc /pig/disconnect-parents <name>
+// osc returns ACK.
 //
 func remoteDisconnectParents(msg *goosc.Message)([]string, error) {
 	var err error
@@ -553,8 +595,10 @@ func remoteDisconnectParents(msg *goosc.Message)([]string, error) {
 	return empty, err
 }
 
+// remotePrintGraph() handler for /pig/print-graph
+// Prints a graphic representation of the MIDI process tree.
 // osc /pig/print-graph
-// -> ACK
+// osc returns ACK.
 //
 func remotePrintGraph(msg *goosc.Message)([]string, error) {
 	var err error
@@ -564,8 +608,9 @@ func remotePrintGraph(msg *goosc.Message)([]string, error) {
 	return empty, err
 }
 
+// remoteQueryGraph() handler for /pig/q-forest
 // osc /pig/q-forest
-// -> list
+// osc returns list of all operator connections.
 //
 func remoteQueryGraph(msg *goosc.Message)([]string, error) {
 	var err error
@@ -591,8 +636,10 @@ func remoteQueryGraph(msg *goosc.Message)([]string, error) {
 	return acc, err
 }
 			
+// remoteQueryCommands() handler for /pig/q-commands
+// Prints list of all osc commands.
 // osc /pig/q-commands
-// -> list
+// osc returns list of all commands.
 //
 func remoteQueryCommands(msg *goosc.Message)([]string, error) {
 	var err error
@@ -606,8 +653,10 @@ func remoteQueryCommands(msg *goosc.Message)([]string, error) {
 	return acc, err
 }
 
-// psc /pig/q-children name
-// -> list
+// remoteQueryChildren() handler for /pig/q-children
+// Prints list of operator's children.
+// osc /pig/q-children <name>
+// osc returns list of children.
 //
 func remoteQueryChildren(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("o", msg)
@@ -625,8 +674,10 @@ func remoteQueryChildren(msg *goosc.Message)([]string, error) {
 	return acc, err
 }
 
-// osc /pig/q-parents name
-// -> list
+// remoteQueryParents() handler for /pig/q-parents
+// Prints list of operator's parents.
+// osc /pig/q-parents <name>
+// osc returns list of parents
 //
 func remoteQueryParents(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("o", msg)
@@ -644,8 +695,10 @@ func remoteQueryParents(msg *goosc.Message)([]string, error) {
 	return acc, err
 }
 
-// osc /pig/print-info name
-// -> Ack
+// remotePrintInfo() handler for /pig/print-info
+// Prints operator's info.
+// osc /pig/print-info <name>
+// osc returns ACK.
 //
 func remotePrintInfo(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("o", msg)
@@ -656,8 +709,10 @@ func remotePrintInfo(msg *goosc.Message)([]string, error) {
 	return empty, err
 }
 
+// remotePrintConfig() handler for /pig/print-config
+// Prints global configuration values.
 // osc /pig/print-config
-// -> Ack
+// osc returns ACK.
 //
 func remotePrintConfig(msg *goosc.Message)([]string, error) {
 	var err error
@@ -666,6 +721,14 @@ func remotePrintConfig(msg *goosc.Message)([]string, error) {
 }
 
 // osc  /pig/op  [name, command, arguments...]
+//
+
+
+
+// dispatchExtendedCommand() handler for /pig/op
+// Sends command to specific operator.  The general form is
+// osc /pig/op <name>, <sub-command>  <,argument-1, argument-2, ..., argument-n>
+// osc returns result of the sub-command.
 //
 func dispatchExtendedCommand(msg *goosc.Message)([]string, error) {
 	args, err := ExpectMsg("os", msg)
@@ -677,5 +740,3 @@ func dispatchExtendedCommand(msg *goosc.Message)([]string, error) {
 	result, rerr := op.DispatchCommand(command, msg)
 	return result, rerr
 }
-
-

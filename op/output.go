@@ -135,9 +135,9 @@ func (op *MIDIOutput) Panic() {
 }
 
 
-
-// osc /pig/op name q-device
-// -> id, device-name
+// op.remoteQueryDevice() extended osc handler for q-device
+// osc /pig/op <name>, q-device
+// osc returns wrapped portmidi device name.
 //
 func (op *MIDIOutput) remoteQueryDevice(_ *goosc.Message)([]string, error) {
 	var err error

@@ -6,10 +6,10 @@ import (
 	"github.com/plewto/pigiron/midi"
 )
 
-// Distributor is an Operator for changing MIDI channel numbers.
-// Incoming channel-message are rebroadcast on each of the distributors
-// selected channels.   The original message channel is ignored.
-// All non-channel messages are passed unchanged.
+// Distributor is an Operator for changing MIDI channels.
+// Incoming channel-message are re-broadcast on each selected-channel.
+// The original message channel is ignored and all non-channel messages
+// are passed unchanged.
 //
 type Distributor struct {
 	baseOperator

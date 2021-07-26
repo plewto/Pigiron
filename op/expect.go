@@ -1,8 +1,8 @@
 package op
 
 /*
- * Expect provide OSC message argument validation.
- *
+** expect.go provides OSC message argument validation.
+**
 */
 
 import (
@@ -14,7 +14,7 @@ import (
 )
 
 
-// StringSlice Embeds all arguments into string slice.
+// StringSlice() embeds all arguments into string slice.
 //
 func StringSlice(values ...interface{}) []string {
 	acc := make([]string, len(values))
@@ -25,7 +25,7 @@ func StringSlice(values ...interface{}) []string {
 }
 
 
-// ToStringSlice converts []interface slice into a string slice.
+// ToStringSlice() converts []interface slice into a string slice.
 //
 func ToStringSlice(values []interface{}) []string {
 	acc := make([]string, len(values))
@@ -50,12 +50,7 @@ type ExpectValue struct {
 	O Operator}
 
 
-// func trimArg(value interface{}) string {
-// 	s := fmt.Sprintf("%v", value)
-// 	return strings.Trim(strings.TrimSpace(s), ",")
-// }
-
-// Expect validates a list of values for appropriate type.
+// Expect() validates a list of values for appropriate type.
 // Each character in the template indicates the expected value for the
 // corresponding position of the values list.
 // The possible template characters are:
@@ -153,7 +148,7 @@ func Expect(template string, values []interface{})([]ExpectValue, error) {
 	return acc, err
 }
 			
-// ExpectMsg is identical to Expect but is applied to osc message Arguments field.
+// ExpectMsg() is identical to Expect() but is applied to osc message arguments.
 //
 func ExpectMsg(template string, msg *goosc.Message)([]ExpectValue, error) {
 	return Expect(template, msg.Arguments)

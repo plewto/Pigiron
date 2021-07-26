@@ -71,7 +71,8 @@ func notInputError(op *MIDIInput, err error) bool {
 }
 
 
-//* Read all MIDIInput and process events.
+// ProcessInputs() polls all MIDIinputs to process weighting events.
+//
 func ProcessInputs() {
 	for _, op :=range inputCache {
 		flag, err := op.stream.Poll()
@@ -94,22 +95,34 @@ func (op *MIDIInput) String() string {
 	return fmt.Sprintf(msg, op.opType, op.name, op.DeviceName())
 }
 
+
+// op.DeviceID() returns the portmidi.DeviceID for the wrapped device.
+//
 func (op *MIDIInput) DeviceID() portmidi.DeviceID {
 	return op.devID
 }
 
+// op.Stream() returns portmidi.Stream
+//
 func (op *MIDIInput) Stream() *portmidi.Stream {
 	return op.stream
 }
 
+// op.DeviceName() returns name for wrapped portmidi device.
+//
 func (op *MIDIInput) DeviceName() string {
 	return op.devInfo.Name
 }
 
+// op.IsOpen() returns true if wrapped portmidi device is open.
+//
 func (op *MIDIInput) IsOpen() bool {
 	return op.devInfo.IsOpened
 }
 
+// op.Close() closes wrapped portmidi device.
+// Close should only be called when the application terminates.
+//
 func (op *MIDIInput) Close() {
 	op.Stream().Close()
 }
@@ -121,9 +134,9 @@ func (op *MIDIInput) Info() string {
 	return s
 }
 
-
-// osc /pig/op name q-device
-// -> id, device-name
+// op.remoteQueryDevice() extended osc handler for q-device
+// osc /pig/op <name>, q-device
+// osc returns wrapped portmidi device name.
 //
 func (op *MIDIInput) remoteQueryDevice(_ *goosc.Message)([]string, error) {
 	var err error

@@ -1,5 +1,11 @@
 package midi
 
+/*
+** ISSUE: A lot of the contents of this file looks to be redundant 
+** with midi.go 
+*/
+
+
 import (
 	"fmt"
 	"github.com/rakyll/portmidi"

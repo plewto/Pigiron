@@ -1,15 +1,20 @@
 package midi
 
+/*
+** track.go defines SMF track chunks.
+**
+*/
 
 import (
 	"fmt"
 	"github.com/plewto/pigiron/pigerr"
 )
 
-var (
-	trackID chunkID = [4]byte{0x4d, 0x54, 0x72, 0x6B}
-)
+var trackID chunkID = [4]byte{0x4d, 0x54, 0x72, 0x6B}
 
+
+// SMFTrack struct implements Chunk interface of MIDI file tracks.
+//
 type SMFTrack struct {
 	events []*UniversalEvent
 }
@@ -22,10 +27,14 @@ func (trk *SMFTrack) Length() int {
 	return len(trk.events)
 }
 
+// trk.Events() returns the track's event list.
+//
 func (trk *SMFTrack) Events() []*UniversalEvent {
 	return trk.events
 }
 
+// trk.Dump() displays tracks contents.
+//
 func (trk *SMFTrack) Dump() {
 	fmt.Println("SMFTrack")
 	fmt.Printf("  ID  : %s\n", trk.ID())
@@ -35,6 +44,13 @@ func (trk *SMFTrack) Dump() {
 	}
 }
 
+// convertTrackBytes() converts a byte slice into an SMFTrack
+// The byte slice is typically read from an open SMF file.
+//
+// Returns:
+//   1. *SMFTrack
+//   2. non-nil error if the track could not be created.
+//
 func convertTrackBytes(bytes []byte) (track *SMFTrack, err error) {
 	var events = make([]*UniversalEvent, 0, 1024)
 	var runningStatus StatusByte = StatusByte(0)
@@ -82,7 +98,7 @@ func convertTrackBytes(bytes []byte) (track *SMFTrack, err error) {
 			d1, d2 := byte(0), byte(0)
 			d1, bytes, err = takeByte(bytes)
 			if err != nil {
-				errmsg := "error geting running-status first data byte"
+				errmsg := "error getting running-status first data byte"
 				err = error2(err, errmsg)
 				return
 			}
@@ -143,7 +159,7 @@ func convertTrackBytes(bytes []byte) (track *SMFTrack, err error) {
 			} else {
 				ue, err = MakeSystemEvent(StatusByte(status))
 				if err != nil {
-					errmsg := "creatring sysmte-message, status = 0x%02X"
+					errmsg := "creating system-message, status = 0x%02X"
 					err = error2(err, fmt.Sprintf(errmsg, byte(status)))
 					return
 				}

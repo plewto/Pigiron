@@ -1,14 +1,12 @@
 package midi
 
 /*
- * Defines scheme for tracking and resolving open MIDI notes.
- *
- */
+** Defines scheme for tracking and resolving open MIDI notes.
+**
+*/
 
+import "github.com/rakyll/portmidi"
 
-import (
-	"github.com/rakyll/portmidi"
-)
 
 // noteQueueChannel counts unresolved note-on events for a MIDI channel.
 //
@@ -22,7 +20,7 @@ func (nqc *noteQueueChannel) reset() {
 	}
 }
 
-// isNoteOff returns true iff event status is 0x80 or is 0x90 with velocity 0.
+// isNoteOff() returns true iff event status is 0x80 or is 0x90 with velocity 0.
 //
 func isNoteOff(event *portmidi.Event) bool {
 	st := event.Status & 0xF0
@@ -31,7 +29,7 @@ func isNoteOff(event *portmidi.Event) bool {
 }
 
 
-// isNoteOn returns true iff event status is 0x90 and velocity > 0.
+// isNoteOn() returns true iff event status is 0x90 and velocity > 0.
 //
 func isNoteOn(event *portmidi.Event) bool {
 	st := event.Status & 0xF0
@@ -39,7 +37,7 @@ func isNoteOn(event *portmidi.Event) bool {
 	return st == 0x90 && velocity > 0
 }
 
-// updateCount increments/decrements specific open note count.
+// nqc.updateCount() increments/decrements specific open note count.
 //
 func (nqc *noteQueueChannel) updateCount(event *portmidi.Event) {
 	switch {
@@ -58,14 +56,15 @@ func (nqc *noteQueueChannel) updateCount(event *portmidi.Event) {
 	}
 }
 
-
-// NoteQueue struct maintains a count of all unresolved note-on events.
-//
+/*
+** NoteQueue struct maintains a count of all unresolved note-on events.
+**
+*/
 type NoteQueue struct {
 	channels [16]noteQueueChannel
 }
 
-// Reset sets all counts to 0.
+// nq.Reset() sets all note-counts to 0.
 //
 func (nq *NoteQueue) Reset() {
 	for _, c := range nq.channels {
@@ -74,7 +73,7 @@ func (nq *NoteQueue) Reset() {
 }
 
 
-// Update increments/decrements count for specific note and channel.
+// nq.Update() increments/decrements count for specific note and channel.
 // The note count is never negative.
 //
 func (nq *NoteQueue) Update(event *portmidi.Event) {
@@ -85,7 +84,7 @@ func (nq *NoteQueue) Update(event *portmidi.Event) {
 	}
 }
 
-// OpenCount returns number of unresolved on events for given channel and key.
+// nq.OpenCount() returns number of unresolved note-on events for given channel and key.
 // The channel parameter has interval 0 <= ci <= 15.
 //
 func (nq *NoteQueue) OpenCount(ci int, key int) int {
@@ -96,7 +95,7 @@ func (nq *NoteQueue) OpenCount(ci int, key int) int {
 	return nqc.openCounts[key]
 }
 
-// OffEvents returns list of MIDI off events required to resolve all open notes.
+// nq.OffEvents() returns list of MIDI off events required to resolve all open notes.
 //
 func (nq *NoteQueue) OffEvents() []*portmidi.Event {
 	var acc = make([]*portmidi.Event, 0, 48)
@@ -113,7 +112,7 @@ func (nq *NoteQueue) OffEvents() []*portmidi.Event {
 }
 
 
-// MakeNoteQueue creates new instance of NoteQueue struct.
+// MakeNoteQueue() creates new instance of NoteQueue struct.
 //
 func MakeNoteQueue() *NoteQueue {
 	clist := [16]noteQueueChannel{}

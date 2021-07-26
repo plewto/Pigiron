@@ -1,8 +1,6 @@
 package midi
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // MIDIChannel type is a single MIDI channel with range 0..16
 //
@@ -10,11 +8,12 @@ type MIDIChannel byte
 
 
 // MIDIChannelNibble type is the lower 4-bit binary representation of a MIDI channel
-// range 0..15
+// range 0..15   MIDIChannelNibble = MIDIChannel - 1
 //
 type MIDIChannelNibble byte
 
-// ValidateMIDIChannel returns nil error iff 1 <= channel <= 16.
+// ValidateMIDIChannel() returns non-nil error if channel is out of bounds.
+// Valid channel range is [1,16].
 //
 func ValidateMIDIChannel(c MIDIChannel) error {
 	var err error
@@ -24,7 +23,8 @@ func ValidateMIDIChannel(c MIDIChannel) error {
 	return err
 }
 
-// ValidateMIDIChannelNibble returns nil iff 0 <= nibble <= 15.
+// ValidateMIDIChannelNibble returns non-nil error if channelNibble is out of bounds.
+// Valid Channel Nibble range is [0,15].
 //
 func ValidateMIDIChannelNibble(ci MIDIChannelNibble) error {
 	var err error
@@ -157,15 +157,15 @@ var (
 
 
 
-// isStatusByte returns true iff argument is a valid MIDI status byte.
-// For channel types, the lower 4-bits must be masked out.
+// isStatusByte() returns true iff argument is a valid MIDI status byte.
+// For channel types the lower 4-bits must be masked out.
 //
 func isStatusByte(s byte) bool {
 	_, flag := statusMnemonics[StatusByte(s)]
 	return flag
 }
 
-// isChannelStatus returns true iff argument is a valid MIDI channel status byte.
+// isChannelStatus() returns true iff argument is a valid MIDI channel status byte.
 // The lower 4-bits are ignored.
 //
 func isChannelStatus(s byte) bool {
@@ -173,7 +173,7 @@ func isChannelStatus(s byte) bool {
 	return flag
 }
 
-// isKeyedStatus returns true iff argument is NOTE_OFF, NOTE_ON or POLY_PRESSURE.
+// isKeyedStatus() returns true iff argument is NOTE_OFF, NOTE_ON or POLY_PRESSURE.
 // The lower 4-bits are ignored.
 //
 func isKeyedStatus(s byte) bool {
@@ -182,20 +182,20 @@ func isKeyedStatus(s byte) bool {
 }
 
 
-// isSystemStatus returns true iff argument is a system-message status byte.
+// isSystemStatus() returns true iff argument is a system-message status byte.
 //
 func isSystemStatus(s byte) bool {
 	_, flag := systemStatusDataCount[StatusByte(s)]
 	return flag
 }
 
-// isMetaStatus returns true iff argument is the meta status byte.
+// isMetaStatus() returns true iff argument is the meta status byte.
 //
 func isMetaStatus(s byte) bool {
 	return StatusByte(s) == META
 }
 
-// isMetaType returns true iff argument is a valid META type -AND- it is not equal to NOT_META.
+// isMetaType() returns true iff argument is a valid META type -AND- it is not equal to NOT_META.
 //
 func isMetaType(s byte) bool {
 	_, flag := metaMnemonics[MetaType(s)]
@@ -203,7 +203,7 @@ func isMetaType(s byte) bool {
 	return flag
 }
 
-// IsMetaTextType returns true iff argument is one of the META text types.
+// IsMetaTextType() returns true iff argument is one of the META text types.
 //
 func IsMetaTextType(mt byte) bool {
 	_, flag := metaTextTypes[MetaType(mt)]
@@ -225,5 +225,3 @@ func (mt MetaType) String() string {
 	}
 	return c
 }
-
-

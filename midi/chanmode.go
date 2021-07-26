@@ -1,8 +1,6 @@
 package midi
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // ChannelMode enum indicates the manner in which MIDI channels are selected.
 // There are three possible values:
@@ -10,7 +8,6 @@ import (
 //    SingleChannel
 //    MultiChannel
 //
-
 type ChannelMode int
 
 const (
@@ -25,6 +22,44 @@ func (m ChannelMode) String() string {
 
 // ChannelSelector interface defines MIDI channel selection.
 //
+// cs.ChannelMode() ChannelMode
+//    ChannelMode function returns the ChannelMode for cs.
+//
+// cs.EnableChannel(c MIDIChannel, flag bool) error
+//    EnableChannel function enables/disables specific MIDI channel.
+//
+//    For SingleChannel mode the flag argument is ignored and c is
+//    set as the current channel.
+//
+//    For MultiChannel mode, c is enabled/disabled without effecting
+//    the state of the other MIDI channels.
+//    Returns non-nill error if c is outside the interval [1,16].
+//
+//    Has no effect for NoChannel mode.
+//
+// cs.SelectChannel(c MIDIChannel) error
+//    SelectChannel is a convenience function identical to
+//    cs.EnableChannel(c, true)
+//
+// cs.SelectedChannelIndexes() []MIDIChannelNibble
+//    SelectedChannelIndexes returns a list of all enabled MIDI channels.
+//    The channels are specified as transmitted in the interval [0,15].
+//    For NoChannel mode the result is an empty list
+//    For SingleChannel mode the result will always be a single value.
+//    For MultiChannel mode the result is a list between 0 and 16 items.
+//
+// cs.ChannelIndexSelected(ci MIDIChannelNibble) bool
+//    Returns true if the MIDI channel-index (0,15) is enabled.
+//    Always returns false for NoChannel Mode.
+//
+// cs.DeselectAllChannels()
+//    Sets all MIDI channels to disabled.
+//    Ignored by NoChannel and SingleChannel modes.
+//
+// cs.SelectAllChannels()
+//    Sets all MIDI channels as enabled.
+//    Ignored by NoChannel and SingleChannel modes.
+//
 type ChannelSelector interface {
 	ChannelMode() ChannelMode
 	EnableChannel(c MIDIChannel, flag bool) error
@@ -37,14 +72,17 @@ type ChannelSelector interface {
 
 
 /*
- * nullChannelSeletor singleton, default instance for ChannelSelector
- *
- */
+** NullChannel singleton
+**
+*/
 
 var nullSelectorInstance *NullChannelSelector = new (NullChannelSelector)
 
 type NullChannelSelector struct {}
 
+// NewNullChannelSelector() returns a ChannelSelector using NoChannel mode.
+// The result is always the same singleton object.
+//
 func NewNullChannelSelector() *NullChannelSelector {
 	return nullSelectorInstance
 }
@@ -83,20 +121,21 @@ func (ncs *NullChannelSelector) SelectAllChannels() {}
 
 
 /*
- * SingleChannelSelector struct selectes one, and only one, MIDI channel at a time.
- *
- */
+** SingleChannelSelector implements ChannelSelector for SingleChannel mode.
+**
+*/
 
 type SingleChannelSelector struct {
 	channelIndex MIDIChannelNibble
 }
 
+// NewSingleChannelSelector() returns a new ChannelSelector with SingleChannel mode.
+//
 func NewSingleChannelSelector() *SingleChannelSelector {
 	scs := new(SingleChannelSelector)
 	scs.channelIndex = 0
 	return scs
 }
-
 
 func (scs *SingleChannelSelector) String() string {
 	return fmt.Sprintf("MIDI Channel: %2d", scs.channelIndex + 1)
@@ -134,14 +173,17 @@ func (scs *SingleChannelSelector) SelectAllChannels() {}
 
 
 /*
- * MultiChannelSelector selects an arbitary set of MIDI channels.
- *
- */
+** MultiChannelSelector implements ChannelSelector for MultiChannel mode.
+**
+*/
 
 type MultiChannelSelector struct {
 	flags [16]bool
 }
 
+
+// NewMultChannelSelector() returns new ChannelSelector with MultiChannel mode.
+//
 func NewMultiChannelSelector() *MultiChannelSelector {
 	ary := [16]bool{false, false, false, false,
 		false, false, false, false,
@@ -151,7 +193,6 @@ func NewMultiChannelSelector() *MultiChannelSelector {
 	s.flags = ary
 	return s
 }
-
 
 func (mcs *MultiChannelSelector) String() string {
 	s := "MIDI Channels: "
@@ -163,7 +204,6 @@ func (mcs *MultiChannelSelector) String() string {
 	return s
 }
 				
-	
 func (mcs *MultiChannelSelector) ChannelMode() ChannelMode {
 	return MultiChannel
 }

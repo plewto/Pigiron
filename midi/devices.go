@@ -1,10 +1,14 @@
 package midi
 
+/*
+** devices.go provides an interface to portmidi MIDI devices.
+**
+*/
+
 import (
 	"fmt"
-	"strings"
 	"strconv"
-	
+	"strings"
 	"github.com/rakyll/portmidi"
 )
 
@@ -25,7 +29,7 @@ func init() {
 }
 
 
-// Cleanup terminates portmidi.
+// Cleanup() terminates portmidi.
 // Only call on application exit.
 //
 func Cleanup() {
@@ -36,7 +40,7 @@ func Cleanup() {
 }
 
 
-// InputIDs returns list of portmidi.DeviceID for all MIDI inputs.
+// InputIDs() returns list of portmidi.DeviceID for all MIDI inputs.
 //
 func InputIDs() []portmidi.DeviceID {
 	maxCount := portmidi.CountDevices()
@@ -52,7 +56,7 @@ func InputIDs() []portmidi.DeviceID {
 }
 
 
-// OutputIDs returns list of portmidi.DevicveID for all MIDI outputs
+// OutputIDs() returns list of portmidi.DevicveID for all MIDI outputs.
 //
 func OutputIDs() []portmidi.DeviceID {
 	maxCount := portmidi.CountDevices()
@@ -76,9 +80,9 @@ func padString(s string, width int) string {
 }
 
 
-// ReprDeviceInfo returns formatted string representation for MIDI device.
+// deviceInfoString() returns string representation for MIDI device.
 //
-func ReprDeviceInfo(info *portmidi.DeviceInfo) string {
+func deviceInfoString(info *portmidi.DeviceInfo) string {
 	name := fmt.Sprintf("\"%s\"", info.Name)
 	s := fmt.Sprintf(" %s  ", padString(name, 32))
 	if info.IsInputAvailable {
@@ -104,7 +108,7 @@ func dumpInputs() {
 	fmt.Println("Portmidi Inputs:")
 	for _, id := range InputIDs() {
 		info := portmidi.Info(id)
-		fmt.Printf("\t[id = %2d] %s\n", id, ReprDeviceInfo(info))
+		fmt.Printf("\t[id = %2d] %s\n", id, deviceInfoString(info))
 	}
 }
 
@@ -113,19 +117,19 @@ func dumpOutputs() {
 	fmt.Println("Portmidi Outputs:")
 	for _, id := range OutputIDs() {
 		info := portmidi.Info(id)
-		fmt.Printf("\t[id = %2d] %s\n", id, ReprDeviceInfo(info))
+		fmt.Printf("\t[id = %2d] %s\n", id, deviceInfoString(info))
 	}
 }
 
 
-// DumpDevices displays list for all portmidi MIDI IO devices.
+// DumpDevices() displays list for all portmidi devices.
 //
 func DumpDevices() {
 	dumpInputs()
 	dumpOutputs()
 }
 
-// getDeviceIdByIndex returns portmidi DeviceID by location in device list.
+// getDeviceIdByIndex() returns portmidi DeviceID by location in device list.
 //
 // Returns non-nil error if string s can not be parsed as an int, or if it is
 // out of bounds.
@@ -147,8 +151,9 @@ func getDeviceIdByIndex(s string, idList []portmidi.DeviceID) (portmidi.DeviceID
 	return id, err
 }
 
-// getDeviceIdByPattern returns first id from list with matching pattern.
-// The first id for which contains pattern as a sub-string is a match.
+// getDeviceIdByPattern() returns first id from list with matching pattern.
+//
+// The first device id which contains pattern as a sub-string is a match.
 // Returns non-nil error if no matches are found.
 //
 func getDeviceIdByPattern(pattern string, idList []portmidi.DeviceID) (portmidi.DeviceID, error) {
@@ -165,9 +170,10 @@ func getDeviceIdByPattern(pattern string, idList []portmidi.DeviceID) (portmidi.
 	return id, err
 }
 		
-// GetInputID selects portmidi input DeviceID by either name or index.
+// GetInputID() selects portmidi input DeviceID by either name or index.
+//
 // pattern may either be an integer index, or a sub-string of a device name.
-// If no matches are found returns the default id and a non-nil error.
+// If no matches are found returns the portmidi default-id and a non-nil error.
 //
 func GetInputID(pattern string) (portmidi.DeviceID, error) {
 	var err error
@@ -186,11 +192,11 @@ func GetInputID(pattern string) (portmidi.DeviceID, error) {
 }
 
 	
-// GetOutputID selects portmidi output DeviceID by either name or index.
-// pattern may either be an integer index, or a sub-string of a device name.
-// If no matches are found returns the default id and a non-nil error.
+// GetOutputID() selects portmidi output DeviceID by either name or index.
 //
-
+// pattern may either be an integer index, or a sub-string of a device name.
+// If no matches are found returns the portmidi default-id and a non-nil error.
+//
 func GetOutputID(pattern string) (portmidi.DeviceID, error) {
 	var err error
 	var id portmidi.DeviceID

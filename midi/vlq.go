@@ -26,10 +26,14 @@ func (vlq *VLQ) setBytes(bytes []byte) {
 	vlq.bytes = bytes
 }
 
+// vlq.Bytes() returns byte slice equivalent of the vlq.
+//
 func (vlq *VLQ) Bytes() []byte {
 	return vlq.bytes
 }
 
+// vlg.SetValue() sets the vlq value.
+//
 func (vlq *VLQ) SetValue(n int) {
 	mask := 0x7f
 	acc := make([]byte, 0, 4)
@@ -42,7 +46,9 @@ func (vlq *VLQ) SetValue(n int) {
 	vlq.bytes = make([]byte, len(acc))
 	vlq.bytes = reverse(acc)
 }
-	
+
+// vlq.Value() returns the vlq' value.
+//
 func (vlq *VLQ) Value() int {
 	acc := 0
 	scale := 1
@@ -62,11 +68,15 @@ func (vlq *VLQ) String() string {
 	return s
 }
 
-
+// vlq.Length() returns the vlq byte-count.
+//
 func (vlq *VLQ) Length() int {
 	return len(vlq.bytes)
 }
 
+
+// NewVLQ() creates new vlq with given value.
+//
 func NewVLQ(value int) *VLQ {
 	vlq := &VLQ{}
 	vlq.SetValue(value)

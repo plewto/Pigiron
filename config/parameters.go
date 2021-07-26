@@ -1,8 +1,6 @@
 package config
 
-import (
-	"fmt"
-)
+import "fmt"
 
 
 /*
@@ -54,14 +52,14 @@ func ResetGlobalParameters() {
 }
 
 
-
-
-// DumpGlobalParameters prints the global configuration values.
+// PrintConfig prints the global configuration values.
 //
 func PrintConfig() {
 	fmt.Println(ConfigInfo())
 }
 
+// ConfigInfo returns string representation of global configuration values.
+//
 func ConfigInfo() string {
 	acc := "Global configuration values\n"
 	acc += fmt.Sprintf("\tpigiron version: %s\n", Version)
@@ -82,5 +80,3 @@ func ConfigInfo() string {
 	acc += fmt.Sprintf("\tMIDIOutputLatency     : %v\n", GlobalParameters.MIDIOutputLatency)
 	return acc
 }
-
-	

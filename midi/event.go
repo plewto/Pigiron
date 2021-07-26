@@ -18,33 +18,50 @@ type UniversalEvent struct {
 	message portmidi.Event
 }
 
+// ue.PortmidiEvent() returns portmidi.Event of UniversalEvent.
+//
+// This method should only be called if ue.MetaType() returns NOT_META (0xFF).
+//
 func (ue *UniversalEvent) PortmidiEvent() portmidi.Event {
 	return ue.message
 }
 
+// ue.DeltaTime() returns the time difference for this event and the previous event.
+// Time is specified as MIDI clock ticks.
+//
 func (ue *UniversalEvent) DeltaTime() int {
 	return ue.deltaTime
 }
 
+// ue.IsMetaEvent() returns true if the UniversalEvent contains a Meta Message.
+//
 func (ue *UniversalEvent) IsMetaEvent() bool {
 	return ue.metaType != NOT_META
 }
 
+
+// ue.IsChannelEvent() returns true if the UniversalEvent contains a MIDI channel message.
+//
 func (ue *UniversalEvent) IsChannelEvent() bool {
 	s := byte(ue.message.Status)
 	return isChannelStatus(s)
 }
 
+// ue.IsSystemEvent() returns true if the UniversalEvent contains a MIDI system real-time  message.
+//
 func (ue *UniversalEvent) IsSystemEvent() bool {
 	s := byte(ue.message.Status)
 	return isSystemStatus(s)
 }
 
+// us.MetaType() returns the type of meta message a UniversalMessage contains.
+// A NOT_META (0xFF) indicates this is not a meta event.
+//
 func (ue *UniversalEvent) MetaType() MetaType {
 	return ue.metaType
 }
 
-// validateMetaType returns error if argument is not a valid MetaType.
+// validateMetaType() returns error if argument is not a valid MetaType.
 //
 func validateMetaType(mtype MetaType) error {
 	var err error
@@ -56,10 +73,11 @@ func validateMetaType(mtype MetaType) error {
 	return err
 }
 
-// MakeMetaEvent creates a new UniversalEvent with meta message
+// MakeMetaEvent() creates a new UniversalEvent with meta message
 // mtype - The MetaType
-// data - data byte slice.
-// Returns error if mtype is not a valid MetaType.
+// data  - data bytes.
+//
+// Returns non-nil error if mtype is not a valid MetaType.
 //
 func MakeMetaEvent(mtype MetaType, data []byte) (*UniversalEvent, error) {
 	var err error
@@ -74,7 +92,7 @@ func MakeMetaEvent(mtype MetaType, data []byte) (*UniversalEvent, error) {
 	return ue, err
 }
 
-// validateMetaTextType returns error is argument is not a valid META text type.
+// validateMetaTextType() returns error if argument is not a valid META text type.
 //
 func validateMetaTextType(mtype MetaType) error {
 	var err error
@@ -86,12 +104,13 @@ func validateMetaTextType(mtype MetaType) error {
 	return err
 }
 
-// MakeMetaTextEvent creates new UniversalEvent for text event.
-// mtype - the meta text type.  If mtype id not a valid test type, type TEXT is used.
-// text -
+// MakeMetaTextEvent() creates new UniversalEvent for text event.
+// mtype - the meta text type.  If mtype id not a valid text type, type TEXT is used.
+// text  - 
 //
-// Returns non-nil error if mtype is not a valid text type.
-// The UniversalEvent result is always non-nil.
+// Returns
+//  1. *UniversalEvent (never nil)
+//  2. non-nil error if mtype is not a valid text type.
 //
 func MakeMetaTextEvent(mtype MetaType, text string) (*UniversalEvent, error) {
 	err := validateMetaTextType(mtype)
@@ -101,7 +120,7 @@ func MakeMetaTextEvent(mtype MetaType, text string) (*UniversalEvent, error) {
 	return MakeMetaEvent(mtype, []byte(text))
 }
 
-// MakeSysExEvent creates new UniversalEvent for System Exclusive message.
+// MakeSysExEvent() creates new UniversalEvent for System Exclusive message.
 // data - the message bytes.
 //
 func MakeSysExEvent(data []byte) (*UniversalEvent, error) {
@@ -114,7 +133,7 @@ func MakeSysExEvent(data []byte) (*UniversalEvent, error) {
 }
 
 
-// validateSystemStatus returns error if argument is not a valid system status byte.
+// validateSystemStatus() returns error if argument is not a valid system status byte.
 //
 func validateSystemStatus(status StatusByte) error {
 	var err error
@@ -126,10 +145,12 @@ func validateSystemStatus(status StatusByte) error {
 	return err
 }
 
-// MakeSystemEvent creates new UniversalEvent for MIDI system events.
+// MakeSystemEvent() creates new UniversalEvent for MIDI system events.
 // Do not use for SYSEX events, use the MakeSysExEvent instead.
 //
-// Returns err if status is not a valid (non SYSEX) system byte.
+// Returns
+//   1. *UniversalEvent
+//   2. err if status is not a valid (non SYSEX) system byte.
 //
 func MakeSystemEvent(status StatusByte) (*UniversalEvent, error) {
 	var err = validateSystemStatus(status)
@@ -144,13 +165,17 @@ func MakeSystemEvent(status StatusByte) (*UniversalEvent, error) {
 }
 
 
-// MakeChannelEvent creates new UniversalEvent for MIDI channel messages.
-// status - a channel message status, the lower 4-bits should be masked out.
-// ch - Channel number is lower 4-bit nibble, 0 <= ch <= 15.
-// data1, data2, the data bytes.
+// MakeChannelEvent() creates new UniversalEvent for MIDI channel messages.
 //
-// NOTE_ON events with data2=0 are converted to NOTE_OFF.
-// Returns error if status is not a valid channel status byte.
+//   status - a channel message status, the lower 4-bits should be masked out.
+//   ch - Channel number is lower 4-bit nibble, 0 <= ch <= 15.
+//   data1, data2, the data bytes.
+//
+// NOTE_ON events with data2 = 0 are converted to NOTE_OFF.
+//
+// Returns
+//   1. *UniversalEvent
+//   2. non-nil error if status is not a valid channel status byte.
 //
 func MakeChannelEvent(status StatusByte, ch MIDIChannelNibble, data1 byte, data2 byte) (*UniversalEvent, error) {
 	var err error
@@ -170,6 +195,16 @@ func MakeChannelEvent(status StatusByte, ch MIDIChannelNibble, data1 byte, data2
 	return ue, err
 }
 
+// MakeControllerEvent() creates UniversalEvent for MIDI control change message.
+//
+//  ch - MIDI channel index [0, 15]
+//  controllerNumber - int [0, 127]
+//  value - int [0, 127]
+//
+// All arguments are masked to be in valid range.
+//
+// Returns *UniversalEvent.
+//
 func MakeControllerEvent(ch MIDIChannelNibble, controllerNumber byte, value byte) *UniversalEvent {
 	controllerNumber = controllerNumber & 0x7F
 	value = value & 0x7F
@@ -177,7 +212,7 @@ func MakeControllerEvent(ch MIDIChannelNibble, controllerNumber byte, value byte
 	return ev
 }
 
-// bytesToString, helper function returns hex-string representation of byte slice.
+// bytesToString() returns hex-string representation of byte slice.
 // The output may be truncated.
 //
 func (ue *UniversalEvent) bytesToString() string {
@@ -194,7 +229,7 @@ func (ue *UniversalEvent) bytesToString() string {
 	return acc
 }
 
-// MetaData returns UniversalEvent meta data bytes.
+// MetaData() returns UniversalEvent meta data bytes.
 // Returns error if the UniversalEvent is not a valid meta event.
 //
 func (ue *UniversalEvent) MetaData() ([]byte, error) {
@@ -208,8 +243,8 @@ func (ue *UniversalEvent) MetaData() ([]byte, error) {
 	return ue.message.SysEx, err
 }
 
-// metaTempoMicroSeconds returns the micro-second value of a META_TEMPO event.
-// Returns error if event is not a temp event or it is malformed.
+// metaTempoMicroSeconds() returns the micro-second value of a META_TEMPO event.
+// Returns error if event is not a tempo event or it is malformed.
 //
 func (ue *UniversalEvent) metaTempoMicroSeconds() (int64, error) {
 	var err error
@@ -234,7 +269,7 @@ func (ue *UniversalEvent) metaTempoMicroSeconds() (int64, error) {
 	return acc, err
 }
 
-// MetaTempoBPM returns the tempo in BPM for a META_TEMPO event.
+// MetaTempoBPM() returns the tempo in BPM for a META_TEMPO event.
 // Returns error if event is not a tempo event or it is malformed.
 // If an error is detected, the returned tempo defaults to 60.0
 //
@@ -253,9 +288,9 @@ func (ue *UniversalEvent) MetaTempoBPM() (float64, error) {
 }
 
 
-// metaTimesig returns the numerator and denominator for a META_TIME_SIGNATURE event.
+// metaTimesig() returns the numerator and denominator for a META_TIME_SIGNATURE event.
 // Returns error if event is not a time-signature or it is malformed.
-// If an error is detected the resulting values default to 4/4
+// If an error is detected the resulting values default to 4/4.
 //
 func (ue *UniversalEvent) metaTimesig() (num byte, den byte, err error) {
 	st := StatusByte(ue.message.Status)

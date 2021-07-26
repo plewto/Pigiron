@@ -11,9 +11,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	toml "github.com/pelletier/go-toml"
-	"strings"
 	"strconv"
+	"strings"
+	toml "github.com/pelletier/go-toml"
 	"github.com/plewto/pigiron/pigpath"
 )
 
@@ -59,15 +59,10 @@ func parseCommandLine() {
 }
 
 
-func splitPath(path string) []string {
-	return strings.Split(path, ".")
-}
-
-
-// hasPath returns true if the config file contains path.
+// hasPath returns true if the config file contains TOML path.
 //
 func hasPath(path string) bool {
-	return tomlTree.HasPath(splitPath(path))
+	return tomlTree.HasPath(strings.Split(path, "."))
 }
 
 
@@ -127,6 +122,21 @@ func readString(path string, fallback string) string {
 	}
 }
 
+// readBool reads Boolean value from config file.
+// Returns fallback if the path does not exists or is invalid.
+//
+func readBool(path string, fallback bool) bool {
+	if hasPath(path) {
+		flag, err := strconv.ParseBool(fmt.Sprintf("%s", tomlTree.Get(path)))
+		if err != nil {
+			flag = fallback
+		}
+		return flag
+	} else {
+		return fallback
+	}
+}
+	
 
 // readConfigurationFile sets GlobalParameters fields from toml config file.
 //
@@ -141,8 +151,8 @@ func readConfigurationFile(filename string) {
 		return
 	} else {
 		// fmt.Printf("Using configuration file: '%s'\n", filename)
-		GlobalParameters.EnableLogging = true  // TODO: implement readBool
-		GlobalParameters.Logfile = "/home/sj/.config/pigiron/log" // TODO replace hardcode 
+		GlobalParameters.EnableLogging = readBool("log.enable", true)
+		GlobalParameters.Logfile = pigpath.SubSpecialDirectories(readString("log.logfile", "!/log"))
 		GlobalParameters.OSCServerRoot = readString("osc-server.root", "pig")
 		GlobalParameters.OSCServerHost = readString("osc-server.host", "127.0.0.1")
 		GlobalParameters.OSCServerPort = readInt("osc-server.port", 8020)
@@ -167,5 +177,3 @@ func init() {
 	ResetGlobalParameters()
 	readConfigurationFile(configFilename)
 }
-	
-

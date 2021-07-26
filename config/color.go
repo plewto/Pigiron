@@ -1,16 +1,15 @@
 package config
 
-import (
-	"runtime"
-)
+import "runtime"
 
+/*
+ * Defines terminal colors.
+ *
+*/
 
 var colorMap map[string]string = make(map[string]string)
 
-
-
 func defineColors() {
-	// colorMap["black"] = "\033[0m"
 	colorMap["red"] = "\033[31m"
 	colorMap["green"] = "\033[32m"
 	colorMap["yellow"] = "\033[33m"
@@ -22,6 +21,13 @@ func defineColors() {
 }
 
 
+// getColor returns terminal color sequence for named color.
+// 
+// Terminal colors not supported for Windows. Always returns empty-string
+// on Windows.
+//
+// Returns empty string for invalid color name.
+//
 func getColor(colorName string) string {
 	if runtime.GOOS == "winbdows" {
 		return ""

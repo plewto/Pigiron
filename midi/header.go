@@ -1,5 +1,9 @@
-
 package midi
+
+/*
+** header.go defines MIDI file header chunk.
+**
+*/
 
 import (
 	"fmt"
@@ -7,10 +11,11 @@ import (
 	"github.com/plewto/pigiron/pigerr"
 )
 
-var (
-	headerID chunkID = [4]byte{0x4d, 0x54, 0x68, 0x64}
-)
+var headerID chunkID = [4]byte{0x4d, 0x54, 0x68, 0x64}
 
+
+// SMFheadr strut implements Chunk interface for MIDI file headers.
+//
 type SMFHeader struct {
 	format int
 	trackCount int  // NOTE: trackCount may be greater then actual track count.
@@ -21,6 +26,8 @@ func (h *SMFHeader) ID() chunkID {
 	return headerID
 }
 
+// h.Division() returns MIDI file clock division.
+//
 func (h *SMFHeader) Division() int {
 	return h.division
 }
@@ -29,6 +36,9 @@ func (h *SMFHeader) Length() int {
 	return 6
 }
 
+
+// h.Bytes() returns MIDI file header's equivalent byte sequence.
+//
 func (h *SMFHeader) Bytes() []byte {
 	var acc = make([]byte, 14)
 	for i, b := range h.ID() {
@@ -44,8 +54,8 @@ func (h *SMFHeader) Bytes() []byte {
 	return acc
 }
 
-
-
+// h.Dump() displays contents of MIDI header chunk.
+//
 func (h *SMFHeader) Dump() {
 	bytes := h.Bytes()
 	var dumpLine = func(index int, count int, tag string) {
@@ -64,7 +74,8 @@ func (h *SMFHeader) Dump() {
 }
 
 
-	
+// readSMFHeader() reads MIDI header chunk from open file.
+//
 func readSMFHeader(f *os.File) (header *SMFHeader, err error) {
 	var id chunkID
 	var length int
@@ -89,7 +100,6 @@ func readSMFHeader(f *os.File) (header *SMFHeader, err error) {
 	// DO NOT replace above lines with readRawChunk()
 	// It may not detect non-smf files and may attempt to 
 	// load huge amounts of data, freezing the application.
-	// id, data, err = readRawChunk(f)
 	//
 	if err != nil {
 		errmsg := "readSMFHeader Could not read SMF header chunk"
@@ -127,6 +137,3 @@ func readSMFHeader(f *os.File) (header *SMFHeader, err error) {
 	}
 	return
 }	
-	
-	
-	

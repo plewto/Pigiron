@@ -1,17 +1,16 @@
 package osc
 
 import (
-	"fmt"
-	"strings"
-	"os"
 	"bufio"
-	"time"
+	"fmt"
 	"io/ioutil"
-	
+	"os"
+	"strings"
+	"time"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/config"
-	"github.com/plewto/pigiron/pigpath"
 	"github.com/plewto/pigiron/piglog"
+	"github.com/plewto/pigiron/pigpath"
 	
 	
 )
@@ -41,6 +40,8 @@ func sleep(n int) {
 	time.Sleep(time.Duration(n) * time.Millisecond)
 }
 
+// Prompt() displays terminal prompt.
+//
 func Prompt() {
 	root := config.GlobalParameters.OSCServerRoot
 	fmt.Printf("\n/%s: ", root)
@@ -75,7 +76,8 @@ func parse(s string)(string, []string) {
 	return command, acc
 }
 
-
+// Eval() evaluates REPL commands
+//
 func Eval(command string, args []string) {
 	switch command {
 	case "":  // ignore blank lines
@@ -98,6 +100,18 @@ func printBatchError(filename string, err error) {
 	fmt.Printf("%s\n", err)
 }
 
+
+// BatchLoad() loads batch file.
+// A batch file is a sequence of osc commands with identical syntax to
+// interactive commands entered to the REPL.   Lines beginning with # are
+// ignored.
+//
+// The filename argument may begin with the special characters:
+//    ~/  file is relative to the user's home directory.
+//    !/  file is relative to the configuration directory.
+//
+// Returns non-nil error if the file could not be read.
+//
 func BatchLoad(filename string) error {
 	batchError = false
 	inBatchMode = true
@@ -132,7 +146,8 @@ func BatchLoad(filename string) error {
 	return err
 }
 		
-
+// REPL() enters the interactive command loop.
+//
 func REPL() {
 	for {
 		fmt.Print(config.GlobalParameters.TextColor)

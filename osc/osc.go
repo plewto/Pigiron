@@ -16,7 +16,8 @@ var (
 )
 
 
-// Must execute after config init()
+// Init() initializes the osc package.
+// Init() must not be called prior to initialization of the config package.
 //
 func Init() {
 	// Create global responders
@@ -34,25 +35,16 @@ func Init() {
 	GlobalServer = NewServer(host, port, root)
 }
 
-
+// Listen() starts OSC server.
+//
 func Listen() {
 	GlobalServer.ListenAndServe()
 }
 
-
+// Cleanup() closes OSC server.
+// Cleanup should only be called on application termination.
+//
 func Cleanup() {
 	GlobalServer.Close()
 }
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -6,6 +6,39 @@ import (
 	
 )
 
+// PigServer interface defines server-side OSC interface.
+//
+// Root() string
+//    Returns the OSC address prefix, default is '/pig'
+//
+// SetRoot(s string)
+//    Sets OSC server address prefix.
+//
+// GetResponder() Responder
+//    Returns the OSC responder.
+//
+// GetREPLResponder() Responder
+//    Returns the responder used for printing to the terminal.
+//
+// AddMsgHandler(address string, handler func(msg *go-osc.Message))
+//    Adds an OSC handler function.
+//    
+// ListenAndServe()
+//    Start server.
+//
+// IP() string
+//    Returns server IP address.
+//
+// Port() int
+//    Returns server port number.
+//
+// Close()
+//    Close the server.  Close should only be called on termination of the
+//    program.
+//
+// Commands() []string
+//    Returns list of defined OSC commands.
+//
 type PigServer interface {
 	Root() string
 	SetRoot(string)
@@ -19,6 +52,9 @@ type PigServer interface {
 	Commands() []string
 }
 
+
+// OSCServer struct implements the PigServer interface.
+//
 type OSCServer struct {
 	backingServer *goosc.Server
 	dispatcher *goosc.StandardDispatcher
@@ -31,7 +67,8 @@ type OSCServer struct {
 }
 
 
-
+// NewServer() returns a new PigServer.
+//
 func NewServer(ip string, port int, root string) PigServer {
 	server := new(OSCServer)
 	server.ip = ip
@@ -92,7 +129,10 @@ func (s *OSCServer) Close() {
 	s.backingServer.CloseConnection()
 }
 
-
+// AddHandler()  adds new OSC handler function to server s.
+// The OSC address prefix is automatically added to the command argument.
+// The command "foo" --> becomes "/pig/foo"
+// 
 func AddHandler(s PigServer, command string, handler func(*goosc.Message)([]string, error)) {
 	address := fmt.Sprintf("/%s/%s", s.Root(), command)
 	var result = func(msg *goosc.Message) {
@@ -107,5 +147,3 @@ func AddHandler(s PigServer, command string, handler func(*goosc.Message)([]stri
 	}
 	s.AddMsgHandler(address, result)
 }
-
-

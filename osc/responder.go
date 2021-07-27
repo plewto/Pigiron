@@ -9,25 +9,46 @@ import (
 	
 )
 
+// Responder interface defines how the OSC server sends responses back to the client.
+//
+// There are two possible responses: Ack and Error.
+//
+// Ack() sends an Acknowledgment that an OSC message has been received
+// without error.  As part of it's "payload" it includes the original
+// message and any requested data.
+//
+// An Error() response indicates the last received OSC message caused an
+// error.  The response includes the offending OSC message and an additional
+// error message. 
+// 
 type Responder interface {
 	Ack(sourceAddress string, args []string)
-	Error(address string, args []string, err error)
+	Error(sourceAddress string, args []string, err error)
 	String() string
 }
 
+// BasciResponder is the primary implementation of the Responder interface.
+// In addition to transmitting ACk and Error responses via OSC, it also
+// writes identical information to a temporary file.  This is useful for
+// clients which do not receive OSC.   The file is overwritten each time a
+// new OSC message is received.
+//
 type BasicResponder struct {
 	client *goosc.Client
 	root string
 	filename string
 }
 
+
+// NewBasicResponder() creates a new instance of basicResponder.
+//
 func NewBasicResponder(ip string, port int, root string, filename string) Responder {
 	client := goosc.NewClient(ip, port)
 	responder := BasicResponder{client, root, filename}
 	return &responder
 }
 
-// writeResponseFile creates a file for the most recently transmitted message.
+// r.writeResponseFile() creates a file for the most recently transmitted message.
 // If the filename field is empty or it can not be created, the write is
 // silently ignored.
 //
@@ -42,10 +63,14 @@ func (r *BasicResponder) writeResponseFile(sourceAddress string, payload string)
 	}
 }
 
+// r.send() transmits OSC message to client.
+//
 func (r *BasicResponder) send(msg *goosc.Message) {
 	r.client.Send(msg)
 }
 
+// f.Ack() transmits an Acknowledgment response to the client.
+//
 func (r *BasicResponder) Ack(sourceAddress string, args []string) {
 	address := fmt.Sprintf("/%s/ACK", r.root)
 	acc := fmt.Sprintf("ACK\n%s\n", sourceAddress)
@@ -62,6 +87,8 @@ func (r *BasicResponder) Ack(sourceAddress string, args []string) {
 	r.writeResponseFile(sourceAddress, acc)
 }
 
+// f.Error() transmits an Error response to the client.
+//
 func (r *BasicResponder) Error(sourceAddress string, args []string, err error) {
 	address := fmt.Sprintf("/%s/ERROR", r.root)
 	acc := fmt.Sprintf("ERROR\n%s\n", sourceAddress)
@@ -91,9 +118,12 @@ func (r *BasicResponder) String() string {
 }
 	
 
-
+// REPLResponder struct is a Responder which prints messages to the terminal.
+//
 type REPLResponder struct {}
 
+// NewREPLResponder() creates new instance of REPLResponder.
+//
 func NewREPLResponder() Responder {
 	return &REPLResponder{}
 }

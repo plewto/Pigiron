@@ -77,7 +77,6 @@ type Transport interface {
 //
 func initTransportHandlers(transport Transport) {
 
-
 	formatResponse := func(command string, values ...string) []string {
 		acc := make([]string, 0, len(values) + 1)
 		acc = append(acc, fmt.Sprintf("subcommand = %s.%s", transport.Name(), command))

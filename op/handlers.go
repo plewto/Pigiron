@@ -711,7 +711,8 @@ func remotePrintConfig(msg *goosc.Message)([]string, error) {
 }
 
 // remoteMIDIInsert handler for /pig/midi
-// Sends MIDI events to specific operator
+// Sends MIDI events to specific operator.
+// List of bytes can not include meta events and can not use running-status.
 // osc /pig/midi <name>, <bytes, ....>
 // osc returns ACK
 //

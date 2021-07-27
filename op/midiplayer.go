@@ -36,6 +36,7 @@ func newMIDIPlayer(name string) *MIDIPlayer {
 	op.tickDuration = midi.TickDuration(24, op.tempo)
 	op.currentTime = 0.0  // milliseconds
 	op.delayStart = 200   // milliseconds
+	op.enableMIDITransport = true
 	initTransportHandlers(op)
 	return op
 }

@@ -56,6 +56,9 @@ type ExpectValue struct {
 // The possible template characters are:
 //     s - string
 //     i - int64
+//         May prefix value with % for binary   %1100
+//         May prefix value with 0x for hex     0xff or 0XFF
+//         Otherwise assume decimal
 //     f - float64
 //     b - bool (see strconv.ParseBool for excepted values)
 //     c - MIDI channel (int 1 <= n <= 16)
@@ -90,17 +93,28 @@ func Expect(template string, values []interface{})([]ExpectValue, error) {
 		case 's':
 			acc[i].S = trim(arg.(string))
 		case 'i':
-			var s string = trim(fmt.Sprintf("%d", arg))
+			var s string = trim(fmt.Sprintf("%s", arg))
 			var n int64 = 0
-			n, err = strconv.ParseInt(s, 10, 64)
+			base := 10
+			switch {
+			case strings.HasPrefix(s, "%"):
+				s = s[1:]
+				base = 2
+			case strings.HasPrefix(strings.ToLower(s), "0x"):
+				s = s[2:]
+				base = 16
+			default:
+				base = 10
+			}
+			n, err = strconv.ParseInt(s, base, 64)
 			if err != nil {
 				msg := "Expected int at index %d, got %v"
-				err = fmt.Errorf(msg, i, arg)
+				err = fmt.Errorf(msg, i, arg, err)
 				return acc, err
 			}
 			acc[i].I = n
 		case 'f':
-			var s string = trim(fmt.Sprintf("%f", arg))
+			var s string = trim(fmt.Sprintf("%s", arg))
 			var n float64 = 0.0
 			n, err = strconv.ParseFloat(s, 64)
 			if err != nil {

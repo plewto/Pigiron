@@ -42,8 +42,12 @@ func newMIDIPlayer(name string) *MIDIPlayer {
 
 func (op *MIDIPlayer) Info() string {
 	acc := op.commonInfo()
-	acc += fmt.Sprintf("\tfilename  : \"%s\"\n", op.MediaFilename())
-	acc += fmt.Sprintf("\tIsPlaying : %v\n", op.IsPlaying())
+	acc += fmt.Sprintf("\tfilename      : \"%s\"\n", op.MediaFilename())
+	acc += fmt.Sprintf("\tIsPlaying     : %v\n", op.IsPlaying())
+	acc += fmt.Sprintf("\teventIndex    : %d\n", op.eventIndex)
+	acc += fmt.Sprintf("\tduration      : %d msec\n", op.Duration())
+	acc += fmt.Sprintf("\tposition      : %d msec\n", op.Position())
+	acc += fmt.Sprintf("\tMIDItransport : %v\n", op.enableMIDITransport)
 	return acc
 }
 	

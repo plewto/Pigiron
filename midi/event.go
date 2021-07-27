@@ -362,3 +362,75 @@ func (ue *UniversalEvent) String() string {
 	}
 	return acc
 }
+
+// BytesToEvents() converts byte slice to list of MIDI events.
+// Do not use running-status
+// 
+func BytesToEvents(bytes []byte)(events []*UniversalEvent, err error) {
+	events = make([]*UniversalEvent, 0, 8)
+	for len(bytes) > 0 {
+		st := bytes[0]
+		switch {
+		case isChannelStatus(byte(st)):
+			var event *UniversalEvent
+			var count int
+			cmd, ci := StatusByte(st & 0xF0), MIDIChannelNibble(st & 0x0F)
+			count, _ = channelStatusDataCount[cmd]
+			if len(bytes) < count + 1 {
+				errmsg := "Expected %d data bytes for %s, got %d"
+				err = fmt.Errorf(errmsg, count, StatusByte(st), count-1)
+				return
+			}
+			var d1, d2 byte = 0, 0
+			d1 = bytes[1]
+			if count == 2 {
+				d2 = bytes[2]
+				bytes = bytes[3:]
+			} else {
+				bytes = bytes[2:]
+			}
+			event, err = MakeChannelEvent(cmd, ci, d1, d2)
+			if err != nil {
+				errmsg := "BytesToEvents could not create ChannelMessage: status = 0x%X"
+				errmsg += "Original error was: %s"
+				err = fmt.Errorf(errmsg, st, err)
+				return
+			}
+			events = append(events, event)
+		case st == byte(SYSEX):
+			var event *UniversalEvent
+			var pointer = 1
+			var by byte = 0
+			for pointer < len(bytes) && by != byte(END_SYSEX) {
+				pointer++
+			}
+			data := bytes[1:pointer]
+			event, err = MakeSysExEvent(data)
+			if err != nil {
+				errmsg := "BytesToEvents could not create SysexMessage: status = 0x%X"
+				errmsg += "Original error was: %s"
+				err = fmt.Errorf(errmsg, st, err)
+				return
+			}
+			events = append(events, event)
+			bytes = bytes[pointer:]
+		case isStatusByte(st):
+			var event *UniversalEvent
+			event, err = MakeSystemEvent(StatusByte(st))
+			if err != nil {
+				errmsg := "BytesToEvents could not create System: status = 0x%X"
+				errmsg += "Original error was: %s"
+				err = fmt.Errorf(errmsg, st, err)
+				return
+			}
+			events = append(events, event)
+			bytes = bytes[1:]
+		default:
+			errmsg := "midi.ByteToEvent Unhandled switch case, status was 0x%X"
+			err = fmt.Errorf(errmsg, int(st))
+			return
+		}
+	}
+	
+	return
+}

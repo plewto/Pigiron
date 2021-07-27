@@ -56,6 +56,7 @@ func Init() {
 	osc.AddHandler(server, "q-parents", remoteQueryParents)
 	osc.AddHandler(server, "print-info", remotePrintInfo)
 	osc.AddHandler(server, "print-config", remotePrintConfig)
+	osc.AddHandler(server, "midi", remoteMIDIInsert)
 	osc.AddHandler(server, "op", dispatchExtendedCommand)
 }
 
@@ -125,8 +126,6 @@ func remoteBatchLoad(msg *goosc.Message)([]string, error) {
 	err = osc.BatchLoad(filename)
 	return empty, err
 }
-
-
 
 // remoteNewOperator() handler for /pig/new
 // Creates new Operator
@@ -209,8 +208,6 @@ func remoteDeleteOperator(msg *goosc.Message)([]string, error) {
 	return empty, err
 }
 
-
-
 // remoteReset() handler for /pig/reset-op 
 // Resets operator.
 // osc /pig/reset-op <name>
@@ -226,8 +223,6 @@ func remoteReset (msg *goosc.Message)([]string, error) {
 	return empty, err
 }
 
-
-
 // remoteResetAll() handler for /pig/reset-all
 // Resets all operators.
 // osc /pig/reset-all
@@ -240,9 +235,6 @@ func remoteResetAll(msg *goosc.Message)([]string, error) {
 	}
 	return empty, err
 }
-
-
-
 
 // remoteEnableMIDI() handler for /pig/enable-midi
 // Enables/disables operator MIDI output.
@@ -261,8 +253,6 @@ func remoteEnableMIDI(msg *goosc.Message)([]string, error) {
 	return rs, err
 	return empty, err
 }
-
-
 
 // remoteQueryMIDIEnabled() handler for /pig/q-midi-enabled
 // Gets state of operator midi-enabled flag.
@@ -720,9 +710,43 @@ func remotePrintConfig(msg *goosc.Message)([]string, error) {
 	return empty, err
 }
 
-// osc  /pig/op  [name, command, arguments...]
+// remoteMIDIInsert handler for /pig/midi
+// Sends MIDI events to specific operator
+// osc /pig/midi <name>, <bytes, ....>
+// osc returns ACK
 //
-
+func remoteMIDIInsert(msg *goosc.Message)([]string, error) {
+	template := "o"
+	for i := 0; i < len(msg.Arguments)-1; i++ {
+		template += "i"
+	}
+	args, err := ExpectMsg(template, msg)
+	if err != nil {
+		fmt.Printf("ERROR: %s\n", err)
+		return empty, err
+	}
+	op := args[0].O
+	bargs := args[1:]
+	bytes := make([]byte, len(bargs))
+	for i := 0; i < len(bargs); i++ {
+		bytes[i] = byte(bargs[i].I)
+	}
+	var events []*midi.UniversalEvent
+	events, err = midi.BytesToEvents(bytes)
+	if err != nil {
+		return empty, err
+	}
+	for _, event := range events {
+		if !event.IsMetaEvent() {
+			op.Send(event.PortmidiEvent())
+		}
+	}
+	return empty, err
+}
+				
+	
+	
+	
 
 
 // dispatchExtendedCommand() handler for /pig/op

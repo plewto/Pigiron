@@ -1,0 +1,23 @@
+Command     new op-type, name
+OSC         /pig/new op-type, name
+
+Creates new operator of given type and name.
+Use the q-operator-type command for a list of available types.
+
+A slightly different syntax is used for creating MIDIInput and
+MIDIOutput operators:
+
+            new MIDIInput, name, device
+	    new MIDIOutput, name, device
+
+Use the q-midi-inputs and q-midi-output commands for a list of MIDI
+devices.  The device may be specified either by its integer position in the
+list or by a unique sub-string of it's name.
+
+
+Operator names must be unique. If the specified name is already in use it
+will be modified so that it is unique.
+
+
+OSC Returns: ACK The actual operator name.
+             ERROR if op-type invalid or device invalid

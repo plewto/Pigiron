@@ -1,0 +1,12 @@
+Command     q-channel-mode name
+OSC         /pig/q-channel-mode name
+
+Returns the MIDI channel selection mode of named operator.
+There are three possible values:
+
+    NoChannel     - No channel selection.
+    SingleChannel - One, and only one, channel is selected at any time.
+    MultiChannel  - Any number of channels may be selected simultaneously.
+
+OSC Return: ACK the channel mode.
+            ERROR if operator does not exist.

@@ -1,0 +1,6 @@
+Command     print-config
+OSC         /pig/print-config
+
+Prints configuration values.
+
+OSC Return: ACK

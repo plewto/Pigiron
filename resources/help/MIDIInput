@@ -1,0 +1,18 @@
+Operator MIDIInput
+
+MIDIInput is an Operator wrapper for a MIDI Input device.
+
+There may only be a single MIDIInput operator for a given MIDI device.   If
+an attempt is made to create a  MIDIInput for a device already in use, the
+original MIDIInput operator is returned.
+
+
+Sub-Commands
+
+Command     op name, q-device
+OSC         /pig/op name, q-device
+
+Gets name of MIDI device.
+
+OSC Return: ACK: MIDI device name.
+

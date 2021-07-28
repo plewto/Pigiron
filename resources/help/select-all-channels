@@ -1,0 +1,7 @@
+Command     select-all-channels name
+OSC         /pig/select-all-channels name
+
+Enable all MIDI channels for named operator.
+
+OSC Return: ACK
+            ERROR if operator does not exists.

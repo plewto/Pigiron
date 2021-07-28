@@ -1,0 +1,13 @@
+Command     batch filename
+OSC         /pig/batch filename
+
+Loads filename as an OSC batch file.
+Within the file commands are listed in sequence.
+Lines beginning with # are ignored.
+
+The filename prefix may indicate one of two special directories:
+
+~/filename is relative to the user's home directory.
+!/filename is relative to the configuration directory.
+
+

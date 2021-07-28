@@ -1,0 +1,8 @@
+Command     enable-midi name, bool
+OSC         /pig/enable-midi name, bool
+
+Enables/disable MIDI output for named operator.
+
+OSC Return: ACK
+            ERROR if operator does not exists, or bool not valid
+	          Boolean value.

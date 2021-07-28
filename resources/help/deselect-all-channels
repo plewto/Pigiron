@@ -1,0 +1,8 @@
+Command     deselect-all-channels name
+OSC         /pig/deselect-all-channels name
+
+Disables all MIDI channels for named operator.
+For single mode operators, channel 1 will be selected.
+
+OSC Return: ACk
+            ERROR if operator does not exists.

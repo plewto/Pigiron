@@ -1,0 +1,8 @@
+Command     del-op  name
+OSC         /pig/del-op name
+
+Deletes the named operator.
+
+OSC Returns: ACK if operator was deleted.
+             ERROR if operator name does not exists.
+	    

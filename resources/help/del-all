@@ -1,0 +1,8 @@
+Command     del-all
+OSC         /pig/del-all
+
+Deletes all operators.
+
+OSC returns: ACK.
+
+	    

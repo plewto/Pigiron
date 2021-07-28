@@ -1,0 +1,8 @@
+Operator type Monitor
+
+A Monitor is an Operator which displays MIDI traffic to the terminal.
+
+
+Sub-Commands:
+
+None

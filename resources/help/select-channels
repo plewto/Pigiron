@@ -1,0 +1,7 @@
+Command     select-channels name, chan1 [,chan2, chan3, ....] 
+OSC         /pig/select-channels name, chan1 [,chan2, chan3, ....] 
+
+Selects listed MIDI channels as enabled for named operator
+
+OSC Return: ACK list of enabled channel
+            ERROR if operator does not exists or MIDI channel is invalid.

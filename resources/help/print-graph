@@ -1,0 +1,6 @@
+Command     print-graph
+OSC         /pig/print-graph
+
+Prints graphic representation of the MIDI process tree to the terminal.
+
+OSC Return: ACK

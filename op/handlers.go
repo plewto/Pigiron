@@ -13,6 +13,7 @@ import (
 	"github.com/plewto/pigiron/osc"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
+	"github.com/plewto/pigiron/help"
 )
 
 var empty []string
@@ -58,6 +59,7 @@ func Init() {
 	osc.AddHandler(server, "print-config", remotePrintConfig)
 	osc.AddHandler(server, "midi", remoteMIDIInsert)
 	osc.AddHandler(server, "op", dispatchExtendedCommand)
+	osc.AddHandler(server, "help", remoteHelp)
 }
 
 // remotePing() handler for /pig/ping
@@ -747,10 +749,6 @@ func remoteMIDIInsert(msg *goosc.Message)([]string, error) {
 }
 				
 	
-	
-	
-
-
 // dispatchExtendedCommand() handler for /pig/op
 // Sends command to specific operator.  The general form is
 // osc /pig/op <name>, <sub-command>  <,argument-1, argument-2, ..., argument-n>
@@ -766,3 +764,19 @@ func dispatchExtendedCommand(msg *goosc.Message)([]string, error) {
 	result, rerr := op.DispatchCommand(command, msg)
 	return result, rerr
 }
+
+func remoteHelp(msg *goosc.Message)([]string, error) {
+	args, err := ExpectMsg("s", msg)
+	if err != nil {
+		return empty, err
+	}
+	var topic = args[0].S
+	var text = ""
+	text, err = help.Help(topic)
+	if err != nil {
+		return empty, err
+	}
+	text = fmt.Sprintf("\n\n%s", text)
+	return []string{text}, err
+}
+		

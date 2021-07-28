@@ -1,0 +1,13 @@
+Command     op name, sub-command [,arguments ...]
+OSC         /pig/op name, sub-command [,arguments ...]
+
+Sends sub-command to named operator.
+
+Syntax note: All values to the right of 'op' are argument to op and
+must be separated by commas.
+
+The avaliable sub-commands depends on the specific operator type.  For
+operator-type Foo, use 'help Foo' for details.
+
+
+OSC Return: Is depended on specific sub-command

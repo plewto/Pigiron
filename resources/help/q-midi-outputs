@@ -1,0 +1,4 @@
+Command     q-midi-outputs
+OSC         /pig/q-midi-outputs
+
+OSC Returns: list of MIDI output devices.

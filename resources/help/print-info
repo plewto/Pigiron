@@ -1,0 +1,7 @@
+Command     print-info name
+OSC         /pig/print-info name
+
+Prints information about named operator.
+
+OSC Return: ACK
+            ERROR if operator does not exists.

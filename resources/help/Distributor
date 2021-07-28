@@ -1,0 +1,13 @@
+Operator Distributor
+
+A Distributor is an Operator which re-channelizes incoming MIDI messages.
+
+Multiple output channels may be selected simultaneously.  The message
+(regardless of it's original channel) is re-broadcast on each of the
+selected output channels.  Non-channel messages are always passed
+unaltered.
+
+
+Sub-Commands:
+
+None

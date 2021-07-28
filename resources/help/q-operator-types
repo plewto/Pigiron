@@ -1,0 +1,6 @@
+Command     q-operator-types
+OSC         /pig/q-operator-types
+
+List available operator types.
+
+OSC Return: ACK list of operator types.

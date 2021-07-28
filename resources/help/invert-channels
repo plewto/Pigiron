@@ -1,0 +1,8 @@
+Command     invert-channels name
+OSC         /pig/invert-channels name
+
+Invert MIDI channel selection for named operator.
+Has no effect foe single channel operators.
+
+OSC Return: ACK list of selected channels
+            ERROR if operator does not exists.

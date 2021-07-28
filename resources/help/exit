@@ -1,0 +1,6 @@
+Command     exit
+OSC         /pig/exit
+
+Terminates Pigiron
+
+OSC Returns: ACK

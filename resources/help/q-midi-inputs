@@ -1,0 +1,4 @@
+Command     q-midi-inputs
+OSC         /pig/q-midi-inputs
+
+OSC Returns: list of MIDI input devices.

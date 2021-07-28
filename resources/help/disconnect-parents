@@ -1,0 +1,7 @@
+Command     disconnect-parents child
+OSC         /pig/disconnect-parents child
+
+Disconnects all parents to child operator.
+
+OSC Return: ACK
+            ERROR if child operator does not exists.

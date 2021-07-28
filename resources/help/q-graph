@@ -1,0 +1,6 @@
+Command     q-graph
+OSC         /pig/q-graph
+
+Prints set of oerpator connections.
+
+OSC Return: ACK list of operator connections.

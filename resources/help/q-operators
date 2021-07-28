@@ -1,0 +1,6 @@
+Command     q-operators
+OSC         /pig/q-operators
+
+Prints list of active operators.
+
+OSC Return: ACK list of operators.

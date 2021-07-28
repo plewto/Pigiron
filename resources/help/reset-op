@@ -1,0 +1,7 @@
+Command     reset-op name
+OSC         /pig/reset-op name
+
+Resets named operator
+
+OSC Return: ACK
+            ERROR if operator does not exists.

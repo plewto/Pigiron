@@ -1,0 +1,7 @@
+Command     q-midi-enabled name
+OSC         /pig/q-midi-enabled name
+
+Checks if MIDI is enabled for named operator.
+
+OSC Return: ACK bool
+            ERROR if operator does not exists.

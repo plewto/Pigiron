@@ -1,0 +1,107 @@
+Operator MIDIPlayer
+
+MIDIPlayer is an Operator for playing MIDI Files.
+
+
+Currently only MIDI file format 0 (single track) is supported.  For format 1
+(multi-track) files, only the first track is played.  Format 2 (multi-song)
+files are rare and not support.
+
+Sub-Commands
+
+
+Command     op name, stop
+OSC         /pig/op name, stop
+
+Halts playback.
+
+OSC Return: ACK
+
+------------------------------------------------------------
+
+Command     op name, play
+OSC         /pig/op name, play
+
+Starts playback from beginning.
+
+OSC Return: ACK
+            ERROR if no MIDI file has been loaded.
+
+------------------------------------------------------------
+
+
+Command     op name, continue
+OSC         /pig/op name, continue
+
+Continue playback from current location.
+
+OSC Return: ACK
+            ERROR if no MIDI file has been loaded.
+
+------------------------------------------------------------
+
+Command     op name, load, filename
+OSC         /pig/op name, load, filename
+
+Load named MIDI file.
+Filename may  be prefixed with ~/ for home directory or !/ for
+configuration directory.
+
+OSC Return: ACK the absolute filename.
+            ERROR if file could not be read as a MIDI file.
+
+------------------------------------------------------------
+
+Command     op name, enable-midi-transport, bool
+OSC         /pig/op name, enable-midi-transport, bool
+
+Sets whether the player responds to MIDI stop, play and continue messages.  
+
+OSC Return: ACK
+            ERROR if bool is not valid Boolean value.
+
+------------------------------------------------------------
+
+Command     op name, q-midi-transport-enabled
+OSC         /pig/op name, q-midi-transport-enabled
+
+Checks if MIDI transport mode is enabled.
+
+OSC Return: ACK bool
+
+------------------------------------------------------------
+
+Command     op name, q-is-playing
+OSC         /pig/op name, q-is-playing
+
+Checks if playback is currently in progress.
+
+OSC Return: ACK bool.
+
+------------------------------------------------------------
+
+Command     op name, q-duration
+OSC         /pig/op name, q-duration
+
+Gets approximate duration of media in milliseconds.
+
+OSC Return: ACK duration in milliseconds.
+
+------------------------------------------------------------
+
+Command     op name, q-position
+OSC         /pig/op name, q-position
+
+Gets current playback position in milliseconds.
+
+OSC Return: ACK position in milliseconds.
+
+------------------------------------------------------------
+
+Command     op name, q-media-filename
+OSC         /pig/op name, q-media-filename
+
+Gets absolute filename for MIDI file
+
+OSC Return: ACK filename.
+

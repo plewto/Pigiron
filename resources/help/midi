@@ -1,0 +1,15 @@
+Command     midi name, byte1, byte2, ..., byteN
+OSC         /pig/midi name, byte1, byte2, ..., byteN
+
+Sends MIDI messages to named operator.
+
+The messages are specified as a list of bytes and more then one message may
+be sent.   Numeric values may be expressed in decimal (default), binary or
+hex.   Binary values are indicated by the prefix %, as in %1001.  Hex
+values have the prefix 0x, as in 0xFF.
+
+For System exclusive messages the byte sequence must terminate with
+end-of-exclusive status 0xF7.
+
+OSC Return: ACK
+            ERROR if operator does not exists or MIDI data invalid.

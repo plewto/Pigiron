@@ -1,0 +1,7 @@
+Command     deselect-channels name, chan1 [,chan2, chan3, ...]
+OSC         /pig/deselect-channels name, chan1 [,chan2, chan3, ...]
+
+Disables all listed MIDI channels for named operator
+
+OSC Return: ACK list of enabled MIDI channels.
+            ERROR if operator does not exists or MIDI channel invalid.

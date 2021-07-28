@@ -1,0 +1,6 @@
+Command     q-commands
+OSC         /pig/q-commands
+
+Prints list of commands.
+
+OSC Return: ACK list of commands.

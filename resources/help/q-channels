@@ -1,0 +1,7 @@
+Command     q-channels name
+OSC         /pig/q-channels name
+
+Returns list of active MIDI channels for named operator
+
+OSC Return: ACK list of MIDI channels
+            ERROR of operator does not exists.

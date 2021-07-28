@@ -1,0 +1,6 @@
+Command     q-roots
+OSC         /pig/q-roots
+
+Prints list of all root operators.
+
+OSC Return: ACK list of root operators.

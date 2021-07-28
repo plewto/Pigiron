@@ -1,0 +1,6 @@
+Command     reset-all
+OSC         /pig/reset-all
+
+Resets all operators.
+
+OSC Return: ACK

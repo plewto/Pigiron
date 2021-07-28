@@ -1,0 +1,7 @@
+Command     q-parents name
+OSC         /pig/q-parents name
+
+Prints list of all parents for named operator.
+
+OSC Return: ACK list of parents
+            ERROR if operator does not exists.

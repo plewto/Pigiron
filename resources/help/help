@@ -1,0 +1,8 @@
+Command     help topic
+OSC         /pig/help topic
+
+Displays help for named topic.
+Use 'help topics' for list of available topics
+
+OSC Return: ACK help text.
+            ERROR if topic does not exists.

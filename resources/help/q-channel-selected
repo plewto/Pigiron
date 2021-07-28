@@ -1,0 +1,7 @@
+Command     q-channel-selected name channel
+OSC         /pig/q-channel-selected name channel
+
+Checks if specific MIDI channel is enabled for named operator.
+
+OSC Return: ACK bool
+            ERROR if operator does not exists.

@@ -1,0 +1,14 @@
+Command     connect op1, op2 [, op3, ..., opn]
+OSC         /pig/connect op1, op2 [, op3, ..., opn]
+
+Connects named operators  op1 --> op2.
+If additional operators are specified they are connected in sequence.
+op1 --> op2 --> op3 --> ... --> opn
+
+It is not an error to connect operators which are already connected.
+
+OSC returns: ACK if the connections where successful.
+             ERROR if the max tree depth is exceeded or if a circular tree
+                   would have been created. 
+
+	    

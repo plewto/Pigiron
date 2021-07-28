@@ -1,0 +1,24 @@
+Operator ChannelFilter
+
+
+A ChannelFilter is an Operator which selectively blocks/passes MIDI
+messages based on channel.  Any number of channels may be selected
+simultaneously.  Separately non-channel messages my be blocked.
+
+
+Sub-Commands:
+
+Command     op name, enable-system-events, bool
+OSC         /pig/op name, enable-system-events, bool
+
+Enables/disables filtering of MIDI system messages for named ChannelFilter
+
+OSC Return: AKC
+
+-----------------------------------------------------
+
+Command     op name, q-system-events-enabled
+OSC         /pig/op name, q-system-events-enabled
+
+OSC Return: AKC bool false if MIDI system messages are filtered.
+

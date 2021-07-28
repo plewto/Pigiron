@@ -1,0 +1,7 @@
+Command     ping
+OSC         /pig/ping
+
+Diagnostic to check OSC connectivity.
+Prints the word 'ping' to terminal
+
+OSC Returns:  ACK

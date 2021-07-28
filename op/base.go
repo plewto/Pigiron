@@ -15,6 +15,14 @@ import (
 	"github.com/plewto/pigiron/config"
 )
 
+const (
+	TEE = '├'
+	HBAR = '─'
+	VBAR = '│'
+	ELBOW = '└'
+	SPACE = ' '
+)
+
 // baseOperator struct implements the Operator interface.
 // All Operator classes should extend baseOperator.
 //
@@ -148,31 +156,30 @@ func (op *baseOperator) IsLeaf() bool {
 	return len(op.childrenMap) == 0
 }
 
-// op.printTree() recursively displays the structure of the MIDI process tree.
-//
-func (op *baseOperator) printTree(depth int) {
-	switch {
-		case depth > int(config.GlobalParameters.MaxTreeDepth):
-		fmt.Printf("ERROR: MaxTreeDepth exceeded: %d\n", config.GlobalParameters.MaxTreeDepth)
-		return 
-	case depth == 0:
-		fmt.Printf("%s\n", op.Name())
-	default:
-		pad := ""
-		for i := 0; i <= depth; i++ {
-			pad += "  "
-		}
-		fmt.Printf(" %s%s\n", pad, op.name)
+
+func printTree(op Operator, depth int) {
+	if int64(depth) > config.GlobalParameters.MaxTreeDepth {
+		return
 	}
-	for _, child := range op.childrenMap {
-		child.printTree(depth + 1)
+	if depth == 0 {
+		fmt.Printf("%s\n", op.Name())
+	} else {
+		pad := ""
+		for i := 0; i < depth; i++ {
+			pad += "   "
+		}
+		fmt.Printf("%s%s\n", pad, op.Name())
+	}
+	for _, child := range op.Children() {
+		printTree(child, depth+1)
 	}
 }
+
 
 // op.PrintTree() prints the structure of the MIDI process tree.
 //
 func (op *baseOperator) PrintTree() {
-	op.printTree(0)
+	printTree(op, 0)
 }
 
 

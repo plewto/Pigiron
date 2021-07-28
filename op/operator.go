@@ -32,7 +32,6 @@ type Operator interface {
 	// Node
 	IsRoot() bool
 	IsLeaf() bool
-	printTree(depth int)
 	PrintTree()
 	parents() map[string]Operator
 	Parents() map[string]Operator

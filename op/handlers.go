@@ -594,6 +594,7 @@ func remotePrintGraph(msg *goosc.Message)([]string, error) {
 	var err error
 	for _, op := range RootOperators() {
 		op.PrintTree()
+		fmt.Println()
 	}
 	return empty, err
 }

@@ -4,7 +4,7 @@
 #
 
 [log]
-	enable = false       # NOTE: Not currently being read
+	enable = false
 	logfile = "!/log"
 
 [osc-server]

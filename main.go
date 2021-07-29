@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	//"time"
+	"time"
 	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/osc"
 	"github.com/plewto/pigiron/midi"
@@ -67,11 +67,13 @@ func main() {
 	go osc.REPL()
 	fmt.Println()
 	// main loop
+	var pollInterval = time.Duration(config.GlobalParameters.MIDIInputPollInterval)
 	for { 
 		if osc.Exit {
 			Exit()
 		}
 		op.ProcessInputs()
+		time.Sleep(pollInterval * time.Millisecond)
 	}
 }
 

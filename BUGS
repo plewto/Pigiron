@@ -14,10 +14,12 @@ BUG 002 21-June-2021 Closed
     Replaced with named colors.
     
 ---------------------------------------------------------------------- 003
-BUG 003 21-June-2021 Open
+BUG 003 21-June-2021 Closed
      Reading batch file from command line causes segmentation fault.
      Feature is temporarily disabled.
 
+     Closed, changed so that batch file was loaded after REPL go-routine
+     had started. 
 
 ---------------------------------------------------------------------- 004
 BOG 004 12-July-2021 Open

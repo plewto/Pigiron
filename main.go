@@ -60,11 +60,14 @@ func main() {
 	osc.Init()
 	op.Init()
 	osc.Listen()
-	if config.BatchFilename != "" {  
-		// osc.LoadBatchFile(config.BatchFilename) // BUG 003 -- do not use --
-		fmt.Println("BUG 003, command line batch file is disabled.")
-	}
 	go osc.REPL()
+	if config.BatchFilename != "" {  
+		err := osc.BatchLoad(config.BatchFilename)
+		if err != nil {
+			fmt.Printf("Could not load batch file %s\n", config.BatchFilename)
+			fmt.Printf("%s\n", err)
+		}
+	}
 	fmt.Println()
 	// main loop
 	var pollInterval = time.Duration(config.GlobalParameters.MIDIInputPollInterval)

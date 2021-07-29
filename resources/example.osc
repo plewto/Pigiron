@@ -1,9 +1,19 @@
-# example.osc
+# Example Pigiron batch file.
 #
+# Commands have the general form:
+#
+#   command arg-1, arg-2, ..., arg-n
+#
+# The command 'q-commands' displays a list of avaliabl commands,
+# while 'help command' displays a help text for a specific command.
+# Help is itself a command so that 'help help' is valid.
 
-new MIDIInput, in, Arturia
-new MIDIPlayer, player
-new Monitor, mon
-new MIDIOutput, out, Xmidi
-connect in, player, mon, out
+# The 'new' command is used to create new operators.
+#
+#     syntax:  new operator-type, name
+
+new ChannelFilter, filter  # creates a ChannelFilter with name filter.
+
+
+
 

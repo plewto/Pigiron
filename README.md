@@ -1,8 +1,57 @@
 # Pigiron README
 
+Pigiron is a fully configurable MIDI routing utility with integrated MIDI
+file player and comprehensive OSC interface.  It provides a series of
+*Operators* which may be freely linked to form a *MIDI process tree*.  Each
+Operator may have any number of MIDI inputs and outputs.  Currently the
+following Operator types are available:
 
-## Requirements
-portmidi
+- MIDIInput - wrapper for MIDI input device.
+- MIDIOutput - wrapper for MIDI output device.
+- ChannelFilter - filter events by MIDI channel.
+- Distributor - transmit events over several MIDI channels.
+- MIDIPlayer - MIDI file player.
+- Monitor - print incoming MIDI messages.
+
+
+There are three distinct ways to interact with Pigiron.
+
+1. Remotely via OSC messages.
+2. Manually enter commands at terminal prompt.
+3. Load a batch file of commands.
+
+
+The command syntax for these modes are nearly identical.  The only real
+difference is that the command 'foo' at the terminal prompt and in a batch
+file is entered directly, while as an OSC message it is prefixed with the
+application OSC id (by default /pig/).
+
+	foo        command at terminal or in batch file.
+	/pig/foo   as OSC message.
+	
+
+## Getting help
+
+On startup Pigiron displays a command prompt (by default /pig: ).   For a
+list of help topics enter
+
+	/pig:  help topics
+	
+For a list of commands enter
+
+	/pig: q-commands
+	
+In general commands which begin with 'q-' (q for query) returns some
+information.  
+
+The resources directory contains the batch file 'example.osc'
+which sets up a basic MIDI process.   
+
+
+## Dependencies
+	github.com/pelletier/go-toml
+	github.com/rakyll/portmidi
+    github.com/hypebeast/go-osc
 
 
 ## Installation

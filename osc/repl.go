@@ -3,22 +3,21 @@ package osc
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"time"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/piglog"
-	"github.com/plewto/pigiron/pigpath"
-	
-	
+)
+
+const (
+	COMMENT = "#"
 )
 
 var (
 	internalClient *goosc.Client
 	reader *bufio.Reader
-
 	// if true exit batch mode
 	batchError bool = false
 
@@ -67,6 +66,7 @@ func splitCommand(s string)(string, string) {
 	
 
 func parse(s string)(string, []string) {
+	s = strings.Split(s, COMMENT)[0]
 	command, rawArgs := splitCommand(s)
 	acc := make([]string, 0, len(rawArgs))
 	for _, a := range strings.Split(rawArgs, ",") {
@@ -94,57 +94,10 @@ func Eval(command string, args []string) {
 }
 
 
-func printBatchError(filename string, err error) {
-	fmt.Print(config.GlobalParameters.ErrorColor)
-	fmt.Printf("Can not read batch file '%s'\n", filename)
-	fmt.Printf("%s\n", err)
-}
 
 
-// BatchLoad() loads batch file.
-// A batch file is a sequence of osc commands with identical syntax to
-// interactive commands entered to the REPL.   Lines beginning with # are
-// ignored.
-//
-// The filename argument may begin with the special characters:
-//    ~/  file is relative to the user's home directory.
-//    !/  file is relative to the configuration directory.
-//
-// Returns non-nil error if the file could not be read.
-//
-func BatchLoad(filename string) error {
-	batchError = false
-	inBatchMode = true
-	filename = pigpath.SubSpecialDirectories(filename)
-	file, err := os.Open(filename)
-	if err != nil {
-		printBatchError(filename, err)
-		inBatchMode = false
-		return err
-	}
-	defer file.Close()
-	raw, err := ioutil.ReadAll(file)
-	if err != nil {
-		printBatchError(filename, err)
-		inBatchMode = false
-		return err
-	}
-	fmt.Printf("Loading batch file  '%s'\n", filename)
-	lines := strings.Split(string(raw), "\n")
-	for i, line := range lines {
-		fmt.Printf("Batch [%3d]  %s\n", i+1, line)
-		piglog.Log(fmt.Sprintf("BATCH: [line %3d] %s", i, line))
-		command, args := parse(line)
-		Eval(command, args)
-		sleep(10)
-		if batchError {
-			break
-		}
-	}
-	batchError = false
-	inBatchMode = false
-	return err
-}
+
+
 		
 // REPL() enters the interactive command loop.
 //

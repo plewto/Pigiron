@@ -66,10 +66,12 @@ func main() {
 	}
 	go osc.REPL()
 	fmt.Println()
-	for { // main loop
+	// main loop
+	for { 
 		if osc.Exit {
 			Exit()
 		}
+		op.ProcessInputs()
 	}
 }
 

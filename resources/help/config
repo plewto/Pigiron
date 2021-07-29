@@ -1,0 +1,64 @@
+Pigiron configuration
+
+On startup Pigiron attempts to read a default configuration file located at:
+
+Linux:   : ~/.config/pigiron/config.toml
+OSX      : To be determined
+Windows  : To be determined
+
+An alternate file may be specified by the --config command line option.
+
+If a configuration file can not be loaded reasonable defaults will be
+selected.  Enter the command 'print-config' to see the current configuration
+values.
+
+
+The config file is in TOML (https://en.wikipedia.org/wiki/TOML) format with
+a typical example below:
+
+[000] : # Pigiron configuration          # -> comment
+[001] : #
+[002] : 
+[003] : [log]
+[004] : 	enable = false           # enable logging 
+[005] : 	logfile = "!/log"        # log output file. See below
+[006] : 
+[007] : [osc-server]                                
+[008] : 	root = "pig"             # OSC address prefix
+[009] : 	host = "127.0.0.1"
+[010] : 	port = 8020
+[011] : 
+[012] : [osc-client]
+[013] : 	root = "pig-client"      
+[014] : 	host = "127.0.0.1"
+[015] : 	port = 8021
+[016] : 	file = "/home/sj/t/foo"  # Alternate file for OSC responses
+[017] : 
+[018] : [tree]                         
+[019] : 	max-depth = 12           # Maximum number of operators
+[020] :                                  # between a root and final leaf.
+[021] : [midi-input]
+[022] : 	buffer-size = 1024       # portmidi device parameter              
+[023] : 	poll-interval = 0        # MIDI input polling interval in msec 
+[024] : 
+[025] : [midi-output]
+[026] : 	buffer-size = 1024       # portmidi device parameter
+[027] : 	latency = 0              # portmidi device parameter
+[028] :          
+[029] : 
+[030] : # Named terminal colors may be:
+[031] : #   red, green, yellow, blue, purple, cyan, gray and white
+[032] : #   Terminal colors are not available on Windows.
+[033] : 
+[034] : [colors]
+[035] : 	banner = "green"
+[036] : 	text = "gray"
+[037] : 	error = "yellow"
+
+In general filenames throughout Pigiron may be prefixed with one of two
+special directories:
+
+~/  as in ~/foo  indicates the file is relative to the user's home directory.
+!/  as in !/foo  indicates the file is relative to the pigiron
+    configuration directory.
+

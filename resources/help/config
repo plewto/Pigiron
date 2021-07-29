@@ -60,5 +60,5 @@ special directories:
 
 ~/  as in ~/foo  indicates the file is relative to the user's home directory.
 !/  as in !/foo  indicates the file is relative to the pigiron
-    configuration directory.
+    configuration directory.  
 

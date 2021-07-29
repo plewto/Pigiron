@@ -49,7 +49,6 @@ func parseCommandLine() {
 	// config filename
 	defaultFile := filepath.Join(configDir, "pigiron", "config.toml")
 	flag.StringVar(&configFilename, "config", defaultFile, "Sets configuration file.")
-	configFilename = pigpath.SubSpecialDirectories(configFilename)
 	// batch filename
 	defaultFile = ""
 	flag.StringVar(&BatchFilename, "batch", defaultFile, "Sets initial OSC batch file.")
@@ -142,6 +141,7 @@ func readBool(path string, fallback bool) bool {
 //
 func readConfigurationFile(filename string) {
 	var err error
+	filename = pigpath.SubSpecialDirectories(filename)
 	tomlTree, err = toml.LoadFile(filename)
 	if err != nil {
 		fmt.Printf("ERROR: Can not open configuration file: '%s'\n", filename)

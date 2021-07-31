@@ -1,0 +1,55 @@
+Pigiron OSC
+
+For the purpose of OSC communication Pigiron functions as a server.
+Applications sending OSC messages to Pigiron are the clients.   Important
+values for the server and client are established at startup by the
+configuration file and can not be changed.
+
+The command line REPL and batch file processing constitutes an additional
+internal client.
+
+When the server receives an OSC message, it is dispatched to a handler
+function for that specific message.  The result of the handler is then sent
+back to -all- clients.
+
+There are two general responses:
+
+   1. ACK (acknowledge)  - the message was handled without error.
+   2. ERROR
+
+Both ACK and ERROR responses include a list of strings.  The first element
+of the list is the OSC address of the original message.  The remaining
+elements for an ACK response are any requested values.  It is up to the
+client to convert numeric and Boolean values from strings to the
+appropriate types.  For an ERROR response the remaining values are the error
+message.
+
+
+If the configuration value OSCClientFilename is a non-empty string, the
+contents of the OSC response is sent to that file.   The file is
+overwritten with each received message.   This file allows clients which 
+transmit, but not receive, OSC messages to check the response to a
+message.   Sending the responses to this temp file is in parallel to
+transmitting the OSC response.
+
+
+By default the server's OSC addresses have the prefix /pig.  The default
+client prefix is /pig-client.   The message /pig/ping is a diagnostic used
+to test communication between the client and server.   The following
+sequence of events should occur when the client transmits /pig/ping.
+
+
+1. client sends OSC message /pig/ping
+2. server responds with the OSC message /pig-client/ACK,  /pig/ping
+3. server writes similar content to the temp response file.
+4. server sends a response to the internal client and it prints it to the
+   terminal.
+
+An identical sequence of events occurs when the original message comes from
+the command line or a batch file.   The only difference is that for
+internal messages the '/pig' prefix is automatically added, the prefix
+should not be included when manually entering commands are in a batch
+file.
+
+If a received message produces an error, the same sequence of responses
+occurs except the ACK message is replaced with ERROR.

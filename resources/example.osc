@@ -1,19 +1,128 @@
-# Example Pigiron batch file.
+# Example batch file creates the following process tree.
+#
+#  MIDIInput -> ChannelFilter -> Distributor -+-> Monitor -> MIDIOutput
+#                                             |
+#                               MIDIPlayer ---+
 #
 # Commands have the general form:
 #
 #   command arg-1, arg-2, ..., arg-n
 #
-# The command 'q-commands' displays a list of avaliabl commands,
-# while 'help command' displays a help text for a specific command.
-# Help is itself a command so that 'help help' is valid.
-
-# The 'new' command is used to create new operators.
+# The command 'q-commands' displays a list of available commands,
+# while the help command displays a help text for a specific command.
+# 'help topics' displays a list of available topics.
+#
+#
+# The 'new' command creates new operators.
 #
 #     syntax:  new operator-type, name
+#
 
-new ChannelFilter, filter  # creates a ChannelFilter with name filter.
+# An Operator's name must be unique.  If the name argument is already in
+# use, it will be modified such that it is unique.  The modification adds a
+# numeric index to the original name, such as converting 'foo' to 'foo.1'.
+# The new command returns the actual Operator name.
+
+new ChannelFilter, filter  # creates a ChannelFilter named 'filter'.
 
 
+# For the MIDIInput and MIDIOutput Operators the new command has a slightly
+# different syntax.
+#
+#    new MIDIInput, name, device
+#    new MIDIOutput, name, device
+#
+# Where device is the backing MIDI device.  It may either be an integer
+# index or a sub-string of the device's name.
+#
+# The q-midi-inputs and q-midi-outputs commands displays a list of
+# available MIDI devices.  On the system this is being written on
+# q-midi-inputs returns:
+#
+#	[ 0] "Midi Through Port-0" 
+#	[ 1] "E-MU Xmidi 2x2 MIDI 1" 
+#	[ 2] "E-MU Xmidi 2x2 MIDI 2" 
+#	[ 3] "Arturia MiniLab mkII MIDI 1"
+#
+# The device at index 1 may be specified by either the number 1 or by a
+# sub-string of it's name.  If the sub-string matches more then
+# one device, the first matching device is used. 
+#
+
+new MIDIInput, in, 1               # device by index
+new MIDIOutput, out, MIDI 2        # device by sub-string
 
 
+# Create remaining Operators
+#
+
+new MIDIPlayer, player
+new Distributor, distributor
+new Monitor, monitor
+
+# The connect command makes non-branching connections between operators. At
+# a minimum it takes two operator arguments but may make any number of
+# additional connections:
+#
+#    connect a, b, c, ...         # a -> b -> c -> ...
+#
+
+connect in, filter, distributor, monitor, out
+
+# Since the MIDI player is on a branch, a separate connect command is
+# required.
+
+connect player, monitor
+
+
+# *** WARNING ***
+#
+# If this batch file was loaded twice, all of the new operator names will
+# be modified to avoid conflict with the those created the first time.  For
+# example, the name of the new ChannelFilter will be 'channel.1', not the
+# specified name of 'channel'.  When the connect commands are re-executed,
+# they will simply reconnect the original operators.  To avoid this the
+# original operators should be deleted first with the 'del-all' command.
+
+# Some Useful commands.
+#
+# q-operators   - returns list of all operators
+# q-roots       - returns list of all root operators
+# print-graph   - prints structure of the MIDI process graph.
+#
+
+# Many operator types have a set of sub-commands only applicable to that
+# specific type.   Use the help command for details.
+#
+#   help MIDIPlayer 
+#
+# An operator's sub-commands are executed by the extended 'op' command.
+#
+#    op operator-name, sub-command [,argumrnts ....]
+# 
+
+
+# The following commands relate to MIDI channel selections.
+#
+# q-channel-mode operator-name
+#    Returns either NoChannel, SingleChannel or MultiChannel.
+#
+# q-channels operator-name
+#    Returns list of selected channels.
+#
+# q-channel-selected operator-name, channel
+#    Returns true if channel is enabled. false otherwise.
+#
+# select-channels operator-name, chan-A, chan-B, ....
+#    Selects all listed channels as enabled.
+#    For Operators with SingleChannel mode, the final channel is selected.
+#
+# deselect-channels operator-name. chan-A, chan-B, ...
+#    Disables all selected channels.
+#
+# select-all-channels operator-name
+#
+# deselect-all-channels operator-name
+#
+# invert-channels operator-name
+#

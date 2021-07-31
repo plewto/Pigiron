@@ -1,10 +1,18 @@
 # Pigiron README
 
-Pigiron is a fully configurable MIDI routing utility with integrated MIDI
-file player and comprehensive OSC interface.  It provides a series of
-*Operators* which may be freely linked to form a *MIDI process tree*.  Each
-Operator may have any number of MIDI inputs and outputs.  Currently the
-following Operator types are available:
+Pigiron is a fully configurable MIDI routing utility written in Go.  It
+includes a MIDI file player and has a comprehensive OSC interface. 
+
+The primary Pigiron object is called an **Operator**.  Each Operator has
+zero or more MIDI inputs and zero or more MIDI outputs.   When an Operator
+receives a MIDI message, it determines if the message should be forwarded
+to it's outputs.  An Operator may also modify the message prior to
+re-sending it.  
+
+## Operator Types
+
+The following Operators are currently available:
+
 
 - MIDIInput - wrapper for MIDI input device.
 - MIDIOutput - wrapper for MIDI output device.
@@ -41,11 +49,15 @@ For a list of commands enter
 
 	/pig: q-commands
 	
-In general commands which begin with 'q-' (q for query) returns some
+For details on how OSC messages are handled, enter
+
+	/pig: help OSC
+	
+In general commands which begin with 'q-' (for query) returns some
 information.  
 
 The resources directory contains the batch file 'example.osc'
-which sets up a basic MIDI process.   
+which sets up a basic MIDI process.  It includes annotations.
 
 
 ## Dependencies
@@ -54,43 +66,48 @@ which sets up a basic MIDI process.
     github.com/hypebeast/go-osc
 
 
+
+
 ## Installation
 
+**Build Pigiron**
+
+In a terminal cd into the pigiron directory and enter
+
+[pigiron]$ go build .
+
+Copy the pigiron executable to a location included on $HOME/$PATH, typical
+locations would be ~/.local/bin or ~.bin
+
 **Configuration Directory**
+
 - Linux   : ~/.config/pigiron/
 - Windows : To be determined.
-- OSX     : o be determined.
+- OSX     : To be determined.
    
-The configuration directory location is printed on program startup,
-immediately under the Pigiron banner.  
+The location of the configuration directory is printed as Pigiron starts.
+You should either copy, or make a symbolic link, within the configuration
+directory to the pigiron/resources directory.  The resources directly
+contains all the help documents and MIDI files necessary for the test
+suit.   Pigiron will function without these but testing will fail and help
+will not be available.
+
+
+## Command Line Options
+
+Pigiron has the following command line options:
+
+--config filename    # Use alternate configuration file.
+--batch filename     # Load named batch file.
+
+In general filenames within Pigiron may be prefixed with one of two special
+characters.  
+
+  ~/foo names the file foo relative to the user's home directory.
+  !/foo names a file relative to the configuratin directory.
   
-  
-1. Create symbolic link in the configuration directory to the pigiron 
-   resources directory.
-   
-**On Linux**
-	`# cd into the configuration directory
-	 #
-	 $ cd ~/.config/pigiron
-	 
-	 # Create symbolic link to resources directory.
-	 #
-	 $ ln -s <pigiron>/resources .
-	 #
-	 # where <pigiron> is the location of the main pigiron project 
-	 # directory.  IE the directory containing main.go
-	 
-     # The resources directory contains an example configuration file 
-	 #       ~/.config/pigiron/resources/config.toml
-     # You may wish to either copy or link to this file in the top-level
-	 # config directory.
-	 #
-	 $ cd ~/.config/pigiron
-	 $ ln -s ./resources/config.toml .
-	 
-	 
-   
+## GUI?
 
-
-
+Pigiron is strictly a terminal based application, however due to it's OSC
+interface it should be realtivly easy to write a GUI client app.  
 

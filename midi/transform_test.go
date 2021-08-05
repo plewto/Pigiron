@@ -60,7 +60,10 @@ func TestTransformBank(t *testing.T) {
 		return portmidi.Event{0, st, program, 0, []byte{}}
 	}
 
-	
+	// Test 2-program bank
+	//     program 0 - identity f(x) -> x
+	//     program 1 - shifted values  f(x) -> (x+shift) & 0x7F
+	//
 	shift := 10
 	bank := NewTransformBank(2)
 	bank.SelectChannel(1)
@@ -133,5 +136,4 @@ func TestTransformBank(t *testing.T) {
 		t.Fatalf(msg, fname(8))
 	}
 
-		
 }

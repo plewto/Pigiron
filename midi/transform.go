@@ -12,8 +12,9 @@ import (
 type Transform interface {
 	Length() int
 	Reset()
-	Value(byte) (byte, error)
-	SetValue(byte, byte) error
+	Value(index byte) (byte, error)
+	SetValue(index byte, value byte) error
+	Dump() string
 }
 
 /*
@@ -83,7 +84,18 @@ func (dt *DataTable) SetValue(index byte, value byte) error {
 	return err
 }
 
-
+func (dt *DataTable) Dump() string {
+	acc := "\tDataTable:"
+	width := 8
+	for i := 0; i < dt.Length(); i++ {
+		if i % width == 0 {
+			acc += fmt.Sprintf("\n\t[%02X] ", i)
+		}
+		acc += fmt.Sprintf("%02X ", dt.table[i])
+	}
+	acc += "\n"
+	return acc
+}
 
 
 

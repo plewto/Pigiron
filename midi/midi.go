@@ -35,6 +35,26 @@ func ValidateMIDIChannelNibble(ci MIDIChannelNibble) error {
 }
 
 
+// DataNumber indicates 1st or 2nd data byte from MIDI channel message.
+//
+type DataNumber int
+
+const (
+	DATA_1 DataNumber = iota
+	DATA_2
+)
+
+func (d DataNumber) String() string {
+	switch d {
+	case DATA_1: return "DATA_1"
+	case DATA_2: return "DATA_2"
+	default: return "DATA_?"
+	}
+}
+		
+
+
+
 // StatusByte type represents a MIDI status byte.  
 // For channel messages the lower 4-bits should be masked out.
 //
@@ -45,6 +65,8 @@ type StatusByte byte
 type MetaType byte
 
 const (
+	NO_STATUS = 0x00    // Special case indicates no status is selected.
+	KEYED_STATUS = 0x01 // Special case indicates both NOTE_OFF & NOTE_ON.
 	NOTE_OFF StatusByte = 0x80
 	NOTE_ON StatusByte = 0x90
 	POLY_PRESSURE StatusByte = 0xA0
@@ -60,6 +82,7 @@ const (
 	ACTIVE_SNESING StatusByte = 0xFE
 	SYSEX StatusByte = 0xF0
 	END_SYSEX StatusByte = 0xF7
+	
 
 	META_SEQUENCE_NUMBER MetaType = 0x00  
  	META_TEXT MetaType = 0x01
@@ -83,6 +106,8 @@ var (
 	// Maps StatusByte to string mnemonic.
 	//
 	statusMnemonics = map[StatusByte]string {
+		NO_STATUS: "NONE",
+		KEYED_STATUS: "KEYED",
 		NOTE_OFF: "OFF ",
 		NOTE_ON: "ON  ",
 		POLY_PRESSURE: "PRES",

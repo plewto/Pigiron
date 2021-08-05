@@ -13,6 +13,7 @@ func OperatorTypes(sansIO bool) []string {
 	acc = append(acc, "ChannelFilter")
 	acc = append(acc, "Distributor")
 	acc = append(acc, "MIDIPlayer")
+	acc = append(acc, "Transposer")
 	if !sansIO {
 		acc = append(acc, "MIDIInput")
 		acc = append(acc, "MIDIOutput")
@@ -115,6 +116,8 @@ func NewOperator(opType string, name string) (Operator, error) {
 		op = newDistributor(name)
 	case "MIDIPlayer":
 		op = newMIDIPlayer(name)
+	case "Transposer":
+		op = newTransposer(name)
 	default:
 		sfmt := "Invalid Operator type: '%s'"
 		msg := fmt.Sprintf(sfmt, opType)

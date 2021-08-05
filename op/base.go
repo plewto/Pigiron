@@ -15,17 +15,10 @@ import (
 	"github.com/plewto/pigiron/config"
 )
 
-const (
-	TEE = '├'
-	HBAR = '─'
-	VBAR = '│'
-	ELBOW = '└'
-	SPACE = ' '
-)
-
-// baseOperator struct implements the Operator interface.
-// All Operator classes should extend baseOperator.
-//
+/*
+** baseOperator struct implements the Operator interface.
+** All Operator classes should extend baseOperator.
+*/
 type baseOperator struct {
 	opType string
 	name string

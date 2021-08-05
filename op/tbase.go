@@ -7,14 +7,39 @@ import (
 )
 
 
-// initiTransformHandlers adds OSC handlers for Operators implementing midi.Transform.
+// baseXformOperator extends baseOperator to implement midi.Transform
 //
-// ISSUE: function signature could be cleaner due to being a newbi at Go.
-// Both op and xform arguments are the same object.  Is there a way to 'cast' a
-// general Operator to midi.Transform ?
-//
-func initTransformHandlers(op Operator, xform midi.Transform) {
+type baseXformOperator struct {
+	baseOperator
+	xformTable midi.DataTable
+}
 
+
+func (op *baseXformOperator) Reset() {
+	base := &op.baseOperator
+	xform := &op.xformTable
+	base.Reset()
+	xform.Reset()
+}
+
+func (xop *baseXformOperator) Length() int {
+	return xop.xformTable.Length()
+}
+
+func (xop *baseXformOperator) Value(index byte) (value byte, err error) {
+	return xop.xformTable.Value(index)
+}
+
+func (xop *baseXformOperator) SetValue(index byte, value byte) error {
+	return xop.xformTable.SetValue(index, value)
+}
+
+func (xop *baseXformOperator) Dump() string {
+	return xop.xformTable.Dump()
+}
+	
+	
+func initXformOperator(xop *baseXformOperator) {
 
 	// cmd op name, q-xform-length
 	// osc /pig/op name, q-xform-length
@@ -23,7 +48,7 @@ func initTransformHandlers(op Operator, xform midi.Transform) {
 	//
 	remoteQueryLength := func(msg *goosc.Message)([]string, error) {
 		var err error
-		s := fmt.Sprintf("%d", xform.Length())
+		s := fmt.Sprintf("%d", xop.Length())
 		return []string{s}, err
 	}
 
@@ -40,7 +65,7 @@ func initTransformHandlers(op Operator, xform midi.Transform) {
 		}
 		var index byte = byte(args[2].I) 
 		var value byte
-		value, err = xform.Value(index)
+		value, err = xop.Value(index)
 		s := fmt.Sprintf("0x%02X", value)
 		return []string{s}, err
 	}
@@ -58,7 +83,7 @@ func initTransformHandlers(op Operator, xform midi.Transform) {
 		}
 		var index byte = byte(args[2].I)
 		var value byte = byte(args[3].I)
-		err = xform.SetValue(index, value)
+		err = xop.SetValue(index, value)
 		return empty, err
 	}
 
@@ -70,15 +95,15 @@ func initTransformHandlers(op Operator, xform midi.Transform) {
 	//
 	remoteDumpTable := func(msg *goosc.Message)([]string, error) {
 		var err error
-		fmt.Printf("%s\n", xform.Dump())
+		fmt.Printf("%s\n", xop.Dump())
 		return empty, err
 	}
 		
 	
-	op.addCommandHandler("q-xform-length", remoteQueryLength)
-	op.addCommandHandler("q-xform-value", remoteQueryValue)
-	op.addCommandHandler("set-xform-value", remoteSetValue)
-	op.addCommandHandler("print-xform-table", remoteDumpTable)
+	xop.addCommandHandler("q-xform-length", remoteQueryLength)
+	xop.addCommandHandler("q-xform-value", remoteQueryValue)
+	xop.addCommandHandler("set-xform-value", remoteSetValue)
+	xop.addCommandHandler("print-xform-table", remoteDumpTable)
 	
+}	
 	
-}

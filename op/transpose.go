@@ -2,8 +2,8 @@ package op
 
 import (
 	"fmt"
-	"github.com/rakyll/portmidi"	
 	goosc "github.com/hypebeast/go-osc/osc"
+	"github.com/rakyll/portmidi"	
 	"github.com/plewto/pigiron/midi"
 )
 
@@ -11,33 +11,25 @@ import (
 //    midi.Transformer
 //
 type Transposer struct {
-	baseOperator
-	transform midi.Transform
+	baseXformOperator
 	status midi.StatusByte
 	dataNumber midi.DataNumber
 }
 
 func newTransposer (name string) *Transposer {
 	op := new(Transposer)
-	op.transform = midi.NewDataTable()
 	op.status = midi.KEYED_STATUS
 	op.dataNumber = midi.DATA_1
 	initOperator(&op.baseOperator, "Transposer", name, midi.NoChannel)
-	op.initHandlers()
-
-	// var foo midi.Transform
-	// foo = midi.Transform(op)
-	// fmt.Println(foo)
-	initTransformHandlers(op, midi.Transform(op))
-	// initTransformHandlers(op)
+	initXformOperator(&op.baseXformOperator)
+	op.initLocalHandlers()
 	op.Reset()
 	return op
 }
 
 func (op *Transposer) Reset() {
-	base := &op.baseOperator
-	base.Reset()
-	op.transform.Reset()
+	xbase := &op.baseXformOperator
+	xbase.Reset()
 	op.status = midi.KEYED_STATUS
 	op.dataNumber = midi.DATA_1
 }
@@ -46,7 +38,7 @@ func (op *Transposer) Info() string {
 	s := op.commonInfo()
 	s += fmt.Sprintf("\tStatus    : 0x%02X  %s\n", byte(op.status), op.status)
 	s += fmt.Sprintf("\tData byte : %s\n", op.dataNumber)
-	s += fmt.Sprintf("%s\n", op.transform.Dump())
+	s += fmt.Sprintf("%s\n", op.Dump())
 	return s
 }
 
@@ -56,11 +48,11 @@ func (op *Transposer) Send(event portmidi.Event) {
 	if st == op.status || ((op.status == midi.KEYED_STATUS) && keyed) {
 		if op.dataNumber == midi.DATA_2 {
 			data := byte(event.Data2)
-			data, _ = op.transform.Value(data)
+			data, _ = op.Value(data)
 			event.Data2 = int64(data)
 		} else {
 			data := byte(event.Data1)
-			data, _ = op.transform.Value(data)
+			data, _ = op.Value(data)
 			event.Data1 = int64(data)
 		}
 	}
@@ -68,24 +60,13 @@ func (op *Transposer) Send(event portmidi.Event) {
 }
 		
 func (op *Transposer) Length() int {
-	return op.transform.Length()
-}
-
-func (op *Transposer) Value(index byte) (byte, error) {
-	return op.transform.Value(index)
-}
-
-func (op *Transposer) SetValue(index byte, value byte) error {
-	return op.transform.SetValue(index, value)
-}
-
-			
-func (op *Transposer) Dump() string {
-	return op.Info()
+	return op.Length()
 }
 
 
-func (op *Transposer) initHandlers() {
+
+
+func (op *Transposer) initLocalHandlers() {
 
 	channelStats := map[int64]string{0x00 : "DISABLED",
 		0x01 : "KEYED",

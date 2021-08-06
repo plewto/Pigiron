@@ -1,0 +1,85 @@
+Operator Transposer
+
+Transposer is an Operator which selectively modifies MIDI data bytes.
+Either data byte of any channel message may be modified.
+
+General parameters:
+    transpose table - The transformation values tab(q) --> r, where 0x00 <= q, r < 0x80.
+    status - The MIDI status type to be modified.   Possible values are:
+    	0x00 - Disabled
+	0x01 - both KEY_OFF & KEY_ON
+	0x80 - NOTE_OFF 
+	0x90 - NOTE_ON 
+	0xA0 - POLY_PRESSURE 
+	0xB0 - CONTROLLER 
+	0xC0 - PROGRAM 
+	0xD0 - CHANNEL_PRESSURE 
+	0xE0 - BEND
+    dataNumber - the data byte to be modified,   either 1 or 2
+
+------------------------------------------------------------
+Command     op name, q-table-range
+OSC         /pig/op name, q-table-range
+
+OSC Returns:
+    [1] floor    - minimum table index
+    [2] ceiling  - maximum table index
+
+    Table indexes must satisfy  floor <= index < ceiling.
+
+------------------------------------------------------------
+Command     op name, q-table-value, index
+OSC         /pig/op name, q-table-value, index
+
+OSC Returns:
+    Table value at indicated index.
+
+------------------------------------------------------------
+Command     op name, set-table-value, index, value-1 [,value-2, value-3, ...]
+OSC         /pig/op name, set-table-value, index, value-1 [,value-2, value-3, ...]
+
+Sets table value(s) starting at index.
+
+------------------------------------------------------------
+Command     op name, print-table
+OSC         /pig/op name, print-table
+
+Prints hex-dump of transform table.
+
+------------------------------------------------------------
+Command     op name, select-status, status
+OSC         /pig/op name, select-status, status
+
+Selects which MIDI message type are modified.
+status may be one of the following:
+    0x00 - DISABLE
+    0x01 - KEY_OFF & KEY_ON 
+    0x80 - KEY_OFF
+    0x90 - KEY_ON
+    0xA0 - POLY_PRESSURE
+    0xB0 - CONTROLLER
+    0xC0 - PROGRAM
+    0xD0 - MONO_PRESSURE
+    0xE0 - PITCH_BEND
+
+------------------------------------------------------------
+Command     op name, q-status
+OSC         /pig/op name, q-status
+
+OSC Returns:
+     selected status, See select-status to interpret results.
+
+------------------------------------------------------------
+Command     op name, select-data-byte, n
+OSC         /pig/op name, select-data-byte, n
+
+Selects which MIDI data byte is to be modified.
+Valid values for n are 1 and 2.
+
+------------------------------------------------------------
+Command     op name, q-data-byte
+OSC         /pig/op name, q-data-byte
+
+OSC Returns number of data byte being modified, either 1 or 2.
+
+

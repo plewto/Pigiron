@@ -83,14 +83,12 @@ func initXformOperator(xop *baseXformOperator) {
 		for i := 4; i < len(msg.Arguments); i++ {
 			template += "i"
 		}
-		fmt.Printf("DEBUG template: %s\n", template)
 		args, err := ExpectMsg(template, msg)
 		if err != nil {
 			return empty, nil
 		}
 		var index byte = byte(args[2].I)
 		count := len(template) - 3
-		fmt.Printf("DEBUG count = %d\n", count)
 		for i := 0; i < count; i++ {
 			value := byte(args[i+3].I)
 			err = xop.xformTable.SetValue(index, value)

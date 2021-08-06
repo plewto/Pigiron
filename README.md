@@ -14,12 +14,13 @@ re-sending it.
 The following Operators are currently available:
 
 
-- MIDIInput - wrapper for MIDI input device.
-- MIDIOutput - wrapper for MIDI output device.
 - ChannelFilter - filter events by MIDI channel.
 - Distributor - transmit events over several MIDI channels.
+- MIDIInput - wrapper for MIDI input device.
+- MIDIOutput - wrapper for MIDI output device.
 - MIDIPlayer - MIDI file player.
 - Monitor - print incoming MIDI messages.
+- Transposer - manipulate MIDI data bytes.
 
 
 There are three distinct ways to interact with Pigiron.

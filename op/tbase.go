@@ -42,8 +42,8 @@ func (xop *baseXformOperator) Dump() string {
 	
 func initXformOperator(xop *baseXformOperator) {
 
-	// cmd op name, q-xform-range
-	// osc /pig/op name, q-xform-range
+	// cmd op name, q-table-range
+	// osc /pig/op name, q-table-range
 	// Returns table index range:
 	//    [floor, ceiling]
 	//
@@ -54,8 +54,8 @@ func initXformOperator(xop *baseXformOperator) {
 		return []string{sf, sc}, err
 	}
 
-	// cmd op name, q-xform-value, index
-	// osc /pig/op name, q-xform-value, index
+	// cmd op name, q-table-value, index
+	// osc /pig/op name, q-table-value, index
 	// Returns
 	//    Indexed value from transform table
 	//    Error if index is out of bounds
@@ -72,26 +72,39 @@ func initXformOperator(xop *baseXformOperator) {
 		return []string{s}, err
 	}
 
-	// cmd op name, set-xform-value, index, value
-	// osc /pig/op name, set-xform-value, index, value
+	// cmd op name, set-table-value, index, value, [values ...]
+	// osc /pig/op name, set-table-value, index, value, [values ...]
 	// Returns error if either index or value are out of bounds.
 	//    0 <= index < ceiling
 	//    0 <= value < 0x80
 	//
 	remoteSetValue := func(msg *goosc.Message)([]string, error) {
-		args, err := ExpectMsg("osii", msg)
+		template := "osii"
+		for i := 4; i < len(msg.Arguments); i++ {
+			template += "i"
+		}
+		fmt.Printf("DEBUG template: %s\n", template)
+		args, err := ExpectMsg(template, msg)
 		if err != nil {
 			return empty, nil
 		}
 		var index byte = byte(args[2].I)
-		var value byte = byte(args[3].I)
-		err = xop.SetValue(index, value)
+		count := len(template) - 3
+		fmt.Printf("DEBUG count = %d\n", count)
+		for i := 0; i < count; i++ {
+			value := byte(args[i+3].I)
+			err = xop.xformTable.SetValue(index, value)
+			if err != nil {
+				break
+			}
+			index++
+		}		
 		return empty, err
 	}
 
 
-	// cmd op name, print-xform-table
-	// osc /pig/op name, print-xform-table
+	// cmd op name, print-table
+	// osc /pig/op name, print-table
 	//
 	// Display hex-dump of transformation table.
 	//
@@ -100,12 +113,11 @@ func initXformOperator(xop *baseXformOperator) {
 		fmt.Printf("%s\n", xop.Dump())
 		return empty, err
 	}
-		
 	
-	xop.addCommandHandler("q-xform-range", remoteQueryRange)
-	xop.addCommandHandler("q-xform-value", remoteQueryValue)
-	xop.addCommandHandler("set-xform-value", remoteSetValue)
-	xop.addCommandHandler("print-xform-table", remoteDumpTable)
+	xop.addCommandHandler("q-table-range", remoteQueryRange)
+	xop.addCommandHandler("q-table-value", remoteQueryValue)
+	xop.addCommandHandler("set-table-value", remoteSetValue)
+	xop.addCommandHandler("print-table", remoteDumpTable)
 	
 }	
 	

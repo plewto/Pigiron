@@ -6,9 +6,10 @@ import (
 	"github.com/plewto/pigiron/midi"
 )
 
-
-// baseXformOperator extends baseOperator to implement midi.Transform
-//
+/*
+** baseXformOperator extends baseOperator to implement midi.Transform
+**
+*/
 type baseXformOperator struct {
 	baseOperator
 	xformTable midi.DataTable
@@ -22,8 +23,8 @@ func (op *baseXformOperator) Reset() {
 	xform.Reset()
 }
 
-func (xop *baseXformOperator) Length() int {
-	return xop.xformTable.Length()
+func (xop *baseXformOperator) TransformRange() (floor byte, ceiling byte) {
+	return xop.xformTable.TransformRange()
 }
 
 func (xop *baseXformOperator) Value(index byte) (value byte, err error) {
@@ -41,15 +42,16 @@ func (xop *baseXformOperator) Dump() string {
 	
 func initXformOperator(xop *baseXformOperator) {
 
-	// cmd op name, q-xform-length
-	// osc /pig/op name, q-xform-length
-	// Returns:
-	//    Transform table length
+	// cmd op name, q-xform-range
+	// osc /pig/op name, q-xform-range
+	// Returns table index range:
+	//    [floor, ceiling]
 	//
-	remoteQueryLength := func(msg *goosc.Message)([]string, error) {
+	remoteQueryRange := func(msg *goosc.Message)([]string, error) {
 		var err error
-		s := fmt.Sprintf("%d", xop.Length())
-		return []string{s}, err
+		f, c := xop.TransformRange()
+		sf, sc := fmt.Sprintf("0x%02X", f), fmt.Sprintf("0x%02X", c)
+		return []string{sf, sc}, err
 	}
 
 	// cmd op name, q-xform-value, index
@@ -73,7 +75,7 @@ func initXformOperator(xop *baseXformOperator) {
 	// cmd op name, set-xform-value, index, value
 	// osc /pig/op name, set-xform-value, index, value
 	// Returns error if either index or value are out of bounds.
-	//    0 <= index < xform.Length()
+	//    0 <= index < ceiling
 	//    0 <= value < 0x80
 	//
 	remoteSetValue := func(msg *goosc.Message)([]string, error) {
@@ -100,7 +102,7 @@ func initXformOperator(xop *baseXformOperator) {
 	}
 		
 	
-	xop.addCommandHandler("q-xform-length", remoteQueryLength)
+	xop.addCommandHandler("q-xform-range", remoteQueryRange)
 	xop.addCommandHandler("q-xform-value", remoteQueryValue)
 	xop.addCommandHandler("set-xform-value", remoteSetValue)
 	xop.addCommandHandler("print-xform-table", remoteDumpTable)

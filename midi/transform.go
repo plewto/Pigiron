@@ -10,7 +10,7 @@ import (
 **
 */
 type Transform interface {
-	Length() int
+	TransformRange() (floor byte, ceiling byte)
 	Reset()
 	Value(index byte) (byte, error)
 	SetValue(index byte, value byte) error
@@ -33,23 +33,25 @@ func NewDataTable() *DataTable {
 	return &dt
 }
 
-// Length() returns table length.
+// TransformRange() returns table index range 
 //
-func (dt *DataTable) Length() int {
-	return len(dt.table)
+func (dt *DataTable) TransformRange()(floor byte, ceiling byte) {
+	return 0, byte(len(dt.table))
 }
 
 // Reset() sets table to identity f(x) -> x
 //
 func (dt *DataTable) Reset() {
-	for i := 0; i < dt.Length(); i++ {
+	f, c := dt.TransformRange()
+	for i := f; i < c; i++ {
 		dt.table[i] = byte(i)
 	}
 }
 
 func (dt *DataTable) validate(n byte, param string) error {
 	var err error
-	if n < 0 || dt.Length() <= int(n) {
+	f, c := dt.TransformRange()
+	if n < f || c <= n {
 		msg := "DataTable %s out of bounds: %d"
 		err = fmt.Errorf(msg, param, n)
 	}
@@ -86,8 +88,9 @@ func (dt *DataTable) SetValue(index byte, value byte) error {
 
 func (dt *DataTable) Dump() string {
 	acc := "\tDataTable:"
-	width := 8
-	for i := 0; i < dt.Length(); i++ {
+	width := byte(8)
+	f, c := dt.TransformRange()
+	for i := f; i < c; i++ {
 		if i % width == 0 {
 			acc += fmt.Sprintf("\n\t[%02X] ", i)
 		}
@@ -130,11 +133,11 @@ func (bank *TransformBank) currentTransform() Transform {
 	return bank.programs[bank.current]
 }
 
-// Length() returns length of current transform.
+// TransformRange() returns TransformRange of current transform.
 //
-func (bank *TransformBank) Length() int {
+func (bank *TransformBank) TransformRange() (floor byte, ceiling byte) {
 	tr := bank.currentTransform()
-	return tr.Length()
+	return tr.TransformRange()
 }
 
 // Reset() sets current transform to identity.
@@ -205,7 +208,7 @@ func (bank *TransformBank) DeselectAllChannels(){}
 //
 func (bank *TransformBank) SelectAllChannels(){}
 
-// ProgramRange() returns valid program-number range.
+// ProgramTransformRange() returns valid program-number range.
 // Program numbers outside this range are ignored.
 //
 func (bank *TransformBank) ProgramRange() (floor byte, ceiling byte) {
@@ -236,5 +239,5 @@ func (bank *TransformBank) ChangeProgram(event portmidi.Event) {
 
 func (bank *TransformBank) String() string {
 	s := "TransformBank(%d), channel: %d, current program: %d"
-	return fmt.Sprintf(s, bank.Length(), int(bank.channelIndex) + 1, bank.current)
+	return fmt.Sprintf(s, len(bank.programs), int(bank.channelIndex) + 1, bank.current)
 }

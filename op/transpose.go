@@ -7,8 +7,9 @@ import (
 	"github.com/plewto/pigiron/midi"
 )
 
-// implements
-//    midi.Transformer
+// Transposer is an Operator which selectivlty modifies MIDI data bytes.
+// Either data byte of any channel message may be modified.
+// Transposer implements the Operator and midi.Transform interfaces.
 //
 type Transposer struct {
 	baseXformOperator
@@ -62,8 +63,6 @@ func (op *Transposer) Send(event portmidi.Event) {
 func (op *Transposer) Length() int {
 	return op.Length()
 }
-
-
 
 
 func (op *Transposer) initLocalHandlers() {

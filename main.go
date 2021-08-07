@@ -10,8 +10,6 @@ import (
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/op"
 	"github.com/plewto/pigiron/piglog"
-	_ "github.com/plewto/pigiron/help"
-	
 )
 
 

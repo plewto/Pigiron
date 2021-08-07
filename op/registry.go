@@ -11,9 +11,11 @@ func OperatorTypes(sansIO bool) []string {
 	acc := make([]string, 0, 12)
 	acc = append(acc, "Monitor")
 	acc = append(acc, "ChannelFilter")
+	acc = append(acc, "Delay")
 	acc = append(acc, "Distributor")
 	acc = append(acc, "MIDIPlayer")
 	acc = append(acc, "Transposer")
+
 	if !sansIO {
 		acc = append(acc, "MIDIInput")
 		acc = append(acc, "MIDIOutput")
@@ -112,6 +114,8 @@ func NewOperator(opType string, name string) (Operator, error) {
 		op  = newMonitor(name)
 	case "ChannelFilter":
 		op = newChannelFilter(name)
+	case "Delay":
+		op = newDelay(name)
 	case "Distributor":
 		op = newDistributor(name)
 	case "MIDIPlayer":

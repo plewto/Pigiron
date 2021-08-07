@@ -39,7 +39,11 @@ func (xop *baseXformOperator) Dump() string {
 	return xop.xformTable.Dump()
 }
 	
-	
+func (xop *baseXformOperator) Plot() string {
+	return xop.xformTable.Plot()
+}
+
+
 func initXformOperator(xop *baseXformOperator) {
 
 	// cmd op name, q-table-range

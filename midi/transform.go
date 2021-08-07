@@ -15,6 +15,7 @@ type Transform interface {
 	Value(index byte) (byte, error)
 	SetValue(index byte, value byte) error
 	Dump() string
+	Plot() string
 }
 
 /*
@@ -100,7 +101,20 @@ func (dt *DataTable) Dump() string {
 	return acc
 }
 
-
+func (dt *DataTable) Plot() string {
+	scale := 0.50
+	acc := ""
+	f, c := dt.TransformRange()
+	for i := f; i < c; i++ {
+		v, _ := dt.Value(i)
+		acc += fmt.Sprintf("[%02x] %02x ", i, v)
+		for q := 0; q < int(float64(v) * scale); q++ {
+			acc += "-"
+		}
+		acc += "\n"
+	}
+	return acc
+}
 
 /*
 ** TransformBank is a ProgramBank of DataTable.

@@ -14,3 +14,7 @@ OSC         /pig/op name, q-device
 Gets name of MIDI device.
 
 OSC Return: ACK: MIDI device name.
+
+
+
+TODO: Document off-velocity commands.

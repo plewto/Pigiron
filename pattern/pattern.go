@@ -18,7 +18,8 @@ type Pattern interface {
 	SetValues([]int)
 	Next() int
 	Reset()
-	String()
+	String() string
+	Clone() Pattern
 }
 
 
@@ -60,6 +61,12 @@ func (cy *Cycle) Next() int {
 func (cy *Cycle) Reset() {
 	cy.pointer = 0
 }
+
+func (cy *Cycle) Clone() Pattern {
+	other := NewCycle(cy.values)
+	return other
+}
+
 
 func (cy *Cycle) String() string {
 	acc := "Cycle: "

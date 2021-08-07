@@ -1,0 +1,45 @@
+Delay Operator
+
+The Delay Operator adds a note on/off delay with key-mappings, velocity
+shift and presets.
+
+There are 6-preset programs accessible either by MIDI program change or
+OSC commands.   Each program consist of the following parameters:
+
+    1) Count - number of note repeats, may be between 1 and 6 inclusive
+
+    2) keytable - table of key-number conversions.  The keytable is applied
+       on each note repetition.  For example assume the table contents
+       produce a simple transposition by fifths,  table(n) --> n+7.
+       If the note C4 is processed with count = 4 the generated note
+       sequence will be:  C4, G4, D5, A5
+
+    3) delayPattern - is a list of delay times in milliseconds: d1, d2, d3, ....
+       The first repeat is d1 ms after the initial note, the next is delayed
+       by d2 ms.  If the number of delay-times is less then the repeat
+       count, the values cycle back to the beginning.
+       
+   4) velocityShift - amount to add/subtract to velocity on each repetition.
+      For a initial velocity v, and a velocity shift -4, the resulting
+      velocities are v, v-4, v-8, v-12 ...
+
+General parameters:
+
+    1) MIDI channel of note to process.  Events on all other channels are
+       not effected.
+    
+    2) forwardPrograms, if false do not re-transmit program changes on the
+       selected MIDI channel.
+
+
+
+Commands  TODO: add command details
+
+q-delay-pattern  --> list of delay times in milliseconds
+q-repeat-count   --> int
+q-velocity-shift --> int
+q-program-number --> int
+set-delay-pattern d1 [,d2, d3, ..., d6]
+set-repeat-count n
+set-velocity-sift n
+use-program n

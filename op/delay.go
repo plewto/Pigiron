@@ -159,7 +159,7 @@ func (op *Delay) loop(event portmidi.Event) {
 	if count > MAX_DELAY_COUNT {
 		count = MAX_DELAY_COUNT
 	}
-	isNoteOff := event.Status & 0xF0 == 0x80
+	// isNoteOff := event.Status & 0xF0 == 0x80
 	for i := 0; i < count; i++ {
 		delay := time.Duration(tpat.Next())
 		time.Sleep(delay * time.Millisecond)
@@ -168,7 +168,7 @@ func (op *Delay) loop(event portmidi.Event) {
 		switch {
 		case vel > 0x7F: vel = 0x7F
 		case vel < 0: vel = 0x00
-		case isNoteOff: vel = 0x00
+		// case isNoteOff: vel = 0x00
 		default:
 			if vel == 0 {  // note_on with velocity 0
 				break

@@ -16,6 +16,7 @@ import (
 type Pattern interface {
 	Value() int
 	SetValues([]int)
+	Values() []int
 	Next() int
 	Reset()
 	String() string
@@ -51,6 +52,9 @@ func (cy *Cycle) SetValues(values []int) {
 	cy.Reset()
 }
 	
+func (cy *Cycle) Values() []int {
+	return cy.values
+}
 
 func (cy *Cycle) Next() int {
 	v := cy.Value()

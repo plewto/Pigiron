@@ -113,6 +113,7 @@ func initXformOperator(xop *baseXformOperator) {
 	remoteDumpTable := func(msg *goosc.Message)([]string, error) {
 		var err error
 		fmt.Printf("%s\n", xop.Dump())
+		fmt.Printf("%s", xop.Plot())
 		return empty, err
 	}
 	

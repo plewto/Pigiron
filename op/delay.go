@@ -3,7 +3,7 @@ package op
 import (
 	"fmt"
 	"time"
-	// goosc "github.com/hypebeast/go-osc/osc"
+	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/rakyll/portmidi"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/pattern"
@@ -14,6 +14,7 @@ import (
 const (
 	DELAY_PROGRAM_COUNT = 6
 	MAX_DELAY_COUNT = 6
+	MAX_DELAY_TIME = 1000
 )
 
 
@@ -39,7 +40,6 @@ func (dp *delayProgram) Reset() {
 }
 
 
-
 // Delay is an experimental Operator which produces an echo like effect using.
 // Delayed notes may be key-mapped with velocity scaling and variable delay
 // times.  Up to 6 presets may be accessed via MIDI program-change.
@@ -62,6 +62,7 @@ func newDelay(name string) *Delay {
 	for i := 0; i < DELAY_PROGRAM_COUNT; i++ {
 		op.programs[i] = newDelayProgram()
 	}
+	op.initLocalHandlers()
 	op.Reset()
 
 
@@ -144,9 +145,13 @@ func (op *Delay) ChangeProgram(event portmidi.Event) {
 	}
 }
 
+func (op *Delay) program() *delayProgram {
+	return op.programs[op.currentProgramSlot]
+}
+
 
 func (op *Delay) loop(event portmidi.Event) {
-	program := op.programs[op.currentProgramSlot]
+	program := op.program()
 	keytab := program.table
 	tpat := program.timePattern
 	vshift := int64(program.velocityShift)
@@ -195,3 +200,113 @@ func (op *Delay) Send(event portmidi.Event) {
 		}
 	}
 }
+
+
+func (op *Delay) initLocalHandlers() {
+
+	remoteQueryDelayPattern := func(msg *goosc.Message)([]string, error) {
+		var err error
+		values := op.program().timePattern.Values()
+		acc := make([]string, len(values))
+		for i := 0; i < len(values); i++ {
+			acc[i] = fmt.Sprintf("%d", values[i])
+		}
+		return acc, err
+	}
+
+	remoteQueryRepeat := func(msg *goosc.Message)([]string, error) {
+		var err error
+		count := op.program().delayCount
+		acc := []string{fmt.Sprintf("%d", count)}
+		return acc, err
+	}
+
+	remoteQueryVelocityShift := func(msg *goosc.Message)([]string, error) {
+		var err error
+		vshift := op.program().velocityShift
+		acc := []string{fmt.Sprintf("%d", vshift)}
+		return acc, err
+	}
+
+	// op name set-delay-pattern i, [i, i, ...] 
+	remoteSetDelayPattern := func(msg *goosc.Message)([]string, error) {
+		extra := len(msg.Arguments) - 3
+		template := "osi"
+		for i := 0; i < extra; i++ {
+			template += "i"
+		}
+		args, err := ExpectMsg(template, msg)
+		if err != nil {
+			return empty, err
+		}
+		values := make([]int, extra+1)
+		for i := 0; i < len(values); i++ {
+			v := int(args[i+2].I)
+			switch {
+			case v < 0: v = 0
+			case v > MAX_DELAY_TIME: v = MAX_DELAY_TIME
+			}
+			values[i] = v
+		}
+		op.program().timePattern = pattern.NewCycle(values)
+		return empty, err
+	}
+
+	remoteSetRepeat := func(msg *goosc.Message)([]string, error) {
+		args, err := ExpectMsg("osi", msg)
+		if err != nil {
+			return empty, err
+		}
+		count := int(args[2].I)
+		switch {
+		case count < 0: count = 1
+		case count > MAX_DELAY_COUNT: count = MAX_DELAY_COUNT
+		}
+		op.program().delayCount = count
+		return empty, err
+	}
+
+	remoteSetVelocityShift := func(msg *goosc.Message)([]string, error) {
+		args, err := ExpectMsg("osi", msg)
+		if err != nil {
+			return empty, err
+		}
+		vshift := int(args[2].I)
+		switch {
+		case vshift < -64: vshift = -64
+		case vshift > 64: vshift = 64
+		}
+		op.program().velocityShift = vshift
+		return empty, err
+	}
+
+	remoteUseProgram := func(msg *goosc.Message)([]string, error) {
+		args, err := ExpectMsg("osi", msg)
+		if err != nil {
+			return empty, err
+		}
+		p := int(args[2].I) & 0x7F
+		if p >= 0 && p < len(op.programs) {
+			op.currentProgramSlot = byte(p)
+		}
+		return empty, err
+	}
+
+	remoteQueryProgramNumber := func(msg *goosc.Message)([]string, error) {
+		var err error
+		acc := []string{fmt.Sprintf("%d", op.currentProgramSlot)}
+		return acc, err
+	}
+			
+	
+	op.addCommandHandler("q-delay-pattern", remoteQueryDelayPattern)
+	op.addCommandHandler("q-repeat-count", remoteQueryRepeat)
+	op.addCommandHandler("q-velocity-shift", remoteQueryVelocityShift)
+	op.addCommandHandler("q-program-number", remoteQueryProgramNumber)
+	op.addCommandHandler("set-delay-pattern", remoteSetDelayPattern)
+	op.addCommandHandler("set-repeat-count", remoteSetRepeat)
+	op.addCommandHandler("set-velocity-shift", remoteSetVelocityShift)
+	op.addCommandHandler("use-program", remoteUseProgram)
+	
+}
+	

@@ -36,9 +36,9 @@ func (op *ChannelFilter) Reset() {
 }
 
 func (op *ChannelFilter) Send(event portmidi.Event) {
-	s := event.Status
+	s := byte(event.Status)
 	if midi.IsChannelStatus(s) {
-		ci := midi.StatusChannelIndex(s)
+		ci := midi.MIDIChannelNibble((s & 0x0F) - 1)
 		if op.ChannelIndexSelected(ci) {
 			op.distribute(event)
 		}

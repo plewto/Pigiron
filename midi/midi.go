@@ -190,10 +190,10 @@ func isStatusByte(s byte) bool {
 	return flag
 }
 
-// isChannelStatus() returns true iff argument is a valid MIDI channel status byte.
+// IsChannelStatus() returns true iff argument is a valid MIDI channel status byte.
 // The lower 4-bits are ignored.
 //
-func isChannelStatus(s byte) bool {
+func IsChannelStatus(s byte) bool {
 	_, flag := channelStatusDataCount[StatusByte(s & 0xF0)]
 	return flag
 }

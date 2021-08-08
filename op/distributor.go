@@ -30,9 +30,9 @@ func (op *Distributor) Reset() {
 }
 
 func (op *Distributor) Send(event portmidi.Event) {
-	s := event.Status
+	s := byte(event.Status)
 	if midi.IsChannelStatus(s) {
-		cmd := midi.StatusChannelCommand(s)
+		cmd := int64(s & 0xF0)
 		for _, ci := range op.SelectedChannelIndexes() {
 			s2 := cmd | int64(ci)
 			event.Status = s2

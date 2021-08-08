@@ -121,7 +121,7 @@ func convertTrackBytes(bytes []byte) (track *SMFTrack, err error) {
 			}
 			ue.deltaTime = deltaTime
 			events = append(events, ue)
-		case isChannelStatus(status):
+		case IsChannelStatus(status):
 			runningStatus = StatusByte(status & 0xF0)
 			runningChannel = MIDIChannelNibble(status & 0x0F)
 			dataCount, _ := channelStatusDataCount[runningStatus]

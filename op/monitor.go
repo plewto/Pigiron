@@ -20,8 +20,6 @@ func newMonitor(name string) *Monitor {
 
 func (op *Monitor) Send(event portmidi.Event) {
 	op.distribute(event)
-	// fmt.Printf(midi.EventToString(event))
-	// fmt.Println()
 	fmt.Print(formatEvent(event))
 }
 
@@ -52,8 +50,8 @@ func formatSysex(event portmidi.Event) string {
 
 
 func formatEvent(event portmidi.Event) string {
-	st := event.Status
-	var acc = "MON " + midi.StatusMnemonic(st)
+	st := midi.StatusByte(event.Status)
+	var acc = "MON " + st.String()
 	if st >= 0xF0 {
 		switch st {
 		case 0xF0:
@@ -81,11 +79,9 @@ func formatEvent(event portmidi.Event) string {
 		case 0xE0:
 			acc += fmt.Sprintf("%3d %3d", d1, d2)
 		default:
-			acc += " ? "
-			
+			acc += " ? "	
 		}
 		acc += "\n"
-		
 	}
 	return acc
 }

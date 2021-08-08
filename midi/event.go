@@ -44,7 +44,7 @@ func (ue *UniversalEvent) IsMetaEvent() bool {
 //
 func (ue *UniversalEvent) IsChannelEvent() bool {
 	s := byte(ue.message.Status)
-	return isChannelStatus(s)
+	return IsChannelStatus(s)
 }
 
 // ue.IsSystemEvent() returns true if the UniversalEvent contains a MIDI system real-time  message.
@@ -180,7 +180,7 @@ func MakeSystemEvent(status StatusByte) (*UniversalEvent, error) {
 func MakeChannelEvent(status StatusByte, ch MIDIChannelNibble, data1 byte, data2 byte) (*UniversalEvent, error) {
 	var err error
 	var ue = &UniversalEvent{}
-	if !isChannelStatus(byte(status)) {
+	if !IsChannelStatus(byte(status)) {
 		errmsg := "Expected MIDI channel status byte, got 0x%02X"
 		err = fmt.Errorf(errmsg, byte(status))
 		return ue, err
@@ -317,7 +317,7 @@ func (ue *UniversalEvent) String() string {
 	s := StatusByte(ue.message.Status)
 	acc := fmt.Sprintf("[∆t %8d] ", ue.deltaTime)
 	switch {
-	case isChannelStatus(byte(s)):
+	case IsChannelStatus(byte(s)):
 		c := byte(s & 0x0F) + 1
 		s := StatusByte(byte(s) & 0xF0)
 		d1, d2 := ue.message.Data1, ue.message.Data2
@@ -371,7 +371,7 @@ func BytesToEvents(bytes []byte)(events []*UniversalEvent, err error) {
 	for len(bytes) > 0 {
 		st := bytes[0]
 		switch {
-		case isChannelStatus(byte(st)):
+		case IsChannelStatus(byte(st)):
 			var event *UniversalEvent
 			var count int
 			cmd, ci := StatusByte(st & 0xF0), MIDIChannelNibble(st & 0x0F)

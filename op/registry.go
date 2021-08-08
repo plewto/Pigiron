@@ -3,7 +3,6 @@ package op
 import (
 	"time"
 	"fmt"
-	"strings"
 	"errors"
 )
 
@@ -37,51 +36,13 @@ func OperatorExists(name string) bool {
 	return flag
 }
 
-// splitStem separates a string at the final period, if any.
-// Ape     --> "Ape" ""
-// Ape.Bat --> "Ape" "Bat"
-//
-func splitStem(s string) (string, string) {
-	pos := strings.LastIndex(s, ".")
-	head, tail := "", ""
-	if pos == -1 {
-		head = s
-		tail = ""
-	} else {
-		head = s[:pos]
-		tail = s[pos+1:]
-	}
-	return head, tail
-}
-
-// assignName() reassigns the operator's name so that it is unique.
-// If the registry does not contain an operator by the same name, the
-// original name is preserved.   Otherwise the name is modified by
-// appending a unique index.
-// Returns the actual name.
-//
-func assignName(op Operator) string {
-	if OperatorExists(op.Name()) {
-		base, _ := splitStem(op.Name())
-		index := 1
-		name := fmt.Sprintf("%v.%d", base, index)
-		for OperatorExists(name) {
-			index++
-			name = fmt.Sprintf("%v.%d", base, index)
-		}
-		op.setName(name)
-	}
-	return op.Name()
-}
 
 // register() adds an operator to the registry.
-// If needed, the operator's name is changed to make it unique.
-// Returns the actual operator's name.
+// Returns operator's name
 //
 func register(op Operator) string {
-	name := assignName(op)
-	registry[name] = op
-	return name
+	registry[op.Name()] = op
+	return op.Name()
 }
 
 // DumpRegistry() prints the contents of the operator registry.
@@ -98,15 +59,19 @@ func DumpRegistry() {
 // All operators should be created by NewOperator.
 //
 // opType indicates the type of Operator
-// name is the proposed name for the operator.  
-// The actual name may be different if name is already in use.
 //
 // Returns the new Operator and an error.
-// The error is non-nil if opType was invalid.
+// The error is non-nil if opType was invalid or if an Operator named name
+// already exists.
 //
 func NewOperator(opType string, name string) (Operator, error) {
 	var err error
 	var op Operator
+	if OperatorExists(name) {
+		msg := "An operator named %s already exists."
+		err = fmt.Errorf(msg, name)
+		return op, err
+	}
 	switch opType {
 	case "Dummy":
 		op = newDummyOperator(name)

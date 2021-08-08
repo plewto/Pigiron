@@ -17,11 +17,10 @@
 #
 #     syntax:  new operator-type, name
 #
-
-# An Operator's name must be unique.  If the name argument is already in
-# use, it will be modified such that it is unique.  The modification adds a
-# numeric index to the original name, such as converting 'foo' to 'foo.1'.
-# The new command returns the actual Operator name.
+#
+# An Operator's name must be unique.  It is an error if an Operator name
+# already exists.
+#
 
 new ChannelFilter, filter  # creates a ChannelFilter named 'filter'.
 

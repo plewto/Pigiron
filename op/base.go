@@ -66,11 +66,11 @@ func (op *baseOperator) Name() string {
 	return op.name
 }
 
-// op.setName() sets the operator's name.
-// 
-func (op *baseOperator) setName(s string) {
-	op.name = s
-}
+// // op.setName() sets the operator's name.
+// // 
+// func (op *baseOperator) setName(s string) {
+// 	op.name = s
+// }
 
 func (op *baseOperator) String() string {
 	return fmt.Sprintf("%-12s name: \"%s\"", op.opType, op.name)

@@ -15,8 +15,8 @@ devices.  The device may be specified either by its integer position in the
 list or by a unique sub-string of it's name.
 
 
-Operator names must be unique. If the specified name is already in use it
-will be modified so that it is unique.
+Operator names must be unique.  It is an error if an operator with the
+same name already exists.
 
 
 OSC Returns: ACK The actual operator name.

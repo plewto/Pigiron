@@ -22,7 +22,6 @@ type Operator interface {
 	midi.ChannelSelector
 	OperatorType() string
 	Name() string
-	setName(s string)
 	commonInfo() string
 	Info() string
 	Panic()

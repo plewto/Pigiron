@@ -54,7 +54,11 @@ BUG 006 23-July-2021 Open
 
 
 ---------------------------------------------------------------------- 007
-BUG 007 08-Aug-2021 Open
+BUG 007 08-Aug-2021 Closed
     del-all command crashes program.
     This appears related to the MIDI poll loop trying to access destroyed
-    MIDIInputs. 
+    MIDIInputs.
+
+    Made it an error to delete a MIDIInput operator.
+    The op.ClearRegistry function now skips all MIDIInputs.
+    

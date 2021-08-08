@@ -206,7 +206,7 @@ func remoteDeleteOperator(msg *goosc.Message)([]string, error) {
 	if err != nil {
 		return empty, err
 	}
-	DeleteOperator(args[0].O.Name())
+	err = DeleteOperator(args[0].O.Name())
 	return empty, err
 }
 

@@ -133,13 +133,18 @@ func NewOperator(opType string, name string) (Operator, error) {
 }
 
 // DeleteOperator() Deletes named operator.
-// Returns error if operator does not exists.
+// Returns error if operator does not exists or it is a MIDIInput.
 //
 func DeleteOperator(name string) error {
 	var err error
 	var op Operator
 	op, err = GetOperator(name) 
 	if err != nil {
+		return err
+	}
+	if op.OperatorType() == "MIDIInput" {
+		msg := "Can not delete MIDIInput Operator: %s"
+		err = fmt.Errorf(msg, name)
 		return err
 	}
 	op.Panic()
@@ -152,7 +157,7 @@ func DeleteOperator(name string) error {
 
 
 
-// ClearRegistry() Deletes all Operators.
+// ClearRegistry() Deletes all Operators (except MIDIInputs)
 //
 func ClearRegistry() {
 	for _, root := range RootOperators() {
@@ -161,8 +166,10 @@ func ClearRegistry() {
 	time.Sleep(10 * time.Millisecond)
 	for _, op := range Operators() {
 		op.DisconnectAll()
-		delete(registry, op.Name())
-		op.Close()
+		if op.OperatorType() != "MIDIInput" {
+			delete(registry, op.Name())
+			op.Close()
+		}
 	}
 }
 

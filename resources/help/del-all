@@ -1,7 +1,7 @@
 Command     del-all
 OSC         /pig/del-all
 
-Deletes all operators.
+Deletes all operators, except MIDIInputs.
 
 OSC returns: ACK.
 

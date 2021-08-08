@@ -2,7 +2,8 @@ Command     del-op  name
 OSC         /pig/del-op name
 
 Deletes the named operator.
+MIDIInput Operators can not be deleted
 
 OSC Returns: ACK if operator was deleted.
-             ERROR if operator name does not exists.
+             ERROR if operator name does not exists or operator is a MIDIInput.
 	    

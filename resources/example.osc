@@ -43,6 +43,7 @@ new ChannelFilter, filter  # creates a ChannelFilter named 'filter'.
 #	[ 1] "E-MU Xmidi 2x2 MIDI 1" 
 #	[ 2] "E-MU Xmidi 2x2 MIDI 2" 
 #	[ 3] "Arturia MiniLab mkII MIDI 1"
+#	[ 4] "FastTrack Pro MIDI 1" 
 #
 # The device at index 1 may be specified by either the number 1 or by a
 # sub-string of it's name.  If the sub-string matches more then

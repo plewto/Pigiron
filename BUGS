@@ -22,9 +22,11 @@ BUG 003 21-June-2021 Closed
      had started. 
 
 ---------------------------------------------------------------------- 004
-BOG 004 12-July-2021 Open
+BOG 004 12-July-2021 Closed
     Executing print-forest on the REPL caused program to freeze.
     Not sure of the exact configuration at the time.
+
+    Suspect this is actually BUG 006.
 
 ---------------------------------------------------------------------- 005
 BUG 005 22-July-2021 Closed
@@ -49,8 +51,10 @@ BUG 006 23-July-2021 Open
     Program froze in similar manner after entering 'op p, q-position'.
     Again this was after approx half-dozen transport test commands.
     This time there was a valid MIDI file loaded and it had just been played.
-    
 
 
-
-    
+---------------------------------------------------------------------- 007
+BUG 007 08-Aug-2021 Open
+    del-all command crashes program.
+    This appears related to the MIDI poll loop trying to access destroyed
+    MIDIInputs. 

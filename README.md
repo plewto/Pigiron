@@ -21,6 +21,7 @@ The following Operators are currently available:
 - MIDIPlayer - MIDI file player.
 - Monitor - print incoming MIDI messages.
 - Transposer - manipulate MIDI data bytes.
+- Delay - Repeat notes with optional key mapping.
 
 
 There are three distinct ways to interact with Pigiron.
@@ -58,7 +59,8 @@ In general commands which begin with 'q-' (for query) returns some
 information.  
 
 The resources directory contains the batch file 'example.osc'
-which sets up a basic MIDI process.  It includes annotations.
+which sets up a basic MIDI process.  It is heavily annotated.
+
 
 
 ## Dependencies
@@ -67,18 +69,24 @@ which sets up a basic MIDI process.  It includes annotations.
     github.com/hypebeast/go-osc
 
 
-
-
 ## Installation
 
 **Build Pigiron**
 
 In a terminal cd into the pigiron directory and enter
 
-[pigiron]$ go build .
+    [pigiron]$ go build .
 
-Copy the pigiron executable to a location included on $HOME/$PATH, typical
+
+**Install**
+
+Either copy the pigiron executable to a location included on $HOME/$PATH, typical
 locations would be ~/.local/bin or ~.bin
+
+Alternately you may install with the go command.
+
+    [pigiron]$ go install 
+
 
 **Configuration Directory**
 
@@ -109,6 +117,6 @@ characters.
   
 ## GUI?
 
-Pigiron is strictly a terminal based application, however due to it's OSC
+Pigiron is strictly a terminal based, however due to it's OSC
 interface it should be realtivly easy to write a GUI client app.  
 

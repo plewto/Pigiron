@@ -1,8 +1,36 @@
 Operator type Monitor
 
 A Monitor is an Operator which displays MIDI traffic to the terminal.
+BY default all MIDI messages are displayed.  
+
+Messages may be filtered from the output by MIDI channel and/or status
+byte. 
+
+Resetting a Monitor removes all filters.
 
 
 Sub-Commands:
+------------------------------------------------------------
+Command     op name, q-excluded-status
+OSC         /pig/op name, q-excluded-status
 
-None
+Returns list of excluded MIDI status bytes.   MIDI events with matching
+status bytes are ignored. 
+
+------------------------------------------------------------
+Command     op name, exclude-status, st, flag
+OSC         /pig/op name, exclude-status, st, flag
+
+If flag is true, adds MIDI status byte st to the exclude-list.
+
+------------------------------------------------------------
+Command     op name, q-enabled
+OSC         /pig/op name, q-enabled
+
+Returns true if monitor is enabled.
+
+------------------------------------------------------------
+Command     op name, enable, flag
+OSC         /pig/op name, enable, flag
+
+Enables/disables monitor

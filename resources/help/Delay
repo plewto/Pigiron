@@ -1,5 +1,8 @@
 Delay Operator
 
+NOTE: The Delay operator is experimental and may cause Pigiron to
+      become unstable.
+
 The Delay Operator adds a note on/off delay with key-mappings, velocity
 shift and presets.
 

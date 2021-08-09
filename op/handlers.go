@@ -25,6 +25,7 @@ func Init() {
 	server := osc.GlobalServer
 	osc.AddHandler(server, "ping", remotePing)
 	osc.AddHandler(server, "exit", remoteExit)
+	osc.AddHandler(server, "panic", remotePanic)
 	osc.AddHandler(server, "q-midi-inputs", remoteQueryMIDIInputs)
 	osc.AddHandler(server, "q-midi-outputs", remoteQueryMIDIOutputs)
 	osc.AddHandler(server, "batch", remoteBatchLoad)
@@ -780,3 +781,10 @@ func remoteHelp(msg *goosc.Message)([]string, error) {
 	return []string{text}, err
 }
 		
+func remotePanic(msg *goosc.Message)([]string, error) {
+	var err error
+	for _, root := range RootOperators() {
+		root.Panic()
+	}
+	return empty, err
+}

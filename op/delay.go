@@ -1,5 +1,8 @@
 package op
 
+// NOTE: Delay Operator is experimental and at times unstable
+
+
 import (
 	"fmt"
 	"time"
@@ -7,6 +10,7 @@ import (
 	"github.com/rakyll/portmidi"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/pattern"
+	"github.com/plewto/pigiron/pigerr"
 	
 )
 
@@ -64,8 +68,8 @@ func newDelay(name string) *Delay {
 	}
 	op.initLocalHandlers()
 	op.Reset()
-
-
+	pigerr.Warning("Using experimental Delay Operator.",
+		"Program may become unstable.")
 	
 	return op
 }

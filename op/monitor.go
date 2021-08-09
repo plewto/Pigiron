@@ -99,7 +99,8 @@ func formatSysex(event portmidi.Event) string {
 
 func formatEvent(event portmidi.Event) string {
 	st := midi.StatusByte(event.Status)
-	var acc = "MON " + (st & 0xF0).String()
+	//var acc = "MON 0x%02X " + (st & 0xF0).String()
+	var acc = fmt.Sprintf("MON 0x%02X %s ", byte(st), st)
 	if st >= 0xF0 {
 		switch st {
 		case 0xF0:

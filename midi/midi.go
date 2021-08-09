@@ -236,7 +236,14 @@ func IsMetaTextType(mt byte) bool {
 }
 
 func (s StatusByte) String() string {
-	c, flag := statusMnemonics[s]
+	var c string
+	var flag bool
+	if IsChannelStatus(byte(s)) {
+		cs := s & StatusByte(0xF0)
+		c, flag = statusMnemonics[cs]
+	} else {
+		c, flag = statusMnemonics[s]
+	}
 	if !flag {
 		c = "?   "
 	}

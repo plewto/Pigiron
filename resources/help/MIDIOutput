@@ -7,7 +7,7 @@ an attempt is made to create a  MIDIOutput for a device already in use, the
 original MIDIOutput operator is returned.
 
 Sub-Commands
-
+------------------------------------------------------------
 Command     op name, q-device
 OSC         /pig/op name, q-device
 
@@ -15,6 +15,15 @@ Gets name of MIDI device.
 
 OSC Return: ACK: MIDI device name.
 
+------------------------------------------------------------
+Command     op name, q-off-velocity
+OSC         /pig/op name, q-off-velocity
 
+Returns true if NOTE_OFF velocity is enabled.
 
-TODO: Document off-velocity commands.
+------------------------------------------------------------
+Command     op name, enable-off-velocity, bool
+OSC         /pig/op name, enable-off-velocity, bool
+
+Enables/disables NOTE_OFF velocity.  If disabled all off velocities are set
+to 0.

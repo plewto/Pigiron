@@ -35,11 +35,16 @@ General parameters:
 
 Commands  TODO: add command details
 
-q-delay-pattern  --> list of delay times in milliseconds
-q-repeat-count   --> int
-q-velocity-shift --> int
-q-program-number --> int
-set-delay-pattern d1 [,d2, d3, ..., d6]
-set-repeat-count n
-set-velocity-sift n
-use-program n
+The delay-pattern, repeat-count, velocity-shift and table value commands
+are applied to the current program.
+
+op name, q-delay-pattern  --> list of delay times in milliseconds
+op name, q-repeat-count   --> int
+op name, q-velocity-shift --> int
+op name, q-table-value, index --> int
+op name, q-program-number --> int
+op name, set-delay-pattern, d1 [,d2, d3, ..., d6]
+op name, set-repeat-count, n
+op name, set-velocity-sift, n
+op name, set-table-value, index, value
+op name, use-program, n

@@ -61,16 +61,26 @@ func DumpRegistry() {
 // opType indicates the type of Operator
 //
 // Returns the new Operator and an error.
-// The error is non-nil if opType was invalid or if an Operator named name
-// already exists.
+// The error is non-nil if:
+//     1) opType was invalid
+//     2) if an Operator name exists and it's type does not match opType.
+//
+// If Operator name exist with the same type as opType, a new operator 
+// is not created and the existing operator is reused.
 //
 func NewOperator(opType string, name string) (Operator, error) {
 	var err error
 	var op Operator
 	if OperatorExists(name) {
-		msg := "An operator named %s already exists."
-		err = fmt.Errorf(msg, name)
-		return op, err
+		other, _ := registry[name]
+		if other.OperatorType() != opType {
+			msg := "An operator named %s of type %s already exists\n"
+			msg += "Can not create new %s Operator with same name."
+			err = fmt.Errorf(msg, name, other.OperatorType(), opType)
+			return op, err
+		} else {
+			return GetOperator(name)
+		}
 	}
 	switch opType {
 	case "Dummy":

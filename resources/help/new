@@ -15,9 +15,16 @@ devices.  The device may be specified either by its integer position in the
 list or by a unique sub-string of it's name.
 
 
-Operator names must be unique.  It is an error if an operator with the
-same name already exists.
+Operator names must be unique.  If an attempt is made to create a new
+operator with the same name and type as an existing operator, the existing
+operator is reused and a new operator is not created.
+
+It is an error to create a new operator with the same name, but different
+type, of an existing operator. 
 
 
-OSC Returns: ACK The actual operator name.
-             ERROR if op-type invalid or device invalid
+OSC Returns: ACK The operator name.
+             ERROR if:
+	        1) op-type is invalid.
+		2) an operator name exist and it's type is not op-type.
+		

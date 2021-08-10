@@ -1,0 +1,6 @@
+Command     del-macro
+OSC         /pig/del-macro name
+
+Deletes named macro.
+
+See also macro, q-macros, celar-macros

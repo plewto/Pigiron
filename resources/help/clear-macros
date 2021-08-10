@@ -1,0 +1,6 @@
+Command     clear-macros
+OSC         /pig/clear-macros
+
+Deletes all macro definitions.
+
+See macro, q-macros, del-macro

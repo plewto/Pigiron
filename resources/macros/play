@@ -1,0 +1,5 @@
+# Macro insrtucts Operator 'player' to start playback
+#
+
+op player, play
+

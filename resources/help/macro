@@ -1,0 +1,32 @@
+Command     macro name, command, template...
+OSC         /pig/macro name, command, template...
+
+Defines new macro.
+
+A macro replaces name with command and template.  For example
+
+    /pig/macro p, ping
+
+Creates a new macro named 'p' with expands to 'ping'.  Entering p at the
+prompt executes ping.
+
+    /pig/p   --> ping
+
+The optional template values specifies arguments to the expanded command.
+Template values may be:
+
+    1) Literal strings
+    2) Have special form '$n' where n is an integer index.  Upon macro
+       execution '$n' is replaced with the nth argument.   The following
+       defines a replacement for 'new MIDIInput' 
+
+
+       /pig/macro input,  new, MIDIInput, $0, $1
+
+       Calling /pig/input dog, Arturia
+       Expands to: new MIDIInput, dog, Arturia
+
+
+See also q-macros, del-macro, celar-macros
+
+       

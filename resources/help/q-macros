@@ -1,0 +1,6 @@
+Command     q-macros
+OSC         /pig/q-macros
+
+Displays list of defined macros.
+
+See macro, del-macro, clear-macro

@@ -1,0 +1,4 @@
+# Macro commands Operator 'player' to stop playback
+#
+
+op player, stop

@@ -9,6 +9,7 @@ import (
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/piglog"
+	"github.com/plewto/pigiron/macro"
 )
 
 const (
@@ -79,9 +80,9 @@ func parse(s string)(string, []string) {
 // Eval() evaluates REPL commands
 //
 func Eval(command string, args []string) {
-	switch command {
-	case "":  // ignore blank lines
-	case "#": // ignore comment lines
+	switch {
+	case command == "":  // ignore blank lines
+	case command == "#": // ignore comment lines
 	default:
 		root := config.GlobalParameters.OSCServerRoot
 		address := fmt.Sprintf("/%s/%s", root, command)
@@ -92,12 +93,6 @@ func Eval(command string, args []string) {
 		internalClient.Send(msg)
 	}
 }
-
-
-
-
-
-
 		
 // REPL() enters the interactive command loop.
 //
@@ -108,6 +103,14 @@ func REPL() {
 		raw := Read()
 		piglog.Log(fmt.Sprintf("CMD  : %s", raw))
 		command, args := parse(raw)
+		if macro.IsMacro(command) {
+			expanded, err := macro.Expand(command, args)
+			if err != nil {
+				fmt.Printf("ERROR: %v\n", err)
+				continue
+			}
+			command, args = parse(expanded)
+		}
 		Eval(command, args)
 		time.Sleep(10 * time.Millisecond)
 	}

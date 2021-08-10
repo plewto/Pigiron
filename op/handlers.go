@@ -14,6 +14,7 @@ import (
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/help"
+	"github.com/plewto/pigiron/macro"
 )
 
 var empty []string
@@ -61,6 +62,11 @@ func Init() {
 	osc.AddHandler(server, "midi", remoteMIDIInsert)
 	osc.AddHandler(server, "op", dispatchExtendedCommand)
 	osc.AddHandler(server, "help", remoteHelp)
+	osc.AddHandler(server, "macro", remoteDefineMacro)
+	osc.AddHandler(server, "q-macros", remoteQueryMacros)
+	osc.AddHandler(server, "del-macro", remoteDeleteMacro)
+	osc.AddHandler(server, "clear-macros", remoteClearMacros)
+	
 }
 
 // remotePing() handler for /pig/ping
@@ -788,3 +794,46 @@ func remotePanic(msg *goosc.Message)([]string, error) {
 	}
 	return empty, err
 }
+
+
+
+// macro name, command, expansion...
+func remoteDefineMacro(msg *goosc.Message)([]string, error) {
+	template := "ss"
+	for i := 0; i < len(msg.Arguments)-2; i++ {
+		template += "s"
+	}
+	args, err := ExpectMsg(template, msg)
+	if err != nil {
+		return empty, err
+	}
+	name := args[0].S
+	command := args[1].S
+	expansion := make([]string, len(args)-2)
+	for i := 2; i < len(args); i++ {
+		expansion[i-2] = args[i].S
+	}
+	macro.Define(name, command, expansion)
+	return empty, err
+}
+	
+func remoteQueryMacros(msg *goosc.Message)([]string, error) {
+	var err error
+	return macro.ListMacros(), err
+}
+
+func remoteDeleteMacro(msg *goosc.Message)([]string, error) {
+	args, err := ExpectMsg("s", msg)
+	if err != nil {
+		return empty, err
+	}
+	macro.Delete(args[0].S)
+	return empty, err
+}
+
+func remoteClearMacros(msg *goosc.Message)([]string, error) {
+	var err error
+	macro.Reset()
+	return empty, err
+}
+

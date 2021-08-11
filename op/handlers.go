@@ -57,7 +57,7 @@ func Init() {
 	osc.AddHandler(server, "q-commands", remoteQueryCommands)
 	osc.AddHandler(server, "q-children", remoteQueryChildren)
 	osc.AddHandler(server, "q-parents", remoteQueryParents)
-	osc.AddHandler(server, "print-info", remotePrintInfo)
+	osc.AddHandler(server, "info", remotePrintInfo)
 	osc.AddHandler(server, "print-config", remotePrintConfig)
 	osc.AddHandler(server, "midi", remoteMIDIInsert)
 	osc.AddHandler(server, "op", dispatchExtendedCommand)

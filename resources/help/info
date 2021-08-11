@@ -1,5 +1,5 @@
-Command     print-info name
-OSC         /pig/print-info name
+Command     info name
+OSC         /pig/info name
 
 Prints information about named operator.
 

@@ -62,3 +62,8 @@ BUG 007 08-Aug-2021 Closed
     Made it an error to delete a MIDIInput operator.
     The op.ClearRegistry function now skips all MIDIInputs.
     
+
+---------------------------------------------------------------------- 008
+BUG 008 11-Aug-2021 Open
+    select-all-channels causes SingleChannelMode operators to switch to
+    channel 16, instead of being ignored.

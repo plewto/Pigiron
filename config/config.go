@@ -17,7 +17,7 @@ import (
 	"github.com/plewto/pigiron/pigpath"
 )
 
-const Version = "0.0.1 pre-alpha"
+const Version = "0.0.2 alpha"
 	
 
 var (

@@ -67,3 +67,14 @@ BUG 007 08-Aug-2021 Closed
 BUG 008 11-Aug-2021 Open
     select-all-channels causes SingleChannelMode operators to switch to
     channel 16, instead of being ignored.
+
+
+---------------------------------------------------------------------- 009
+BUG 009 11-Aug-2021 Open
+    Stuck notes on some legacy synths.
+    Some legacy synths, specifically a Yamaha TX816 and Yamaha MU100R, are
+    prone to stuck notes while using Pigiron.  More modern instruments do
+    not seem to be effected.
+
+    It is not verified but this appears to happen when there is a high
+    density of MIDI traffic.

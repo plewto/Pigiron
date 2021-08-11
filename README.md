@@ -64,6 +64,7 @@ which sets up a basic MIDI process.  It is heavily annotated.
 
 
 ## Dependencies
+    go
 	github.com/pelletier/go-toml
 	github.com/rakyll/portmidi
     github.com/hypebeast/go-osc
@@ -93,6 +94,20 @@ Alternately you may install with the go command.
 - Linux   : ~/.config/pigiron/
 - Windows : To be determined.
 - OSX     : To be determined.
+
+Make 'batch' directrory inside the configuration directory
+
+     ~/.config/pigiron/
+	     |
+		 +-- config.toml
+		 |
+		 +-- batch/
+		 |
+		 +-- resources/
+		       |
+			   +-- help/
+			   +-- testFiles/
+
    
 The location of the configuration directory is printed as Pigiron starts.
 You should either copy, or make a symbolic link, within the configuration

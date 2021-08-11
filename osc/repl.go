@@ -103,15 +103,20 @@ func REPL() {
 		raw := Read()
 		piglog.Log(fmt.Sprintf("CMD  : %s", raw))
 		command, args := parse(raw)
-		if macro.IsMacro(command) {
-			expanded, err := macro.Expand(command, args)
-			if err != nil {
-				fmt.Printf("ERROR: %v\n", err)
-				continue
+		filename, flag := batchFileExist(command)
+		if flag {
+			BatchLoad(filename)
+		} else {
+			if macro.IsMacro(command) {
+				expanded, err := macro.Expand(command, args)
+				if err != nil {
+					fmt.Printf("ERROR: %v\n", err)
+					continue
+				}
+				command, args = parse(expanded)
 			}
-			command, args = parse(expanded)
+			Eval(command, args)
 		}
-		Eval(command, args)
 		time.Sleep(10 * time.Millisecond)
 	}
 }

@@ -7,6 +7,9 @@
 	enable = false
 	logfile = "!/log"
 
+[batch]
+	directory = "!/batch"
+
 [osc-server]
 	root = "pig"
 	host = "127.0.0.1"

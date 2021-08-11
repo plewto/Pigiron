@@ -13,6 +13,20 @@ import (
 )
 
 
+func batchFileExist(name string) (filename string, flag bool) {
+	if len(name) == 0 {
+		return "", false
+	}
+	filename = pigpath.Join(config.GlobalParameters.BatchDirectory, name)
+	_, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return filename, false
+	} else {
+		return filename, true
+	}
+}
+
+
 func printBatchError(filename string, err error) {
 	fmt.Print(config.GlobalParameters.ErrorColor)
 	fmt.Printf("Can not read batch file '%s'\n", filename)

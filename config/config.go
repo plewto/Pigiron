@@ -153,6 +153,7 @@ func readConfigurationFile(filename string) {
 		// fmt.Printf("Using configuration file: '%s'\n", filename)
 		GlobalParameters.EnableLogging = readBool("log.enable", true)
 		GlobalParameters.Logfile = pigpath.SubSpecialDirectories(readString("log.logfile", "!/log"))
+		GlobalParameters.BatchDirectory = pigpath.SubSpecialDirectories(readString("batch.directory", "!/batch"))
 		GlobalParameters.OSCServerRoot = readString("osc-server.root", "pig")
 		GlobalParameters.OSCServerHost = readString("osc-server.host", "127.0.0.1")
 		GlobalParameters.OSCServerPort = readInt("osc-server.port", 8020)

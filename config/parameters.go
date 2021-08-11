@@ -12,6 +12,7 @@ import "fmt"
 type globalParameters struct {
 	EnableLogging bool
 	Logfile string
+	BatchDirectory string
 	OSCServerRoot string
 	OSCServerHost string
 	OSCServerPort int64
@@ -34,6 +35,7 @@ type globalParameters struct {
 func ResetGlobalParameters() {
 	GlobalParameters.EnableLogging = true
 	GlobalParameters.Logfile = "!/log"
+	GlobalParameters.BatchDirectory = "!/batch"
 	GlobalParameters.OSCServerRoot = "pig"
 	GlobalParameters.OSCServerHost = "127.0.0.1"
 	GlobalParameters.OSCServerPort = 8020
@@ -66,6 +68,7 @@ func ConfigInfo() string {
 	acc += fmt.Sprintf("\tconfig file was \"%s\"\n", configFilename)
 	acc += fmt.Sprintf("\tEnableLogging         : %v\n", GlobalParameters.EnableLogging)
 	acc += fmt.Sprintf("\tLogfile               : %v\n", GlobalParameters.Logfile)
+	acc += fmt.Sprintf("\tBatchDirectory        : %v\n", GlobalParameters.BatchDirectory)
 	acc += fmt.Sprintf("\tOSCServerRoot         : %v\n", GlobalParameters.OSCServerRoot)
 	acc += fmt.Sprintf("\tOSCServerHost         : %v\n", GlobalParameters.OSCServerHost)
 	acc += fmt.Sprintf("\tOSCServerPort         : %v\n", GlobalParameters.OSCServerPort)

@@ -21,7 +21,7 @@ The following Operators are currently available:
 - MIDIPlayer - MIDI file player.
 - Monitor - print incoming MIDI messages.
 - Transposer - manipulate MIDI data bytes.
-- Delay - Repeat notes with optional key mapping.
+- Delay - (Experimental) Repeat notes with optional key mapping.
 
 
 There are three distinct ways to interact with Pigiron.
@@ -64,7 +64,7 @@ which sets up a basic MIDI process.  It is heavily annotated.
 
 
 ## Dependencies
-    go
+    go 1.13
 	github.com/pelletier/go-toml
 	github.com/rakyll/portmidi
     github.com/hypebeast/go-osc
@@ -95,26 +95,30 @@ Alternately you may install with the go command.
 - Windows : To be determined.
 - OSX     : To be determined.
 
-Make 'batch' directrory inside the configuration directory
+The structure within the .config/pigiron/
 
-     ~/.config/pigiron/
+     ~/.config/
 	     |
-		 +-- config.toml
-		 |
-		 +-- batch/
-		 |
-		 +-- resources/
-		       |
-			   +-- help/
-			   +-- testFiles/
+		 +--pigiron/
+              |
+              +-- config.toml
+              +-- log
+              |
+              +-- batch/
+              |
+              +-- resources/
+                    |
+                    +-- help/
+                    +-- testFiles/
 
    
-The location of the configuration directory is printed as Pigiron starts.
-You should either copy, or make a symbolic link, within the configuration
-directory to the pigiron/resources directory.  The resources directly
-contains all the help documents and MIDI files necessary for the test
-suit.   Pigiron will function without these but testing will fail and help
-will not be available.
+
+Within .config/pigiron/ create the batch directory and either simlink or
+copy the resources directory from the Pigiron project.   Pigiron can
+operate without the resources directory but help will not be available and
+some unit test will fail.  The file pigiron/resources/batch/example is an
+example batch file with annotation.
+
 
 
 ## Command Line Options
@@ -128,10 +132,10 @@ In general filenames within Pigiron may be prefixed with one of two special
 characters.  
 
   ~/foo names the file foo relative to the user's home directory.
-  !/foo names a file relative to the configuratin directory.
+  !/foo names a file relative to the configuration directory.
   
 ## GUI?
 
 Pigiron is strictly a terminal based, however due to it's OSC
-interface it should be realtivly easy to write a GUI client app.  
+interface it should be relatively easy to write a GUI client app.  
 

@@ -9,7 +9,7 @@
 #   command arg-1, arg-2, ..., arg-n
 #
 # The command 'q-commands' displays a list of available commands,
-# while the help command displays a help text for a specific command.
+# while the help command displays help text for a specific command.
 # 'help topics' displays a list of available topics.
 #
 #
@@ -18,9 +18,20 @@
 #     syntax:  new operator-type, name
 #
 #
-# An Operator's name must be unique.  It is an error if an Operator name
-# already exists.
+# An Operator's name must be unique.  A name may be reused only for the
+# same type of operator:
 #
+#     new ChannelFilter, foo
+#     new ChannelFilter, foo
+#
+# The above lines are OK, however the 2nd line is ignored and the original
+# 'foo' operator is remains in place.
+#
+#     new ChannelFilter, foo
+#     new Distribute, foo
+#
+# These two lines will fail.  The original 'foo' operator will remain the
+# same but a Distributor with the same name can not be created.
 
 new ChannelFilter, filter  # creates a ChannelFilter named 'filter'.
 
@@ -31,7 +42,7 @@ new ChannelFilter, filter  # creates a ChannelFilter named 'filter'.
 #    new MIDIInput, name, device
 #    new MIDIOutput, name, device
 #
-# Where device is the backing MIDI device.  It may either be an integer
+# Where device is the backing MIDI device and may either be an integer
 # index or a sub-string of the device's name.
 #
 # The q-midi-inputs and q-midi-outputs commands displays a list of
@@ -49,8 +60,8 @@ new ChannelFilter, filter  # creates a ChannelFilter named 'filter'.
 # one device, the first matching device is used. 
 #
 
-new MIDIInput, in, 1               # device by index
-new MIDIOutput, out, MIDI 2        # device by sub-string
+new MIDIInput, in, 0               # device by index
+new MIDIOutput, out, 0        
 
 
 # Create remaining Operators
@@ -75,31 +86,44 @@ connect in, filter, distributor, monitor, out
 connect player, monitor
 
 
-# *** WARNING ***
+# The 'op' command is used for sub-commands of an operator, the general
+# form is
 #
-# If this batch file was loaded twice, all of the new operator names will
-# be modified to avoid conflict with the those created the first time.  For
-# example, the name of the new ChannelFilter will be 'channel.1', not the
-# specified name of 'channel'.  When the connect commands are re-executed,
-# they will simply reconnect the original operators.  To avoid this the
-# original operators should be deleted first with the 'del-all' command.
+#      op name, sub-command [,arguments ....]
+#
+# help OperatorType will display list of sub-commands for a specific
+# Operator type.  The MIDIPlayer operator has the following three
+# sub-commands (among other).
+#
+#     op player, stop
+#     op player, play
+#     op player, load, filename
+#
+# Macros may be used to simplify commonly used commands
+#
+
+macro stop, player, stop
+macro play, player, play
+macro load, player, load, $0
+
+# Hereafter 'stop', 'play' and 'load' may be used instead of the more
+# cumbersome op with sub-command form.   The $0 term in the load macro
+# substitutes the first argument to the macro into the expanded form
+#
+#     load /foo/bar/baz
+#
+# Expands to
+#
+#    op player, load, /foo/bar/baz
+#
+
 
 # Some Useful commands.
 #
 # q-operators   - returns list of all operators
 # q-roots       - returns list of all root operators
 # print-graph   - prints structure of the MIDI process graph.
-#
-
-# Many operator types have a set of sub-commands only applicable to that
-# specific type.   Use the help command for details.
-#
-#   help MIDIPlayer 
-#
-# An operator's sub-commands are executed by the extended 'op' command.
-#
-#    op operator-name, sub-command [,argumrnts ....]
-# 
+# info name     - displays current state of Operator name.
 
 
 # The following commands relate to MIDI channel selections.
@@ -111,7 +135,7 @@ connect player, monitor
 #    Returns list of selected channels.
 #
 # q-channel-selected operator-name, channel
-#    Returns true if channel is enabled. false otherwise.
+#    Returns true if channel is enabled, false otherwise.
 #
 # select-channels operator-name, chan-A, chan-B, ....
 #    Selects all listed channels as enabled.
@@ -119,10 +143,14 @@ connect player, monitor
 #
 # deselect-channels operator-name. chan-A, chan-B, ...
 #    Disables all selected channels.
+#    Ignored by Operators with SingleChannelMode.
 #
 # select-all-channels operator-name
+#    Ignored by Operators with SingleChannelMode (see BUG 008).
 #
 # deselect-all-channels operator-name
+#    Ignored by Operators with SingleChannelMode.
 #
 # invert-channels operator-name
-#
+#    Ignored by Operators with SingleChannelMode.
+

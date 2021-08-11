@@ -27,6 +27,26 @@ Template values may be:
        Expands to: new MIDIInput, dog, Arturia
 
 
-See also q-macros, del-macro, celar-macros
+A practical example to simplify interaction with MIDIPlayer.
+
+    /pig: new MIDIPlayer, player
+    /pig: macro play, op, player, play
+    /pig: macro stop, op, player, stop
+    /pig: macro load, op, player, load, $0
+
+Hereafter to load a MIDI file simply enter 'load filename' instead of the
+more cumbersome 'op player, load, filename'
+
+
+Macros may not refer to previous macros. The following example will not
+work.
+
+    /pig: macro foo, ping
+    /pig: macro baz, foo
+
+The baz macro will fail.
+
+
+See also q-macros, del-macro, clear-macros
 
        

@@ -11,3 +11,12 @@ The filename prefix may indicate one of two special directories:
 !/filename is relative to the configuration directory.
 
 
+If a file is placed in the batch directory, it may be loaded simply by
+entering it's name at the prompt.   The default location for batch files is
+
+    ~/.config/pigiron/batch/
+
+
+Care should be used in naming files in the batch directory so they do not
+shadow existing command names.
+

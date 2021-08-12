@@ -1,8 +1,9 @@
 /*
-** macro package defines command replacement.
+** macro package provides mean to define command aliases by text-replacement.
+** Macros may be used interactivly at the /pig: prompt or within batch files,
+** they do not define new OSC commands.
 **
 */
-
 
 package macro
 
@@ -13,22 +14,18 @@ import (
 	"sort"
 )
 
-const (
-	DELIM = ","
-	DEREF = '$'
-	COMMENT = "#"
-)
+const DEREF = '$'
 
-var (
-	macros = make(map[string]*Macro)
-)
+var macros = make(map[string]*Macro)
+
 
 /*
 ** Macro struct defines a command replacement.
 ** name - The macro's name
 ** command - The OSC command name
-** template - arguments to the expanded command.
-**
+** template - arguments to the expanded command.  Use $n to 
+**            substitute argument n into expanded text.
+**            
 */
 type Macro struct {
 	name string

@@ -1,12 +1,18 @@
 package pattern
 
+/*
+** pattern package defines generalized int sequence generators.
+**
+*/
+
+
 import (
 	"fmt"
 )
 
 
 /*
-** Pattern interface defines generalized sequendce generator.
+** Pattern interface defines generalized sequence generator.
 **
 ** Value() int returns current Pattern value.
 ** SetValues([]int) sets pattern values.

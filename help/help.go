@@ -1,11 +1,16 @@
 package help
 
+// help package provides online help.
+// All help documents stored as simple text files in 
+//
+//     ~/.config/pigiron/resources/help
+//
+
 import (
 	"fmt"
 	"io/ioutil"
 	"github.com/plewto/pigiron/pigpath"
 )
-
 
 func Help(topic string) (text string, err error) {
 	switch topic {
@@ -35,6 +40,3 @@ func helpTopics() (string, error) {
 	acc += "\n"
 	return acc, err
 }
-		
-
-	

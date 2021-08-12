@@ -46,6 +46,9 @@ work.
 
 The baz macro will fail.
 
+Macros are only applicable to the REPL command line or inside a batch
+file.   They do not define new OSC commands.
+
 
 See also q-macros, del-macro, clear-macros
 

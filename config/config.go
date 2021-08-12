@@ -17,9 +17,6 @@ import (
 	"github.com/plewto/pigiron/pigpath"
 )
 
-const Version = "0.0.2 alpha"
-	
-
 var (
 	GlobalParameters = globalParameters{}
 	configFilename string

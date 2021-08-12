@@ -44,7 +44,7 @@ func printBanner() {
 	} else {
 		fmt.Printf("Logging disabled\n")
 	}
-	fmt.Printf("Version: %s\n", config.Version)
+	fmt.Printf("%s\n", VERSION.String())
 	
 
 	fmt.Print(config.GlobalParameters.TextColor)
@@ -54,6 +54,7 @@ func printBanner() {
 
 func main() {
 	piglog.Log("-------- Pigiron main()")
+	piglog.Log(VERSION.String())
 	printBanner()
 	piglog.Log(config.ConfigInfo())
 	osc.Init()

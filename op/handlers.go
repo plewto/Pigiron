@@ -493,7 +493,7 @@ func remoteQueryRoots(msg *goosc.Message)([]string, error) {
 //
 func remoteQueryOperatorTypes(msg *goosc.Message)([]string, error) {
 	var err error
-	return OperatorTypes(false), err
+	return OperatorTypes, err
 }
 
 // remoteDeleteAllOperators() handler for /pig/del-all

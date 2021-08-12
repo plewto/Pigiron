@@ -6,23 +6,14 @@ import (
 	"errors"
 )
 
-func OperatorTypes(sansIO bool) []string {
-	acc := make([]string, 0, 12)
-	acc = append(acc, "Monitor")
-	acc = append(acc, "ChannelFilter")
-	acc = append(acc, "Delay")
-	acc = append(acc, "Distributor")
-	acc = append(acc, "MIDIPlayer")
-	acc = append(acc, "Transposer")
-
-	if !sansIO {
-		acc = append(acc, "MIDIInput")
-		acc = append(acc, "MIDIOutput")
-	}
-	return acc
-}
-	
-
+var OperatorTypes = []string{"ChannelFilter",
+	"Delay",
+	"Disrtributor",
+	"MIDIInput",
+	"MIDIOutput",
+	"MIDIPlayer",
+	"Monitor",
+	"Transposer"}
 
 // The registry is a global map holding all current operators. 
 // MIDIInput and MIDIOutput operators are stored separately.

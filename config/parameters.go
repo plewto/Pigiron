@@ -64,7 +64,6 @@ func PrintConfig() {
 //
 func ConfigInfo() string {
 	acc := "Global configuration values\n"
-	acc += fmt.Sprintf("\tpigiron version: %s\n", Version)
 	acc += fmt.Sprintf("\tconfig file was \"%s\"\n", configFilename)
 	acc += fmt.Sprintf("\tEnableLogging         : %v\n", GlobalParameters.EnableLogging)
 	acc += fmt.Sprintf("\tLogfile               : %v\n", GlobalParameters.Logfile)

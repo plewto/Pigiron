@@ -1,5 +1,7 @@
 # Pigiron README
 
+(c) 2021 Steven Jones  
+
 Pigiron is a fully configurable MIDI routing utility written in Go.  It
 includes a MIDI file player and has a comprehensive OSC interface. 
 
@@ -21,7 +23,7 @@ The following Operators are currently available:
 - MIDIPlayer - MIDI file player.
 - Monitor - print incoming MIDI messages.
 - Transposer - manipulate MIDI data bytes.
-- Delay - (Experimental) Repeat notes with optional key mapping.
+- Delay - Repeat notes with optional key mapping (experimental & unstable).
 
 
 There are three distinct ways to interact with Pigiron.
@@ -58,13 +60,14 @@ For details on how OSC messages are handled, enter
 In general commands which begin with 'q-' (for query) returns some
 information.  
 
-The resources directory contains the batch file 'example.osc'
-which sets up a basic MIDI process.  It is heavily annotated.
+The resources/batch directory contains the batch file 'example'
+which illustrates several commands to set up a basic MIDI process.
+It is heavily annotated.
 
 
 
 ## Dependencies
-    go 1.13
+    go 1.16
 	github.com/pelletier/go-toml
 	github.com/rakyll/portmidi
     github.com/hypebeast/go-osc
@@ -74,7 +77,7 @@ which sets up a basic MIDI process.  It is heavily annotated.
 
 **Build Pigiron**
 
-In a terminal cd into the pigiron directory and enter
+In a terminal navigate into the pigiron directory and enter
 
     [pigiron]$ go build .
 
@@ -95,7 +98,7 @@ Alternately you may install with the go command.
 - Windows : To be determined.
 - OSX     : To be determined.
 
-The structure within the .config/pigiron/
+The structure within the .config/pigiron/ directory is:
 
      ~/.config/
 	     |
@@ -116,8 +119,7 @@ The structure within the .config/pigiron/
 Within .config/pigiron/ create the batch directory and either simlink or
 copy the resources directory from the Pigiron project.   Pigiron can
 operate without the resources directory but help will not be available and
-some unit test will fail.  The file pigiron/resources/batch/example is an
-example batch file with annotation.
+some unit test will fail.  
 
 
 
@@ -125,14 +127,14 @@ example batch file with annotation.
 
 Pigiron has the following command line options:
 
---config filename    # Use alternate configuration file.
---batch filename     # Load named batch file.
+    --config filename    # Use alternate configuration file.
+    --batch filename     # Load named batch file.
 
 In general filenames within Pigiron may be prefixed with one of two special
 characters.  
 
-  ~/foo names the file foo relative to the user's home directory.
-  !/foo names a file relative to the configuration directory.
+    '~/foo' names the file foo relative to the user's home directory.
+    '!/foo' names a file relative to the configuration directory.
   
 ## GUI?
 

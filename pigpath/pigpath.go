@@ -1,13 +1,13 @@
 /* 
- * pigpath package provides utilities for for making filename substitutions.
- * Specifically leading characters '~' and '!' are replaced with the user's
- * home and pigiron configuration directories respectively.
- */
+** pigpath package provides utilities for for making filename substitutions.
+** Specifically leading characters '~' and '!' are replaced with the user's
+** home and pigiron configuration directories respectively.
+**
+*/
 
 package pigpath
 
 import (
-	// "fmt"
 	"os"
 	"path/filepath"
 )

@@ -12,7 +12,8 @@ func TestTransform(t *testing.T) {
 	}
 	
 	dt := NewDataTable()
-	for i := 0; i < dt.Length(); i++ {
+	floor, ceiling := dt.TransformRange()
+	for i := floor; i < ceiling; i++ {
 		j, err := dt.Value(byte(i))
 		if err != nil {
 			msg := "%s unexpected error, index was %d, \nerr was %s"
@@ -76,7 +77,8 @@ func TestTransformBank(t *testing.T) {
 
 	event = program(1, 0)
 	bank.ChangeProgram(event)
-	for i := 0; i < bank.Length(); i++ {
+	floor, ceiling := bank.TransformRange()
+	for i := floor; i < ceiling; i++ {
 		j, err := bank.Value(byte(i))
 		if err != nil {
 			msg := "%s, unexpected error index %d,\nerr %s"
@@ -91,7 +93,8 @@ func TestTransformBank(t *testing.T) {
 	// Out of bounds program should be ignored.
 	event = program(1, 100)
 	bank.ChangeProgram(event)
-	for i := 0; i < bank.Length(); i++ {
+	floor, ceiling = bank.ProgramRange()
+	for i := floor; i < ceiling; i++ {
 		j, err := bank.Value(byte(i))
 		if err != nil {
 			msg := "%s, unexpected error index %d,\nerr %s"
@@ -106,13 +109,14 @@ func TestTransformBank(t *testing.T) {
 	// Switch to offset Transform
 	event = program(1, 1)
 	bank.ChangeProgram(event)
-	for i := 0; i < bank.Length(); i++ {
+	floor, ceiling = bank.ProgramRange()
+	for i := floor; i < ceiling; i++ {
 		j, err := bank.Value(byte(i))
 		if err != nil {
 			msg := "%s, unexpected error index %d,\nerr %s"
 			t.Fatalf(msg, fname(5), i, err)
 		}
-		x := (i + shift) & 0x7F
+		x := (i + byte(shift)) & 0x7F
 		if j != byte(x) {
 			msg := "%s Value(%d) expected %d, got %d"
 			t.Fatalf(msg, fname(6), i, x, j)

@@ -25,7 +25,7 @@
 #     new ChannelFilter, foo
 #
 # The above lines are OK, however the 2nd line is ignored and the original
-# 'foo' operator is remains in place.
+# 'foo' operator remains in place.
 #
 #     new ChannelFilter, foo
 #     new Distribute, foo
@@ -45,7 +45,7 @@ new ChannelFilter, filter  # creates a ChannelFilter named 'filter'.
 # Where device is the backing MIDI device and may either be an integer
 # index or a sub-string of the device's name.
 #
-# The q-midi-inputs and q-midi-outputs commands displays a list of
+# The 'q-midi-inputs' and 'q-midi-outputs' commands display a list of
 # available MIDI devices.  On the system this is being written on
 # q-midi-inputs returns:
 #
@@ -91,15 +91,15 @@ connect player, monitor
 #
 #      op name, sub-command [,arguments ....]
 #
-# help OperatorType will display list of sub-commands for a specific
+# 'help OperatorType' will display list of sub-commands for a specific
 # Operator type.  The MIDIPlayer operator has the following three
-# sub-commands (among other).
+# sub-commands (among others).
 #
 #     op player, stop
 #     op player, play
 #     op player, load, filename
 #
-# Macros may be used to simplify commonly used commands
+# Macros may be used to simplify commonly used commands.
 #
 
 macro stop, player, stop
@@ -108,7 +108,7 @@ macro load, player, load, $0
 
 # Hereafter 'stop', 'play' and 'load' may be used instead of the more
 # cumbersome op with sub-command form.   The $0 term in the load macro
-# substitutes the first argument to the macro into the expanded form
+# substitutes the first macro argument into the expanded form.
 #
 #     load /foo/bar/baz
 #
@@ -120,10 +120,11 @@ macro load, player, load, $0
 
 # Some Useful commands.
 #
-# q-operators   - returns list of all operators
-# q-roots       - returns list of all root operators
-# print-graph   - prints structure of the MIDI process graph.
-# info name     - displays current state of Operator name.
+# q-operator-types - returns list of available operator types.
+# q-operators      - returns list of all operators.
+# q-roots          - returns list of all root operators.
+# print-graph      - prints structure of the MIDI process graph.
+# info name        - displays current state of Operator name.
 
 
 # The following commands relate to MIDI channel selections.
@@ -131,25 +132,32 @@ macro load, player, load, $0
 # q-channel-mode operator-name
 #    Returns either NoChannel, SingleChannel or MultiChannel.
 #
+#
 # q-channels operator-name
 #    Returns list of selected channels.
 #
+#
 # q-channel-selected operator-name, channel
 #    Returns true if channel is enabled, false otherwise.
+#
 #
 # select-channels operator-name, chan-A, chan-B, ....
 #    Selects all listed channels as enabled.
 #    For Operators with SingleChannel mode, the final channel is selected.
 #
+#
 # deselect-channels operator-name. chan-A, chan-B, ...
 #    Disables all selected channels.
 #    Ignored by Operators with SingleChannelMode.
 #
+#
 # select-all-channels operator-name
 #    Ignored by Operators with SingleChannelMode (see BUG 008).
 #
+#
 # deselect-all-channels operator-name
 #    Ignored by Operators with SingleChannelMode.
+#
 #
 # invert-channels operator-name
 #    Ignored by Operators with SingleChannelMode.

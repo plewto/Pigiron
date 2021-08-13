@@ -2,7 +2,7 @@
 
 (c) 2021 Steven Jones  
 
-Pigiron is a fully configurable MIDI routing utility written in Go.  It
+**Pigiron** is a fully configurable MIDI routing utility written in Go.  It
 includes a MIDI file player and has a comprehensive OSC interface. 
 
 The primary Pigiron object is called an **Operator**.  Each Operator has
@@ -101,8 +101,8 @@ Alternately you may install with the go command.
 The structure within the .config/pigiron/ directory is:
 
      ~/.config/
-	     |
-		 +--pigiron/
+         |
+         +--pigiron/
               |
               +-- config.toml
               +-- log

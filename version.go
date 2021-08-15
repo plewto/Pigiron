@@ -9,7 +9,7 @@ type version struct {
 	level string
 }
 
-var VERSION = version{0, 1, 0, "Beta"}
+var VERSION = version{0, 1, 1, "Beta"}
 
 func (v *version) String() string {
 	mj, mn, rv, lev := v.major, v.minor, v.revision, v.level

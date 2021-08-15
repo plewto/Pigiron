@@ -3,6 +3,7 @@ package osc
 import (
 	"fmt"
 	goosc "github.com/hypebeast/go-osc/osc"
+	"github.com/plewto/pigiron/piglog"
 	
 )
 
@@ -95,7 +96,15 @@ func (s *OSCServer) GetREPLResponder() Responder {
 }
 
 func (s *OSCServer) AddMsgHandler(address string, handler func(msg *goosc.Message)) {
-	s.dispatcher.AddMsgHandler(address, handler)
+
+	logger := func(msg *goosc.Message) {
+		piglog.Print(msg.Address)
+		for i, a := range msg.Arguments {
+			piglog.Print(fmt.Sprintf("[%2d] %v", i, a))
+		}
+		handler(msg)
+	}
+	s.dispatcher.AddMsgHandler(address, logger)
 	s.commands = append(s.commands, address)
 }
 

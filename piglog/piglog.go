@@ -51,3 +51,9 @@ func Log(text ...string) {
 		}
 	}
 }
+
+func Print(s string) {
+	if config.GlobalParameters.EnableLogging {
+		log.Print(s)
+	}
+}

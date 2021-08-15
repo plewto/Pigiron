@@ -79,3 +79,8 @@ BUG 009 11-Aug-2021 Open
 
     It is not verified but this appears to happen when there is a high
     density of MIDI traffic.
+
+---------------------------------------------------------------------- 010
+BUG 010 14-Aug-2021 Closed
+    External OSC commands not added to log file.
+

@@ -33,6 +33,7 @@ func Init() {
 	port = int(config.GlobalParameters.OSCServerPort)
 	root = config.GlobalParameters.OSCServerRoot
 	GlobalServer = NewServer(host, port, root)
+	AddHandler(GlobalServer, "exec", remoteEval)
 }
 
 // Listen() starts OSC server.

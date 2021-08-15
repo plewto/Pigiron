@@ -1,0 +1,23 @@
+Command     exec command
+OSC         /pig/exec command
+
+Executes command.
+
+exec allows sending a single string containing an OSC command.  For example
+sending:
+
+      /pig/exec "new MIDIPlayer, player" 
+
+executes:
+
+     /pig/new MIDIPlayer, player
+
+exec was added specifically to allow CYCO to function as a Pigiron
+client. 
+
+
+
+
+
+
+    

@@ -121,3 +121,16 @@ func REPL() {
 	}
 }
 		
+
+// /pig/eval command [,arg1, arg2, ...]
+// 
+func remoteEval(msg *goosc.Message) ([]string, error) {
+	var err error
+	for _, raw := range msg.Arguments {
+		command, args := parse(fmt.Sprintf("%v", raw))
+		Eval(command, args)
+		time.Sleep(10 * time.Millisecond)
+	}
+	return empty, err
+}
+	

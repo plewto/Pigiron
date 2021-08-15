@@ -84,3 +84,8 @@ BUG 009 11-Aug-2021 Open
 BUG 010 14-Aug-2021 Closed
     External OSC commands not added to log file.
 
+---------------------------------------------------------------------- 011
+BUG 011 15-Aug-2021 OPEN
+   MIDPlayer seg-fault when loading MIDI file including System Exclusive data.
+   
+

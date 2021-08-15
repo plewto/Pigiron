@@ -140,7 +140,7 @@ func ReadSMF(filename string) (smf *SMF, err error) {
 	var file *os.File
 	file, err = os.Open(filename)
 	if err != nil {
-		errmsg := "Can not open MIDI file, filename = %s"
+		errmsg := "Can not open MIDI file, filename = \"%s\""
 		err = pigerr.CompoundError(err, fmt.Sprintf(errmsg, filename))
 		return
 	}

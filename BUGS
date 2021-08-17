@@ -88,4 +88,17 @@ BUG 010 14-Aug-2021 Closed
 BUG 011 15-Aug-2021 OPEN
    MIDPlayer seg-fault when loading MIDI file including System Exclusive data.
    
+---------------------------------------------------------------------- 012
+BUG 012 16-Aug-2021 OPEN
+   Executing MIDIPlayer stop sometimes causes segmentation violation.
+   See stack trace  saved to CrashLogs/BUG012
 
+---------------------------------------------------------------------- 013
+BUG 013 16-Aug-2021 OPEN
+   Panics on spurious input while running in Konsol.
+
+While running Pigiron in Konsol terminal emulator, hitting the up-arrow key
+can produce text which appears as invalid regex:   ^[[A
+Pigiron panics if it attempts to read this text
+panic: regexp: Compile("/pig/\x1b[A"): error parsing regexp: missing closing ]: `[A`
+   

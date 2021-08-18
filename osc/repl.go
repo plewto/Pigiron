@@ -128,6 +128,7 @@ func remoteEval(msg *goosc.Message) ([]string, error) {
 	var err error
 	for _, raw := range msg.Arguments {
 		command, args := parse(fmt.Sprintf("%v", raw))
+		command = strings.TrimRight(command, ",")
 		Eval(command, args)
 		time.Sleep(10 * time.Millisecond)
 	}

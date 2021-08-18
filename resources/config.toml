@@ -19,7 +19,7 @@
 	root = "pig-client"
 	host = "127.0.0.1"
 	port = 8021
-	file = "/home/sj/t/foo"
+	file = "~/.config/pigiron/response"
 
 [tree]
 	max-depth = 12

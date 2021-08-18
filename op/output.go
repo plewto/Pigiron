@@ -21,7 +21,6 @@ type MIDIOutput struct {
 	devID portmidi.DeviceID
 	devInfo *portmidi.DeviceInfo
 	stream *portmidi.Stream
-	disableOffVelocity bool
 }
 
 var outputCache = make(map[portmidi.DeviceID]*MIDIOutput)
@@ -46,9 +45,6 @@ func newMIDIOutput(name string,  devID portmidi.DeviceID) (*MIDIOutput, error) {
 	}
 	op.stream = stream
 	op.addCommandHandler("q-device", op.remoteQueryDevice)
-	op.addCommandHandler("q-off-velocity", op.remoteQueryOffVelocity)
-	op.addCommandHandler("enable-off-velocity", op.remoteEnableOffVelocity)
-	op.disableOffVelocity = true
 	return op, err
 }
 
@@ -102,7 +98,6 @@ func (op *MIDIOutput) Info() string {
 	s := op.commonInfo()
 	s += fmt.Sprintf("\tDevice ID   : %d\n", op.DeviceID())
 	s += fmt.Sprintf("\tDevice Name : %s\n", op.DeviceName())
-	s += fmt.Sprintf("\tOff Velocity disabled : %v\n", op.disableOffVelocity)
 	return s
 }
 
@@ -111,10 +106,6 @@ func (op *MIDIOutput) Send(event portmidi.Event) {
 	if len(event.SysEx) > 0 {
 		op.stream.WriteSysExBytes(portmidi.Time(), event.SysEx)
 	} else {
-		st := byte(event.Status) & 0xF0
-		if st == byte(midi.NOTE_OFF) && op.disableOffVelocity {
-			event.Data2 = 0
-		}
 		op.stream.WriteShort(event.Status, event.Data1, event.Data2)
 	}
 	op.distribute(event)
@@ -155,24 +146,3 @@ func (op *MIDIOutput) remoteQueryDevice(_ *goosc.Message)([]string, error) {
 	return []string{id, name}, err
 }
 
-
-// op name q-off-velocity --> bool
-//   true result --> off velocity enabled
-func (op *MIDIOutput) remoteQueryOffVelocity(_ *goosc.Message)([]string, error) {
-	var err error
-	acc := []string{fmt.Sprintf("%v", !op.disableOffVelocity)}
-	return acc, err
-}
-
-
-// op name enable-off-velocity bool
-//
-func (op *MIDIOutput) remoteEnableOffVelocity(msg *goosc.Message)([]string, error) {
-	args, err := ExpectMsg("osb", msg)
-	if err != nil {
-		return empty, err
-	}
-	op.disableOffVelocity = !args[2].B
-	return empty, err
-}
-	

@@ -1,0 +1,11 @@
+Pigiron CHANGELOG
+
+0.1.0 beta
+      Initial release
+
+0.1.1 beta
+      Fixes typos
+      Fixes BUG 10, external OSC commands now added to log file.
+      Adds exec OSC command.
+      Removes MIDIOutput note-off velocity disable.
+      

@@ -1,0 +1,142 @@
+BUG 012 stack trace
+Caused when executing stop command durring MIDIPlayer palyback.
+
+
+fatal error: unexpected signal during runtime execution                                                                                                                                      
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x187a000 pc=0x7f8648874f6d]                                                                                                           
+
+runtime stack:                                                                                                                                                                               
+runtime.throw(0x5f94f9, 0x2a)                                                                                                                                                                
+
+runtime.sigpanic()                                                                                                                                                                           
+
+
+goroutine 56 [syscall]:                                                                                                                                                                      
+runtime.cgocall(0x5869a0, 0xc00034fa88, 0x0)                                                                                                                                                 
+
+github.com/rakyll/portmidi._Cfunc_Pm_Write(0x7f863c000b60, 0xc0003592c0, 0x1, 0x0)                                                                                                           
+
+github.com/rakyll/portmidi.(*Stream).Write.func1(0xc0001d2000, 0xc0003592c0, 0x1, 0x1, 0x1, 0xc00006d680)                                                                                    
+
+github.com/rakyll/portmidi.(*Stream).Write(0xc0001d2000, 0xc00034fbe0, 0x1, 0x1, 0x0, 0x0)                                                                                                   
+
+github.com/rakyll/portmidi.(*Stream).WriteShort(0xc0001d2000, 0x89, 0x1f, 0x0, 0xc00034fc68, 0x410b53)                                                                                       
+
+github.com/plewto/pigiron/op.(*MIDIOutput).Send(0xc0001c6230, 0x0, 0x89, 0x1f, 0x0, 0x77cf08, 0x0, 0x0)                                                                                      
+
+github.com/plewto/pigiron/op.(*baseOperator).distribute(0xc00028c140, 0x0, 0x89, 0x1f, 0x0, 0x77cf08, 0x0, 0x0)                                                                              
+
+github.com/plewto/pigiron/op.(*MIDIPlayer).killActiveNotes(0xc00028c140)                                                                                                                     
+
+github.com/plewto/pigiron/op.(*MIDIPlayer).playloop(0xc00028c140)                                                                                                                            
+
+runtime.goexit()                                                                                                                                                                             
+
+created by github.com/plewto/pigiron/op.(*MIDIPlayer).Play                                                                                                                                   
+
+
+goroutine 1 [runnable]:                                                                                                                                                                      
+github.com/rakyll/portmidi._Cfunc_Pm_Poll(0x7f8638000e10, 0x7f8600000000)                                                                                                                    
+
+github.com/rakyll/portmidi.(*Stream).Poll.func1(0xc00017c000, 0xc00004de48)                                                                                                                  
+
+github.com/rakyll/portmidi.(*Stream).Poll(0xc00017c000, 0xc000084b10, 0xc00004de48, 0x1)                                                                                                     
+
+github.com/plewto/pigiron/op.ProcessInputs()                                                                                                                                                 
+
+main.main()                                                                                                                                                                                  
+
+
+goroutine 19 [IO wait]:                                                                                                                                                                      
+internal/poll.runtime_pollWait(0x7f86442d0f08, 0x72, 0x0)                                                                                                                                    
+
+internal/poll.(*pollDesc).wait(0xc000102018, 0x72, 0xff00, 0xffff, 0x0)                                                                                                                      
+
+internal/poll.(*pollDesc).waitRead(...)                                                                                                                                                      
+
+internal/poll.(*FD).ReadFrom(0xc000102000, 0xc00039c000, 0xffff, 0xffff, 0x0, 0x0, 0x0, 0x0, 0x0)                                                                                            
+
+net.(*netFD).readFrom(0xc000102000, 0xc00039c000, 0xffff, 0xffff, 0x5a76e0, 0x40df06, 0xc00004bd80, 0x5c0500, 0x4fb001)                                                                      
+
+net.(*UDPConn).readFrom(0xc000010010, 0xc00039c000, 0xffff, 0xffff, 0x101, 0xc00004bd58, 0xc00004bdd0, 0x44398c)                                                                             
+
+net.(*UDPConn).ReadFrom(0xc000010010, 0xc00039c000, 0xffff, 0xffff, 0xc00023ef60, 0x0, 0x0, 0x0, 0x0)                                                                                        
+
+github.com/hypebeast/go-osc/osc.(*Server).readFromConnection(0xc000084c00, 0x62e5e0, 0xc000010010, 0x62ac80, 0xc00023ef60, 0x0, 0x0)                                                         
+
+github.com/hypebeast/go-osc/osc.(*Server).Serve(0xc000084c00, 0x62e5e0, 0xc000010010, 0xe, 0x62e5e0)                                                                                         
+
+github.com/hypebeast/go-osc/osc.(*Server).ListenAndServe(0xc000084c00, 0x0, 0x0)                                                                                                             
+
+created by github.com/plewto/pigiron/osc.(*OSCServer).ListenAndServe                                                                                                                         
+
+
+goroutine 20 [syscall]:                                                                                                                                                                      
+syscall.Syscall(0x0, 0x0, 0xc0000ce000, 0x1000, 0xc00011ac70, 0x800000, 0x42da3a)                                                                                                            
+
+syscall.read(0x0, 0xc0000ce000, 0x1000, 0x1000, 0x0, 0xc00006c900, 0xc00002aa00)                                                                                                             
+
+syscall.Read(...)                                                                                                                                                                            
+
+internal/poll.(*FD).Read(0xc0000a0000, 0xc0000ce000, 0x1000, 0x1000, 0x0, 0x0, 0x0)                                                                                                          
+
+os.(*File).read(...)                                                                                                                                                                         
+
+os.(*File).Read(0xc00009e000, 0xc0000ce000, 0x1000, 0x1000, 0x0, 0xc0000a0060, 0xc0000a0078)                                                                                                 
+
+bufio.(*Reader).fill(0xc0000a02a0)                                                                                                                                                           
+
+bufio.(*Reader).ReadSlice(0xc0000a02a0, 0x74740a, 0x5e45a0, 0xc0001044e0, 0xc00011ae88, 0x4b1291, 0xc0001044e0)                                                                              
+
+bufio.(*Reader).ReadBytes(0xc0000a02a0, 0xa, 0x7, 0x0, 0x0, 0x5a76e0, 0xc000424770)
+        /usr/lib/go-1.13/src/bufio/bufio.go:437 +0x73
+bufio.(*Reader).ReadString(...)
+        /usr/lib/go-1.13/src/bufio/bufio.go:477
+github.com/plewto/pigiron/osc.Read(0x62ada0, 0xc00009e008)
+        /home/sj/Code/Pigiron/osc/repl.go:52 +0x32
+github.com/plewto/pigiron/osc.REPL()
+        /home/sj/Code/Pigiron/osc/repl.go:103 +0xb7
+created by main.main
+        /home/sj/Code/Pigiron/main.go:63 +0x154
+
+goroutine 41 [sleep]:
+runtime.goparkunlock(...)
+        /usr/lib/go-1.13/src/runtime/proc.go:310
+time.Sleep(0xf4240)
+        /usr/lib/go-1.13/src/runtime/time.go:105 +0x157
+github.com/plewto/pigiron/op.(*MIDIPlayer).Stop(0xc00028c140)
+        /home/sj/Code/Pigiron/op/midiplayer.go:80 +0x195
+github.com/plewto/pigiron/op.initTransportHandlers.func3(0xc00023ef60, 0xc00013fbc0, 0xc000355375, 0x4, 0xc0002a2090, 0xc00036ad01)
+        /home/sj/Code/Pigiron/op/transport.go:99 +0x3c
+github.com/plewto/pigiron/op.(*baseOperator).DispatchCommand(0xc00028c140, 0xc000355375, 0x4, 0xc00023ef60, 0x0, 0x0, 0x0, 0x0, 0x0)
+        /home/sj/Code/Pigiron/op/base.go:403 +0x21b
+github.com/plewto/pigiron/op.dispatchExtendedCommand(0xc00023ef60, 0x0, 0x0, 0x0, 0xc0000c4000, 0x9)
+        /home/sj/Code/Pigiron/op/handlers.go:771 +0xb8
+github.com/plewto/pigiron/osc.AddHandler.func1(0xc00023ef60)
+        /home/sj/Code/Pigiron/osc/server.go:148 +0x6b
+github.com/plewto/pigiron/osc.(*OSCServer).AddMsgHandler.func1(0xc00023ef60)
+        /home/sj/Code/Pigiron/osc/server.go:105 +0x158
+github.com/hypebeast/go-osc/osc.HandlerFunc.HandleMessage(0xc0000f4670, 0xc00023ef60)
+        /home/sj/Documents/go_workspace/pkg/mod/github.com/hypebeast/go-osc@v0.0.0-20210408213458-3287e1838f40/osc/osc.go:100 +0x30
+github.com/hypebeast/go-osc/osc.(*StandardDispatcher).Dispatch(0xc0000908c0, 0x62ac80, 0xc00023ef60)
+        /home/sj/Documents/go_workspace/pkg/mod/github.com/hypebeast/go-osc@v0.0.0-20210408213458-3287e1838f40/osc/osc.go:148 +0x155
+created by github.com/hypebeast/go-osc/osc.(*Server).Serve
+        /home/sj/Documents/go_workspace/pkg/mod/github.com/hypebeast/go-osc@v0.0.0-20210408213458-3287e1838f40/osc/osc.go:571 +0x131
+
+goroutine 32 [sleep]:
+runtime.goparkunlock(...)
+        /usr/lib/go-1.13/src/runtime/proc.go:310
+time.Sleep(0x989680)
+        /usr/lib/go-1.13/src/runtime/time.go:105 +0x157
+github.com/plewto/pigiron/osc.remoteEval(0xc000187d70, 0x0, 0x0, 0x0, 0xc0000c4000, 0x14)
+        /home/sj/Code/Pigiron/osc/repl.go:143 +0x150
+github.com/plewto/pigiron/osc.AddHandler.func1(0xc000187d70)
+        /home/sj/Code/Pigiron/osc/server.go:148 +0x6b
+github.com/plewto/pigiron/osc.(*OSCServer).AddMsgHandler.func1(0xc000187d70)
+        /home/sj/Code/Pigiron/osc/server.go:105 +0x158
+github.com/hypebeast/go-osc/osc.HandlerFunc.HandleMessage(0xc000083f80, 0xc000187d70)
+        /home/sj/Documents/go_workspace/pkg/mod/github.com/hypebeast/go-osc@v0.0.0-20210408213458-3287e1838f40/osc/osc.go:100 +0x30
+github.com/hypebeast/go-osc/osc.(*StandardDispatcher).Dispatch(0xc0000908c0, 0x62ac80, 0xc000187d70)
+        /home/sj/Documents/go_workspace/pkg/mod/github.com/hypebeast/go-osc@v0.0.0-20210408213458-3287e1838f40/osc/osc.go:148 +0x155
+created by github.com/hypebeast/go-osc/osc.(*Server).Serve
+        /home/sj/Documents/go_workspace/pkg/mod/github.com/hypebeast/go-osc@v0.0.0-20210408213458-3287e1838f40/osc/osc.go:571 +0x131

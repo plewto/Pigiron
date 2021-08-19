@@ -2,9 +2,13 @@ package op
 
 import (
 	"fmt"
+	"os"
+	"time"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/rakyll/portmidi"
 	"github.com/plewto/pigiron/midi"
+	"github.com/plewto/pigiron/pigpath"
+	
 )
 
 // Monitor is an Operator for real-time monitoring of MIDI events.
@@ -13,6 +17,8 @@ type Monitor struct {
 	baseOperator
 	excludeStatusFlags map[midi.StatusByte]bool
 	enable bool
+	logFilename string
+	logFile *os.File
 }
 
 func newMonitor(name string) *Monitor {
@@ -22,6 +28,7 @@ func newMonitor(name string) *Monitor {
 	op.initLocalHandlers()
 	op.SelectAllChannels()
 	op.enable = true
+	op.logFilename = ""
 	return op
 }
 
@@ -43,8 +50,40 @@ func (op *Monitor) Info() string {
 			acc += fmt.Sprintf("0x%02x ", byte(key))
 		}
 	}
+	fname := op.logFilename
+	if fname == "" {
+		fname = "<closed>"
+	}
+	acc += fmt.Sprintf("Log file : '%s'\n", fname)
 	acc += "\n"
 	return acc
+}
+
+
+func (op *Monitor) Close() {
+	op.CloseLogFile()
+}
+
+func (op *Monitor) OpenLogFile(filename string) (truename string, err error) {
+	op.logFilename = pigpath.SubSpecialDirectories(filename)
+	op.logFile, err = os.OpenFile(op.logFilename, os.O_CREATE | os.O_WRONLY, 0644)
+	if err != nil {
+		msg := "Monitor %s, can not open log file: '%s'\nPrevious error: %v"
+		err = fmt.Errorf(msg, op.Name(), op.logFilename, err)
+		op.logFilename = ""
+		return "", err
+	}
+	op.logFile.WriteString("# Timestamp in milliseconds after January 1, 1970 UTC.\n")
+	truename = op.logFilename
+	return truename, err
+}
+	
+func (op *Monitor) CloseLogFile() {
+	if op.logFile != nil {
+		fmt.Printf("Closing MIDI Monitor log file: %s\n", op.logFilename)
+		op.logFile.Close()
+		op.logFile = nil
+	}
 }
 
 
@@ -65,10 +104,20 @@ func (op *Monitor) monitorEvent(event portmidi.Event) bool {
 	return true
 }
 
+func (op *Monitor) logEvent(s string) {
+	if op.logFile != nil {
+		timeStamp := time.Now().UnixNano() / int64(time.Millisecond)
+		
+		op.logFile.WriteString(fmt.Sprintf("%8v %s", timeStamp, s))
+	}
+}
+
 func (op *Monitor) Send(event portmidi.Event) {
 	op.distribute(event)
 	if op.monitorEvent(event) {
-		fmt.Print(formatEvent(event))
+		s := formatEvent(event)
+		fmt.Print(s)
+		op.logEvent(s)
 	}
 }
 
@@ -99,7 +148,6 @@ func formatSysex(event portmidi.Event) string {
 
 func formatEvent(event portmidi.Event) string {
 	st := midi.StatusByte(event.Status)
-	//var acc = "MON 0x%02X " + (st & 0xF0).String()
 	var acc = fmt.Sprintf("MON 0x%02X %s ", byte(st), st)
 	if st >= 0xF0 {
 		switch st {
@@ -186,9 +234,50 @@ func (op *Monitor) initLocalHandlers() {
 		acc := []string{fmt.Sprintf("%v", op.enable)}
 		return acc, err
 	}
+
+	// op name, open-logfile, filename
+	// returns truename of logfile.
+	//
+	remoteOpenLogfile := func(msg *goosc.Message)([]string, error) {
+		args, err := ExpectMsg("oss", msg)
+		if err != nil {
+			return empty, err
+		}
+		filename := args[2].S
+		var truename string
+		truename, err = op.OpenLogFile(filename)
+		return []string{truename}, err
+	}
+
+	// op name, close-logfile
+	//
+	remoteCloseLogfile := func(msg *goosc.Message)([]string, error) {
+		var err error
+		op.CloseLogFile()
+		return empty, err
+	}
+
+	// op name, q-logfile
+	// Returns logfile filename, or '<closed>'
+	//
+	remoteQueryLogfile := func(msg *goosc.Message)([]string, error) {
+		var err error
+		var filename string
+		if op.logFilename == "" {
+			filename = "<closed>"
+		} else {
+			filename = op.logFilename
+		}
+		return []string{filename}, err
+	}
 	
 	op.addCommandHandler("q-excluded-status", remoteQueryStatus)
 	op.addCommandHandler("exclude-status", remoteBlockStatus)
 	op.addCommandHandler("enable", remoteEnable)
 	op.addCommandHandler("q-enabled", remoteQueryEnable)
+	op.addCommandHandler("open-logfile", remoteOpenLogfile)
+	op.addCommandHandler("close-logfile", remoteCloseLogfile)
+	op.addCommandHandler("q-logfile", remoteQueryLogfile)
 }
+
+

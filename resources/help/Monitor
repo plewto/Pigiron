@@ -3,10 +3,11 @@ Operator type Monitor
 A Monitor is an Operator which displays MIDI traffic to the terminal.
 BY default all MIDI messages are displayed.  
 
-Messages may be filtered from the output by MIDI channel and/or status
-byte. 
+Messages may be filtered by MIDI channel and/or status byte. 
 
 Resetting a Monitor removes all filters.
+
+Events may optionally be saved to a logfile.
 
 
 Sub-Commands:
@@ -34,3 +35,27 @@ Command     op name, enable, flag
 OSC         /pig/op name, enable, flag
 
 Enables/disables monitor
+
+
+------------------------------------------------------------
+Command     op name, open-logfile, filename
+OSC         /pig/op name, open-logfile, filename
+
+Opens log file
+Returns true name for log file.
+
+------------------------------------------------------------
+Command     op name, close-logfile
+OSC         /pig/op name, close-logfile
+
+Closes log file.
+The log file is closed automatically when the Monitor is deleted or
+Pigiron exits.
+
+
+------------------------------------------------------------
+Command     op name, q-logfile
+OSC         /pig/op name, q-logfile
+
+Returns log filename.
+Returns '<closed>' if logfile is closed.

@@ -3,9 +3,11 @@ Pigiron CHANGELOG
 0.1.0 beta
       Initial release
 
-0.1.1 beta
-      Fixes typos
-      Fixes BUG 10, external OSC commands now added to log file.
-      Adds exec OSC command.
-      Removes MIDIOutput note-off velocity disable.
-      
+0.1.01 beta
+       Fixes typos
+       Fixes BUG 010, external OSC commands now added to log file.
+       Fixes BUG 014, ChannelFilter no longer decrements MIDI channel.
+       Adds exec OSC command.    
+       Removes MIDIOutput note-off velocity disable.
+       Adds optional logging to Monitor operator.        
+

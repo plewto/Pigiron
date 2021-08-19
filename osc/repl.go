@@ -93,29 +93,47 @@ func Eval(command string, args []string) {
 		internalClient.Send(msg)
 	}
 }
-		
+
+
+
 // REPL() enters the interactive command loop.
 //
 func REPL() {
+
+	// Filter input characters as BUG 013 fix.
+	//
+	accept := func(s string) bool {
+		for _, c := range strings.TrimSpace(s) {
+			b := byte(c)
+			if b < 0x20 || b > 0x7E {
+				return false
+			}
+		}
+		return true
+	}
+
+	
 	for {
 		fmt.Print(config.GlobalParameters.TextColor)
 		Prompt()
 		raw := Read()
-		piglog.Log(fmt.Sprintf("CMD  : %s", raw))
-		command, args := parse(raw)
-		filename, flag := batchFileExist(command)
-		if flag {
-			BatchLoad(filename)
-		} else {
-			if macro.IsMacro(command) {
-				expanded, err := macro.Expand(command, args)
-				if err != nil {
-					fmt.Printf("ERROR: %v\n", err)
-					continue
+		if accept(raw) {
+			piglog.Log(fmt.Sprintf("CMD  : %s", raw))
+			command, args := parse(raw)
+			filename, flag := batchFileExist(command)
+			if flag {
+				BatchLoad(filename)
+			} else {
+				if macro.IsMacro(command) {
+					expanded, err := macro.Expand(command, args)
+					if err != nil {
+						fmt.Printf("ERROR: %v\n", err)
+						continue
+					}
+					command, args = parse(expanded)
 				}
-				command, args = parse(expanded)
+				Eval(command, args)
 			}
-			Eval(command, args)
 		}
 		time.Sleep(10 * time.Millisecond)
 	}

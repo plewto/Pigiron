@@ -65,10 +65,11 @@ BUG 007 08-Aug-2021 Closed
     
 
 ---------------------------------------------------------------------- 008
-BUG 008 11-Aug-2021 Open
+BUG 008 11-Aug-2021 Closed
     select-all-channels causes SingleChannelMode operators to switch to
     channel 16, instead of being ignored.
 
+    Added explcit test for MultiChannel mode before altering channel.
 
 ---------------------------------------------------------------------- 009
 BUG 009 11-Aug-2021 Open
@@ -94,13 +95,15 @@ BUG 012 16-Aug-2021 OPEN
    See stack trace  saved to CrashLogs/BUG012
 
 ---------------------------------------------------------------------- 013
-BUG 013 16-Aug-2021 OPEN
+BUG 013 16-Aug-2021 CLOSED
    Panics on spurious input while running in Konsol.
 
-While running Pigiron in Konsol terminal emulator, hitting the up-arrow key
-can produce text which appears as invalid regex:   ^[[A
-Pigiron panics if it attempts to read this text
-panic: regexp: Compile("/pig/\x1b[A"): error parsing regexp: missing closing ]: `[A`
+   While running Pigiron in Konsol terminal emulator, hitting the up-arrow
+   key can produce text which appears as invalid regex: ^[[A Pigiron panics
+   if it attempts to read this text panic: regexp: Compile("/pig/\x1b[A"):
+   error parsing regexp: missing closing ]: `[A`
+
+   Added input character filter.
 
 ---------------------------------------------------------------------- 014
 BUG 014 18-Aug-2021 Closed

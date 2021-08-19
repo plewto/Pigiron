@@ -3,11 +3,15 @@ Pigiron CHANGELOG
 0.1.0 beta
       Initial release
 
-0.1.01 beta
+0.1.01 beta  19-Aug-2021
        Fixes typos
        Fixes BUG 010, external OSC commands now added to log file.
        Fixes BUG 014, ChannelFilter no longer decrements MIDI channel.
        Adds exec OSC command.    
        Removes MIDIOutput note-off velocity disable.
-       Adds optional logging to Monitor operator.        
+       Adds optional logging to Monitor operator.
+
+0.1.02 beta
+       Fixes BUG 013, REPL no longer panics on out of bounds characters.
+	
 

@@ -390,8 +390,10 @@ func remoteSelectAllChannels(msg *goosc.Message)([]string, error) {
 		return empty, err
 	}
 	op := args[0].O
-	for i:=1; i<17; i++ {
-		op.EnableChannel(midi.MIDIChannel(i), true)
+	if op.ChannelMode() == midi.MultiChannel {
+		for i:=1; i<17; i++ {
+			op.EnableChannel(midi.MIDIChannel(i), true)
+		}
 	}
 	return empty, err
 }
@@ -408,8 +410,10 @@ func remoteDeselectAllChannels(msg *goosc.Message)([]string, error) {
 		return empty, err
 	}
 	op := args[0].O
-	for i:=1; i<17; i++ {
-		op.EnableChannel(midi.MIDIChannel(i), false)
+	if op.ChannelMode() == midi.MultiChannel {
+		for i:=1; i<17; i++ {
+			op.EnableChannel(midi.MIDIChannel(i), false)
+		}
 	}
 	return empty, err
 }
@@ -426,14 +430,16 @@ func remoteInvertChannelSelection(msg *goosc.Message)([]string, error) {
 		return empty, err
 	}
 	op := args[0].O
-	for i:=0; i<16; i++ {
-		flag := op.ChannelIndexSelected(midi.MIDIChannelNibble(i))
-		op.EnableChannel(midi.MIDIChannel(i+1), flag)
-	}
-	clist := op.SelectedChannelIndexes()
-	acc := make([]string, len(clist))
-	for i, ci := range clist {
-		acc[i] = fmt.Sprintf("%d", int(ci+1))
+	acc := make([]string, 0, 16)
+	if op.ChannelMode() == midi.MultiChannel {
+		for i:=0; i<16; i++ {
+			flag := op.ChannelIndexSelected(midi.MIDIChannelNibble(i))
+			op.EnableChannel(midi.MIDIChannel(i+1), flag)
+		}
+		clist := op.SelectedChannelIndexes()
+		for _, ci := range clist {
+			acc = append(acc, fmt.Sprintf("%d", int(ci+1)))
+		}
 	}
 	return acc, err
 }

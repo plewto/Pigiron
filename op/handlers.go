@@ -66,6 +66,7 @@ func Init() {
 	osc.AddHandler(server, "q-macros", remoteQueryMacros)
 	osc.AddHandler(server, "del-macro", remoteDeleteMacro)
 	osc.AddHandler(server, "clear-macros", remoteClearMacros)
+	osc.AddHandler(server, "debug", remoteDebug)
 	
 }
 
@@ -843,3 +844,7 @@ func remoteClearMacros(msg *goosc.Message)([]string, error) {
 	return empty, err
 }
 
+func remoteDebug(msg *goosc.Message)([]string, error) {
+	var err error
+	return empty, err
+}

@@ -153,9 +153,27 @@ func convertTrackBytes(bytes []byte) (track *SMFTrack, err error) {
 			events = append(events, ue)
 		case isSystemStatus(status):
 			var ue *UniversalEvent
+
 			runningStatus = StatusByte(0)
 			if StatusByte(status) == SYSEX {
-				// TODO build sysex message
+				var d byte
+				var data = make([]byte, 0, 128)
+				for d != byte(END_SYSEX) {
+					d, bytes, err = takeByte(bytes)
+					if err != nil {
+						errmsg := "creating sysex message"
+						err = error2(err, fmt.Sprintf(errmsg))
+						return
+					}
+					data = append(data, d)
+					index++
+				}
+				ue, err = MakeSysExEvent(data)
+				if err != nil {
+					errmsg := "creating sysex message"
+					err = error2(err, fmt.Sprintf(errmsg))
+					return
+				}
 			} else {
 				ue, err = MakeSystemEvent(StatusByte(status))
 				if err != nil {

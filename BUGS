@@ -86,13 +86,18 @@ BUG 010 14-Aug-2021 Closed
     External OSC commands not added to log file.
 
 ---------------------------------------------------------------------- 011
-BUG 011 15-Aug-2021 OPEN
+BUG 011 15-Aug-2021 Closed
    MIDPlayer seg-fault when loading MIDI file including System Exclusive data.
-   
+
+   Bug is probably in convertTrackBytes function in midi/track.go at line 159.
+   Handling sysex events has not been implemented.
+
+   Added explicit SysEx clause in convertTrackBytes.
+
 ---------------------------------------------------------------------- 012
 BUG 012 16-Aug-2021 OPEN
    Executing MIDIPlayer stop sometimes causes segmentation violation.
-   See stack trace  saved to CrashLogs/BUG012
+   See stack tracein in Pigiorn/CrashLogs/BUG012/
 
 ---------------------------------------------------------------------- 013
 BUG 013 16-Aug-2021 CLOSED

@@ -42,7 +42,7 @@ BUG 005 22-July-2021 CLOSED
     FIX: Added explicit string trimming function to Expect values.
     
 ---------------------------------------------------------------------- 006
-BUG 006 23-July-2021 OPEN SERIUS (hard to reproduce)
+BUG 006 23-July-2021 OPEN SERIOUS (hard to reproduce)
     Program froze after entering 'op p, load, !/resources/testFiles/a2.mid'
     p was name of MIDIPlayer operator and named file was valid MIDI file.
     The failing command was entered after a long stream of transport test commands
@@ -73,7 +73,7 @@ BUG 008 11-Aug-2021 CLOSED
     select-all-channels causes SingleChannelMode operators to switch to
     channel 16, instead of being ignored.
 
-    Added explcit test for MultiChannel mode before altering channel.
+    Added explicit test for MultiChannel mode before altering channel.
 
 ---------------------------------------------------------------------- 009
 BUG 009 11-Aug-2021 CLOSED Not able to reproduce.
@@ -99,9 +99,9 @@ BUG 011 15-Aug-2021 CLOSED
    Added explicit SysEx clause in convertTrackBytes.
 
 ---------------------------------------------------------------------- 012
-BUG 012 16-Aug-2021 OPEN  SERIUS (hard to reproduce)
+BUG 012 16-Aug-2021 OPEN  SERIOUS (hard to reproduce)
    Executing MIDIPlayer stop sometimes causes segmentation violation.
-   See stack trace in Pigiorn/CrashLogs/BUG012/
+   See stack trace in Pigiron/CrashLogs/BUG012/
 
 ---------------------------------------------------------------------- 013
 BUG 013 16-Aug-2021 CLOSED
@@ -116,7 +116,7 @@ BUG 013 16-Aug-2021 CLOSED
 
 ---------------------------------------------------------------------- 014
 BUG 014 18-Aug-2021 CLOSED
-    ChannelFilter incorectlry decrementing MIDI channel nibble.
+    ChannelFilter incorrectly decrements MIDI channel nibble.
     Removed subtraction operation.
 
 

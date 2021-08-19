@@ -101,4 +101,9 @@ While running Pigiron in Konsol terminal emulator, hitting the up-arrow key
 can produce text which appears as invalid regex:   ^[[A
 Pigiron panics if it attempts to read this text
 panic: regexp: Compile("/pig/\x1b[A"): error parsing regexp: missing closing ]: `[A`
-   
+
+---------------------------------------------------------------------- 014
+BUG 014 18-Aug-2021 Closed
+    ChannelFilter incorectlry decrementing MIDI channel nibble.
+    Removed subtraction operation.
+    

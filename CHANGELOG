@@ -13,7 +13,7 @@ Pigiron CHANGELOG
 
 0.1.02 beta
        Fixes BUG 008, select-all-channels no longer effects SingleChannel operators.
+       Closed BUG 009, stuck notes on legacy Yamaha synths, unable to reproduce.
        Fixes BUG 011, MIDIPlayer no longer crashes when loading Sysex.
        Fixes BUG 013, REPL no longer panics on out of bounds characters.	  
-
-
+       Fixes BUG 015, Monitor timestamp.

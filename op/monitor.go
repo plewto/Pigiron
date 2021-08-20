@@ -19,6 +19,7 @@ type Monitor struct {
 	enable bool
 	logFilename string
 	logFile *os.File
+	previousTime time.Time
 }
 
 func newMonitor(name string) *Monitor {
@@ -73,8 +74,9 @@ func (op *Monitor) OpenLogFile(filename string) (truename string, err error) {
 		op.logFilename = ""
 		return "", err
 	}
-	op.logFile.WriteString("# Timestamp in milliseconds after January 1, 1970 UTC.\n")
+	op.logFile.WriteString("# Δt in milliseconds")
 	truename = op.logFilename
+	op.previousTime = time.Now()
 	return truename, err
 }
 	
@@ -106,16 +108,17 @@ func (op *Monitor) monitorEvent(event portmidi.Event) bool {
 
 func (op *Monitor) logEvent(s string) {
 	if op.logFile != nil {
-		timeStamp := time.Now().UnixNano() / int64(time.Millisecond)
-		
-		op.logFile.WriteString(fmt.Sprintf("%8v %s", timeStamp, s))
+		op.logFile.WriteString(s)
 	}
 }
 
 func (op *Monitor) Send(event portmidi.Event) {
 	op.distribute(event)
 	if op.monitorEvent(event) {
-		s := formatEvent(event)
+		now := time.Now()
+		elapse := now.Sub(op.previousTime)
+		op.previousTime = now
+		s := formatEvent(elapse, event)
 		fmt.Print(s)
 		op.logEvent(s)
 	}
@@ -146,9 +149,10 @@ func formatSysex(event portmidi.Event) string {
 	return acc
 }
 
-func formatEvent(event portmidi.Event) string {
+func formatEvent(elapse time.Duration, event portmidi.Event) string {
+	tdelta := elapse.Milliseconds()
 	st := midi.StatusByte(event.Status)
-	var acc = fmt.Sprintf("MON 0x%02X %s ", byte(st), st)
+	var acc = fmt.Sprintf("Δt %5d 0x%02X %s ", tdelta,  byte(st), st)
 	if st >= 0xF0 {
 		switch st {
 		case 0xF0:

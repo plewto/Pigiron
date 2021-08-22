@@ -49,7 +49,6 @@ type ExpectValue struct {
 	C midi.MIDIChannel
 	O Operator}
 
-
 // Expect() validates a list of values for appropriate type.
 // Each character in the template indicates the expected value for the
 // corresponding position of the values list.

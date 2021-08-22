@@ -89,7 +89,7 @@ func initXformOperator(xop *baseXformOperator) {
 		}
 		args, err := ExpectMsg(template, msg)
 		if err != nil {
-			return empty, nil
+			return empty, err
 		}
 		var index byte = byte(args[2].I)
 		count := len(template) - 3

@@ -60,11 +60,6 @@ func (op *Transposer) Send(event portmidi.Event) {
 	op.distribute(event)
 }
 		
-func (op *Transposer) Length() int {
-	return op.Length()
-}
-
-
 func (op *Transposer) initLocalHandlers() {
 
 	channelStats := map[int64]string{0x00 : "DISABLED",

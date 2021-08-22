@@ -111,12 +111,11 @@ func REPL() {
 		}
 		return true
 	}
-
 	
 	for {
 		fmt.Print(config.GlobalParameters.TextColor)
 		Prompt()
-		raw := Read()
+		raw := strings.TrimLeft(Read(), " ,")
 		if accept(raw) {
 			piglog.Log(fmt.Sprintf("CMD  : %s", raw))
 			command, args := parse(raw)

@@ -17,3 +17,5 @@ Pigiron CHANGELOG
        Fixes BUG 011, MIDIPlayer no longer crashes when loading Sysex.
        Fixes BUG 013, REPL no longer panics on out of bounds characters.	  
        Fixes BUG 015, Monitor timestamp.
+       Fixes BUG, remoteSetValue was returning nil for some error conditions.
+       Adds example-2 batch file, using Transposer to generate chords. 

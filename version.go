@@ -12,7 +12,7 @@ type version struct {
 var VERSION = version{0, 1, 2, "Beta"}
 
 func (v *version) String() string {
-	mj, mn, rv, lev := v.major, v.minor, v.revision, v.level
+	mj, mn, rv, lev  :=  v.major, v.minor, v.revision, v.level
 	return fmt.Sprintf("Version %d.%d.%d %s", mj, mn, rv, lev)
 }
 

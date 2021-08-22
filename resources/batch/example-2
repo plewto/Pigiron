@@ -1,0 +1,41 @@
+# example-2 Pigiron batch file.
+# Chord generator in key of C
+# 
+# MidiInput -> ChannelFilter --+--> Transposer --+--> MIDIOutput
+#                              +--> Transposer --+
+#                              |                 |
+#                              +-----------------+
+#
+
+
+new MIDIInput,  in, Arturia       # Replace device names as required.
+new MIDIOutput, out,  MIDI 1      # Replace device names as required.
+new ChannelFilter, filter
+new Transposer, fifths            
+new Transposer, thirds            
+new Monitor, mon
+
+connect in, filter, fifths, out, mon
+connect filter, thirds, out
+connect filter, out
+
+select-all-channels filter
+
+
+# Transposer fifths transposes all notes up a fifth (+7)
+# The first 0 is the starting index of where to write the remaining values
+# into the table.
+#
+op fifths, set-table-value, 0, 7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,116,117,118,119,120,121,122
+
+# Transposer thirds transposes notes selectively 
+# For keys C, F and G, transpose up a major-third (+4)
+# For all other white keys, transpose up a minor-third (+3)
+# For black keys, transpose down a minor-third (-3)
+#
+op thirds, set-table-value, 0, 4, 10,  5,  0,  7,  9,  3, 11,  5, 12,  7, 14, 16, 10, 17, 12, 19, 21, 15, 23, 17, 24, 19, 26, 28, 22, 29, 24, 31, 33, 27, 35, 29, 36, 31, 38, 40, 34, 41, 36, 43, 45, 39, 47, 41, 48, 43, 50, 52, 46, 53, 48, 55, 57, 51, 59, 53, 60, 55, 62, 64, 58, 65, 60, 67, 69, 63, 71, 65, 72, 67, 74, 76, 70, 77, 72, 79, 81, 75, 83, 77, 84, 79, 86, 88, 82, 89, 84, 91, 93, 87, 95, 89, 96, 91, 98,100, 94,101, 96,103,105, 99,107,101,108,103,110,112,106,113,108,115,117,111,119,113,120,115,122,124,118,125,120,127,117,123,119
+
+
+# Modify thirds table starting at index 60 so that for the octave
+# starting at middle C, staked fifths are produced  (C, G, D)
+op thirds, set-table-value, 60, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86

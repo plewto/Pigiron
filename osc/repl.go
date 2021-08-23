@@ -131,7 +131,14 @@ func REPL() {
 					}
 					command, args = parse(expanded)
 				}
-				Eval(command, args)
+				if isCommand(command) {
+					Eval(command, args)
+				} else {
+					msg := fmt.Sprintf("ERROR: Invalid command: %s", command)
+					fmt.Print(config.GlobalParameters.ErrorColor)
+					fmt.Println(msg)
+					fmt.Print(config.GlobalParameters.TextColor)
+				}
 			}
 		}
 		time.Sleep(10 * time.Millisecond)

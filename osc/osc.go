@@ -10,7 +10,7 @@ var (
 	replResponder Responder
 	GlobalServer PigServer
 	empty []string
-
+	commands map[string]bool
 	// Exit application if true.
 	Exit bool = false
 )
@@ -27,13 +27,19 @@ func Init() {
 	filename := pigpath.SubSpecialDirectories(config.GlobalParameters.OSCClientFilename)
 	globalResponder = NewBasicResponder(host, port, root, filename)
 	replResponder = NewREPLResponder()
-	
+	commands = make(map[string]bool)
 	// Create global OSC server
 	host = config.GlobalParameters.OSCServerHost
 	port = int(config.GlobalParameters.OSCServerPort)
 	root = config.GlobalParameters.OSCServerRoot
 	GlobalServer = NewServer(host, port, root)
 	AddHandler(GlobalServer, "exec", remoteEval)
+}
+
+
+func isCommand(s string) bool {
+	_, flag := commands[s]
+	return flag
 }
 
 // Listen() starts OSC server.

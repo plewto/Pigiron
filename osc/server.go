@@ -7,6 +7,7 @@ import (
 	
 )
 
+
 // PigServer interface defines server-side OSC interface.
 //
 // Root() string
@@ -143,6 +144,7 @@ func (s *OSCServer) Close() {
 // The command "foo" --> becomes "/pig/foo"
 // 
 func AddHandler(s PigServer, command string, handler func(*goosc.Message)([]string, error)) {
+	commands[command] = true
 	address := fmt.Sprintf("/%s/%s", s.Root(), command)
 	var result = func(msg *goosc.Message) {
 		status, err := handler(msg)

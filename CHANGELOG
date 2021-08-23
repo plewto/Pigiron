@@ -19,3 +19,6 @@ Pigiron CHANGELOG
        Fixes BUG 015, Monitor timestamp.
        Fixes BUG, remoteSetValue was returning nil for some error conditions.
        Adds example-2 batch file, using Transposer to generate chords. 
+
+0.1.03 beta
+       Adds REPL command validation.

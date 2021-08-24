@@ -55,7 +55,7 @@ func (op *Monitor) Info() string {
 	if fname == "" {
 		fname = "<closed>"
 	}
-	acc += fmt.Sprintf("Log file : '%s'\n", fname)
+	acc += fmt.Sprintf("\nLog file : '%s'\n", fname)
 	acc += "\n"
 	return acc
 }
@@ -96,7 +96,7 @@ func (op *Monitor) monitorEvent(event portmidi.Event) bool {
 	st := midi.StatusByte(event.Status)
 	cmd := st & midi.StatusByte(0xF0)
 	ci := midi.MIDIChannelNibble(st & 0x0F)
-	flag, exists := op.excludeStatusFlags[cmd]
+	flag, exists := op.excludeStatusFlags[st]
 	if flag && exists {
 		return false
 	}

@@ -19,6 +19,7 @@ type MIDIPlayer struct {
 	isPlaying bool
 	eventIndex int
 	tempo float64
+	tempoScale float64
 	tickDuration float64
 	currentTime int // msec
 	delayStart int  // msec
@@ -214,6 +215,7 @@ func (op *MIDIPlayer) playloop() {
 			case mtype == byte(midi.META_TEMPO):
 				bpm, _ := event.MetaTempoBPM()
 				op.tempo = bpm
+				op.tickDuration = midi.TickDuration(op.smf.Division(), op.tempo)
 				fmt.Printf("tempo = %f\n", op.tempo)
 			case midi.IsMetaTextType(mtype):
 				bytes, err := event.MetaData()

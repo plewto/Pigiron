@@ -39,7 +39,7 @@ func Init() {
 
 func isCommand(s string) bool {
 	_, flag := commands[s]
-	return flag
+	return flag || len(s) == 0
 }
 
 // Listen() starts OSC server.

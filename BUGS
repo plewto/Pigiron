@@ -124,4 +124,10 @@ BUG 014 18-Aug-2021 CLOSED
 BUG 015 18-Aug-2021 CLOSED
     Monitor log file timestamps are incorrect.
     
+---------------------------------------------------------------------- 016
+BUG 016 24-Aug-2021 OPEN
+
+    MIDIPlayer does not recognize tempo changes.
+
+
 

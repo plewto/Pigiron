@@ -22,3 +22,4 @@ Pigiron CHANGELOG
 
 0.1.03 beta
        Adds REPL command validation.
+       Fixes BUG 016 MIDIPlayer now recognizes tempo.	

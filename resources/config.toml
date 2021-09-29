@@ -5,7 +5,7 @@
 
 [log]
 	enable = false
-	logfile = "!/log"
+	logfile = ""
 
 [batch]
 	directory = "!/batch"
@@ -26,7 +26,7 @@
 
 [midi-input]
 	buffer-size = 1024
-	poll-interval = 0   # in ms, may be 0
+	poll-interval = 8   # in ms, may be 0
 
 [midi-output]
 	buffer-size = 1024

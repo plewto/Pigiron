@@ -7,7 +7,7 @@ Pigiron CHANGELOG
        Fixes typos
        Fixes BUG 010, external OSC commands now added to log file.
        Fixes BUG 014, ChannelFilter no longer decrements MIDI channel.
-       Adds exec OSC command.    
+       Adds exec OSC command.
        Removes MIDIOutput note-off velocity disable.
        Adds optional logging to Monitor operator.
 
@@ -15,11 +15,12 @@ Pigiron CHANGELOG
        Fixes BUG 008, select-all-channels no longer effects SingleChannel operators.
        Closed BUG 009, stuck notes on legacy Yamaha synths, unable to reproduce.
        Fixes BUG 011, MIDIPlayer no longer crashes when loading Sysex.
-       Fixes BUG 013, REPL no longer panics on out of bounds characters.	  
+       Fixes BUG 013, REPL no longer panics on out of bounds characters.
        Fixes BUG 015, Monitor timestamp.
        Fixes BUG, remoteSetValue was returning nil for some error conditions.
-       Adds example-2 batch file, using Transposer to generate chords. 
+       Adds example-2 batch file, using Transposer to generate chords.
 
 0.1.03 beta
        Adds REPL command validation.
-       Fixes BUG 016 MIDIPlayer now recognizes tempo.	
+	Fixes BUG 016 MIDIPlayer now recognizes tempo.
+	Removes Delay Operator.

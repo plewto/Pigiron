@@ -23,7 +23,6 @@ The following Operators are currently available:
 - MIDIPlayer - MIDI file player.
 - Monitor - print incoming MIDI messages.
 - Transposer - manipulate MIDI data bytes.
-- Delay - Repeat notes with optional key mapping (experimental & unstable).
 
 
 There are three distinct ways to interact with Pigiron.

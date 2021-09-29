@@ -7,7 +7,6 @@ import (
 )
 
 var OperatorTypes = []string{"ChannelFilter",
-	"Delay",
 	"Disrtributor",
 	"MIDIInput",
 	"MIDIOutput",
@@ -80,8 +79,6 @@ func NewOperator(opType string, name string) (Operator, error) {
 		op  = newMonitor(name)
 	case "ChannelFilter":
 		op = newChannelFilter(name)
-	case "Delay":
-		op = newDelay(name)
 	case "Distributor":
 		op = newDistributor(name)
 	case "MIDIPlayer":

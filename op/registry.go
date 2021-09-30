@@ -6,7 +6,8 @@ import (
 	"errors"
 )
 
-var OperatorTypes = []string{"ChannelFilter",
+var OperatorTypes = []string{
+	"ChannelFilter",
 	"Disrtributor",
 	"MIDIInput",
 	"MIDIOutput",
@@ -75,16 +76,16 @@ func NewOperator(opType string, name string) (Operator, error) {
 	switch opType {
 	case "Dummy":
 		op = newDummyOperator(name)
-	case "Monitor":
-		op  = newMonitor(name)
-	case "ChannelFilter":
-		op = newChannelFilter(name)
-	case "Distributor":
-		op = newDistributor(name)
-	case "MIDIPlayer":
-		op = newMIDIPlayer(name)
-	case "Transposer":
-		op = newTransposer(name)
+	// case "Monitor":
+	// 	op  = newMonitor(name)
+	// case "ChannelFilter":
+	// 	op = newChannelFilter(name)
+	// case "Distributor":
+	// 	op = newDistributor(name)
+	// case "MIDIPlayer":
+	// 	op = newMIDIPlayer(name)
+	// case "Transposer":
+	// 	op = newTransposer(name)
 	default:
 		sfmt := "Invalid Operator type: '%s'"
 		msg := fmt.Sprintf(sfmt, opType)

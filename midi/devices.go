@@ -2,7 +2,7 @@ package midi
 
 /*
 ** devices.go provides an interface to portmidi MIDI devices.
-**
+** DEPRECIATED, replace with gomidi drivers.
 */
 
 import (
@@ -26,6 +26,8 @@ func must(err error, msg string) {
 func init() {
 	must(portmidi.Initialize(),
 		"Can not initialize portmidi, nothing can be done without it!")
+	fmt.Println()
+	fmt.Println("WARNING: midi.devices.go has been DEPRECIATED.")
 }
 
 

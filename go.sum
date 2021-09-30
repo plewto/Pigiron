@@ -4,3 +4,11 @@ github.com/pelletier/go-toml v1.9.2 h1:7NiByeVF4jKSG1lDF3X8LTIkq2/bu+1uYbIm1eS5t
 github.com/pelletier/go-toml v1.9.2/go.mod h1:u1nR/EPcESfeI/szUZKdtJ0xRNbUoANCkoOuaOx1Y+c=
 github.com/rakyll/portmidi v0.0.0-20201020180702-d436ceaa537a h1:+qeh9b4LlO8AYVvm+TG4OXDRwBynTLk82t0HDBBBOQ8=
 github.com/rakyll/portmidi v0.0.0-20201020180702-d436ceaa537a/go.mod h1:xKffaBd7e1YUoLpR2azvJqkxEdUDNGNDMlsUNdv6Bcs=
+gitlab.com/gomidi/midi v1.23.7 h1:I6qKoIk9s9dcX+pNf0jC+tziCzJFn82bMpuntRkLeik=
+gitlab.com/gomidi/midi/v2 v2.0.0-alpha.8/go.mod h1:quTyMKSQ4Klevxu6gY4gy2USbeZra0fV5SalndmPfsY=
+gitlab.com/gomidi/midi/v2 v2.0.0-alpha.14 h1:V54nw/DM3CRgb59BavJy+4cdsbyozRsFH2K/yrowfh4=
+gitlab.com/gomidi/midi/v2 v2.0.0-alpha.14/go.mod h1:quTyMKSQ4Klevxu6gY4gy2USbeZra0fV5SalndmPfsY=
+gitlab.com/gomidi/midi/v2/drivers/rtmididrv v0.0.0-20210712093228-8dc29768c837 h1:9ZEAThbWKp/TtVI4fp4RYyDk0v/w1Nd0keJyZdSFG6w=
+gitlab.com/gomidi/midi/v2/drivers/rtmididrv v0.0.0-20210712093228-8dc29768c837/go.mod h1:ShVSF28zo/g9C4wzSZJRIHwKZOsSMV7ZuxF/yBu6NPM=
+gitlab.com/gomidi/midi/v2/drivers/rtmididrv/imported/rtmidi v0.0.0-20210425073027-dcb5d7eb9e83 h1:FuKUpVHyDsZy9y+ZrWrT9uR2/HWY16MOj0/wY++IEY8=
+gitlab.com/gomidi/midi/v2/drivers/rtmididrv/imported/rtmidi v0.0.0-20210425073027-dcb5d7eb9e83/go.mod h1:OPj7tH2bUPFpPN1uU6E7ShXuDlJO0+RHlwp32KhcrtE=

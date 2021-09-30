@@ -1,8 +1,9 @@
 package op
 
 import (
-	"github.com/rakyll/portmidi"
+	// "github.com/rakyll/portmidi"
 	goosc "github.com/hypebeast/go-osc/osc"
+	gomidi "gitlab.com/gomidi/midi/v2"
 	"github.com/plewto/pigiron/midi"
 )
 
@@ -54,7 +55,7 @@ type Operator interface {
 	MIDIOutputEnabled() bool
 	SetMIDIOutputEnabled(flag bool)
 	
-	Accept(event portmidi.Event) bool
-	distribute(event portmidi.Event)
-	Send(event portmidi.Event)
+	Accept(msg gomidi.Message) bool
+	distribute(msg gomidi.Message)
+	Send(msg gomidi.Message)
 }

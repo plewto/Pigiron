@@ -9,7 +9,8 @@ package op
 import (
 	"fmt"
 	"errors"
-	"github.com/rakyll/portmidi"
+	// "github.com/rakyll/portmidi"
+	gomidi "gitlab.com/gomidi/midi/v2"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
@@ -361,16 +362,16 @@ func (op *baseOperator) SetMIDIOutputEnabled(flag bool) {
 // Extending classes should override as needed.
 // The default always returns true.
 //
-func (op *baseOperator) Accept(event portmidi.Event) bool {
+func (op *baseOperator) Accept(msg gomidi.Message) bool {
 	return true
 }
 
 // op.distribute() transmits MIDI event to all child operators.
 //
-func (op *baseOperator) distribute(event portmidi.Event) {
+func (op *baseOperator) distribute(msg gomidi.Message) {
 	if op.MIDIOutputEnabled() {
 		for _, child := range op.children() {
-			child.Send(event)
+			child.Send(msg)
 		}
 	}
 }
@@ -379,9 +380,9 @@ func (op *baseOperator) distribute(event portmidi.Event) {
 // Extending classes should override as needed.
 // The default is to re-transmit all events unchanged.
 //
-func (op *baseOperator) Send(event portmidi.Event) {
-	if op.Accept(event) {
-		op.distribute(event)
+func (op *baseOperator) Send(msg gomidi.Message) {
+	if op.Accept(msg) {
+		op.distribute(msg)
 	}
 }
 

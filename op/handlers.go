@@ -8,13 +8,15 @@ package op
 import (
 	"fmt"
 	"strconv"
-	"github.com/rakyll/portmidi"
+	// "github.com/rakyll/portmidi"
+	// gomidi "gitlab.com/gomidi/midi/v2"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/osc"
 	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/help"
 	"github.com/plewto/pigiron/macro"
+	"github.com/plewto/pigiron/backend"
 )
 
 var empty []string
@@ -95,13 +97,14 @@ func remoteExit(msg *goosc.Message)([]string, error) {
 //
 func remoteQueryMIDIInputs(msg *goosc.Message)([]string, error) {
 	var err error
-	ids := midi.InputIDs()
+	ids := backend.InputNames()
 	acc := make([]string, len(ids))
 	for i, id := range ids {
-		info := portmidi.Info(id)
-		acc[i] = fmt.Sprintf("\"%s\" ", info.Name)
+		// info := portmidi.Info(id)
+		acc[i] = fmt.Sprintf("\"%s\" ", id)
 	}
 	return acc, err
+
 }
 
 
@@ -110,11 +113,11 @@ func remoteQueryMIDIInputs(msg *goosc.Message)([]string, error) {
 //
 func remoteQueryMIDIOutputs(msg *goosc.Message)([]string, error) {
 	var err error
-	ids := midi.OutputIDs()
+	ids := backend.OutputNames()
 	acc := make([]string, len(ids))
 	for i, id := range ids {
-		info := portmidi.Info(id)
-		acc[i] = fmt.Sprintf("\"%s\" ", info.Name)
+		// info := portmidi.Info(id)
+		acc[i] = fmt.Sprintf("\"%s\" ", id)
 	}
 	return acc, err
 }
@@ -741,31 +744,33 @@ func remotePrintConfig(msg *goosc.Message)([]string, error) {
 // osc returns ACK
 //
 func remoteMIDIInsert(msg *goosc.Message)([]string, error) {
-	template := "o"
-	for i := 0; i < len(msg.Arguments)-1; i++ {
-		template += "i"
-	}
-	args, err := ExpectMsg(template, msg)
-	if err != nil {
-		fmt.Printf("ERROR: %s\n", err)
-		return empty, err
-	}
-	op := args[0].O
-	bargs := args[1:]
-	bytes := make([]byte, len(bargs))
-	for i := 0; i < len(bargs); i++ {
-		bytes[i] = byte(bargs[i].I)
-	}
-	var events []*midi.UniversalEvent
-	events, err = midi.BytesToEvents(bytes)
-	if err != nil {
-		return empty, err
-	}
-	for _, event := range events {
-		if !event.IsMetaEvent() {
-			op.Send(event.PortmidiEvent())
-		}
-	}
+	fmt.Println("ISSUE: WARNING: handlers.remoteMIDIInsert commented out.")
+	// template := "o"
+	// for i := 0; i < len(msg.Arguments)-1; i++ {
+	// 	template += "i"
+	// }
+	// args, err := ExpectMsg(template, msg)
+	// if err != nil {
+	// 	fmt.Printf("ERROR: %s\n", err)
+	// 	return empty, err
+	// }
+	// op := args[0].O
+	// bargs := args[1:]
+	// bytes := make([]byte, len(bargs))
+	// for i := 0; i < len(bargs); i++ {
+	// 	bytes[i] = byte(bargs[i].I)
+	// }
+	// var events []*midi.UniversalEvent
+	// events, err = midi.BytesToEvents(bytes)
+	// if err != nil {
+	// 	return empty, err
+	// }
+	// for _, event := range events {
+	// 	if !event.IsMetaEvent() {
+	// 		op.Send(event.PortmidiEvent())
+	// 	}
+	// }
+	var err error
 	return empty, err
 }
 				

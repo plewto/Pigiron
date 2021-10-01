@@ -33,7 +33,7 @@ type globalParameters struct {
 // ResetGlobalParameters sets all global configuration parameter to default values."
 //
 func ResetGlobalParameters() {
-	GlobalParameters.EnableLogging = true
+	GlobalParameters.EnableLogging = false
 	GlobalParameters.Logfile = "!/log"
 	GlobalParameters.BatchDirectory = "!/batch"
 	GlobalParameters.OSCServerRoot = "pig"

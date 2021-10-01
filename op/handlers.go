@@ -181,36 +181,29 @@ func remoteNewOperator(msg *goosc.Message)([]string, error) {
 	}
 }
 
-// ISSUE: Restore
 // helper for remoteNewOperator
 //
-// func makeIOOperator(args []ExpectValue)([]string, error) {
-// 	optype, name, device := args[0].S, args[1].S, args[2].S
-// 	switch optype {
-// 	case "MIDIInput":
-// 		op, err := NewMIDIInput(name, device)
-// 		if err != nil {
-// 			return empty, err
-// 		}
-// 		return []string{op.Name()}, err
-// 	case "MIDIOutput":
-// 		op, err := NewMIDIOutput(name, device)
-// 		if err != nil {
-// 			return empty, err
-// 		}
-// 		return []string{op.Name()}, err
-// 	default:
-// 		msg := "Expected operator type at index 0, got %s"
-// 		err := fmt.Errorf(msg, optype)
-// 		return empty, err
-// 	}
-// }
-
-func makeIOOperator(args[]ExpectValue) ([]string, error) {
-	err := fmt.Errorf("Using place holder for handlers.makeIOOperator() function")
-	return empty, err
+func makeIOOperator(args []ExpectValue)([]string, error) {
+	optype, name, device := args[0].S, args[1].S, args[2].S
+	switch optype {
+	case "MIDIInput":
+		op, err := NewMIDIInput(name, device)
+		if err != nil {
+			return empty, err
+		}
+		return []string{op.Name()}, err
+	case "MIDIOutput":
+		op, err := NewMIDIOutput(name, device)
+		if err != nil {
+			return empty, err
+		}
+		return []string{op.Name()}, err
+	default:
+		msg := "Expected operator type at index 0, got %s"
+		err := fmt.Errorf(msg, optype)
+		return empty, err
+	}
 }
-	
 
 
 // remoteDeleteOperator() handler for /pig/op-del

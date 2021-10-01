@@ -31,7 +31,10 @@ func newMIDIOutput(name string,  port gomidi.Out) *MIDIOutput {
 	op = new(MIDIOutput)
 	initOperator(&op.baseOperator, "MIDIOutput", name, midi.NoChannel)
 	op.port = port
+	op.port.Open()
 	op.addCommandHandler("q-device", op.remoteQueryDevice)
+	outputCache[port.String()] = op
+	register(op)
 	return op
 }
 
@@ -50,8 +53,6 @@ func NewMIDIOutput(name string, deviceSpec string) (*MIDIOutput, error) {
 	portName := port.String()
 	if op, cached = outputCache[portName]; !cached {
 		op = newMIDIOutput(name, port)
-		outputCache[portName] = op
-		register(op)
 	}
 	return op, err
 }
@@ -80,6 +81,7 @@ func (op *MIDIOutput) Info() string {
 }
 
 func (op *MIDIOutput) Send(msg gomidi.Message) {
+	fmt.Printf("OUT send %v\n", msg)
 	op.port.Send(msg.Data)
 	op.distribute(msg)
 }

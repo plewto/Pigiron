@@ -22,7 +22,7 @@ func init() {
 		file, err = os.OpenFile(logfile, os.O_WRONLY | os.O_CREATE, 0666)
 	
 		if err != nil {
-			errmsg := "ERROR: Can not open log file: %s, logging disabled"
+			errmsg := "ERROR: Can not open log file: %s, logging disabled\n\n"
 			fmt.Printf(errmsg, logfile)
 			config.GlobalParameters.EnableLogging = false
 		} else {

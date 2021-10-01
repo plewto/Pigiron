@@ -21,37 +21,41 @@ type MIDIInput struct {
 
 var inputCache = make(map[string]*MIDIInput)
 
-func newMIDIInput(name string, port gomidi.In) *MIDIInput {
+func newMIDIInput(name string, port gomidi.In) (*MIDIInput, error) {
 	op := new(MIDIInput)
 	initOperator(&op.baseOperator, "MIDIInput", name, midi.NoChannel)
 	op.addCommandHandler("q-device", op.remoteQueryDevice)
-	return op
+	op.port = port
+	callback := func(msg gomidi.Message, delta int64) {
+		op.Send(msg)
+	}
+	listener, err := gomidi.NewListener(port, callback)
+	if err != nil {
+		msg := fmt.Sprintf("Can not set callback for MIDIInput %s", name)
+		msg += fmt.Sprintf("\n%v", err)
+		err = fmt.Errorf(msg)
+		return nil, err
+	}
+	listener.StartListening()
+	inputCache[port.String()] = op
+	register(op)
+	return op, err
 }
+
+
 
 func NewMIDIInput(name string, deviceSpec string) (*MIDIInput, error) {
 	var op *MIDIInput
-	var err error
-	var port gomidi.In
-	var cached bool
-	port, err = backend.GetMIDIInput(deviceSpec)
+	port, err := backend.GetMIDIInput(deviceSpec)
 	if err != nil {
 		return op, err
 	}
-	portName := port.String()
-	if op, cached = inputCache[portName]; !cached {
-		op = newMIDIInput(name, port)
-		inputCache[portName] = op
-		
-		listener, err2 := gomidi.NewListener(op.port, func(msg gomidi.Message, dtime int64) {
-			op.Send(msg)
-		})
-		if err2 != nil {
-			msg1 := fmt.Sprintf("MIDIInput %s, can not listen to port %s\n", op.Name(), op.port)
-			msg2 := fmt.Sprintf("%s", err2)
-			return nil, fmt.Errorf(msg1 + msg2)
+	op, cached := inputCache[port.String()]
+	if !cached {
+		op, err = newMIDIInput(name, port)
+		if err != nil {
+			return op, err
 		}
-		listener.StartListening()
-		register(op)
 	}
 	return op, err
 }

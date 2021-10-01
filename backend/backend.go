@@ -90,4 +90,50 @@ func GetMIDIOutput(pattern string) (gomidi.Out, error) {
 	}
 	return out, err
 }
+
+
+func getInputByIndex(s string) (gomidi.In, error) {
+	var err error
+	var index int
+	ins, _ := gomidi.Ins()
+	index, err = strconv.Atoi(s)
+	if err != nil {
+		return nil, err
+	}
+	if index < 0 || len(ins) <= index {
+		err = fmt.Errorf("MIDI input index in of bounds: %d", index)
+		return nil, err
+	}
+	return ins[index], nil
+}
+		
+
+
+func getInputByName(pattern string) (gomidi.In, error) {
+	var err error
+	ins, _ := gomidi.Ins()
+	for _, port := range ins {
+		name := port.String()
+		if strings.Contains(name, pattern) {
+			return port, nil
+		}
+	}
+	err = fmt.Errorf("Pattern '%s' did not match any MIDI device", pattern)
+	return nil, err
+}
+		
+
+// pattern may be one of:
+//   int index (as string)
+//   substrng of device name.
+//   
+func GetMIDIInput(pattern string) (gomidi.In, error) {
+	var err error
+	var in gomidi.In
+	in, err = getInputByIndex(fmt.Sprintf("%s", pattern))
+	if err != nil {
+		in, err = getInputByName(pattern)
+	}
+	return in, err
+}
 	

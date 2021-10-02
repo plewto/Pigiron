@@ -28,7 +28,7 @@ func init() {
 
 // KeyName() returns a string representation for a MIDI key-number.
 //
-func KeyName(n int64) string {
+func KeyName(n byte) string {
 	if 0 <= n && n < 128 {
 		return keynames[n]
 	} else {

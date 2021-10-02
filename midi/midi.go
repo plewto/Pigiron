@@ -1,16 +1,15 @@
 package midi
 
-import "fmt"
 
-// MIDIChannel type is a single MIDI channel with range 0..16
+import (
+	"fmt"
+)
+
+
+// MIDIChannel type single MIDI channel, range 1..16 inclusive
 //
-type MIDIChannel byte 
+type MIDIChannel byte
 
-
-// MIDIChannelNibble type is the lower 4-bit binary representation of a MIDI channel
-// range 0..15   MIDIChannelNibble = MIDIChannel - 1
-//
-type MIDIChannelNibble byte
 
 // ValidateMIDIChannel() returns non-nil error if channel is out of bounds.
 // Valid channel range is [1,16].
@@ -23,6 +22,16 @@ func ValidateMIDIChannel(c MIDIChannel) error {
 	return err
 }
 
+
+func (c MIDIChannel) String() string {
+	return fmt.Sprintf("CHAN: %02d", c)
+}
+
+
+// MIDIChannelNibble type, lower four bits of transmitted channel, range 0..15 inclusive
+//
+type MIDIChannelNibble byte
+
 // ValidateMIDIChannelNibble returns non-nil error if channelNibble is out of bounds.
 // Valid Channel Nibble range is [0,15].
 //
@@ -32,6 +41,10 @@ func ValidateMIDIChannelNibble(ci MIDIChannelNibble) error {
 		err = fmt.Errorf("Illegal MIDIChannelNibble: %d", ci)
 	}
 	return err
+}
+
+func (ci MIDIChannelNibble) String() string {
+	return fmt.Sprintf("CHAN_NIB: %02d", ci)
 }
 
 
@@ -51,18 +64,12 @@ func (d DataNumber) String() string {
 	default: return "DATA_?"
 	}
 }
-		
-
 
 
 // StatusByte type represents a MIDI status byte.  
-// For channel messages the lower 4-bits should be masked out.
+// Mask out lower 4-bits for channel status.
 //
 type StatusByte byte
-
-// MetaType type represents a META message type.
-//
-type MetaType byte
 
 const (
 	NO_STATUS = 0x00    // Special case indicates no status is selected.
@@ -82,8 +89,74 @@ const (
 	ACTIVE_SNESING StatusByte = 0xFE
 	SYSEX StatusByte = 0xF0
 	END_SYSEX StatusByte = 0xF7
-	
+)
 
+var statusMnemonics = map[StatusByte]string {
+		NO_STATUS        : "NONE ",
+		KEYED_STATUS     : "KEYED",
+		NOTE_OFF         : "OFF  ",
+		NOTE_ON          : "ON   ",
+		POLY_PRESSURE    : "PPRS ",
+		CONTROLLER       : "CTRL ",
+		PROGRAM          : "PROG ",
+		CHANNEL_PRESSURE : "CPRS ",
+		BEND             : "BEND ",
+		META             : "META ",
+		CLOCK            : "CLCK ",
+		START            : "STRT ",
+		CONTINUE         : "CONT ",
+		STOP             : "STOP ",
+		ACTIVE_SNESING   : "ASNS ",
+		SYSEX            : "SYEX ",
+		END_SYSEX        : "EOX  "}
+
+
+func IsChannelStatus(st StatusByte) bool {
+	return st == KEYED_STATUS || (st & 0xF0) < 0xF0
+}
+
+func IsMetaStatus(st StatusByte) bool {
+	return st == META
+}
+
+func IsSystemStatus(st StatusByte) bool {
+	return !(IsMetaStatus(st) || IsChannelStatus(st))
+}
+
+func IsKeyedStatus(st StatusByte) bool {
+	hi := st & 0xF0
+	return hi == KEYED_STATUS || hi == NOTE_OFF || hi == NOTE_ON || hi == POLY_PRESSURE
+}
+
+
+func (st StatusByte) String() string {
+	var rs string
+	if IsChannelStatus(st) {
+		rs, _ = statusMnemonics[st & 0xF0]
+	} else {
+		rs, _ = statusMnemonics[st]
+	}
+	if rs == "" {
+		rs = "?STATUS¿"
+	}
+	return rs
+}
+
+func ChannelMessageDataCount(st StatusByte) int {
+	hi := st & 0xF0
+	if hi == 0xc0 || hi == 0xd0 {
+		return 1
+	} else {
+		return 2
+	}
+}
+
+
+// MetaType type represents a META message type.
+//
+type MetaType byte
+
+const (
 	META_SEQUENCE_NUMBER MetaType = 0x00  
  	META_TEXT MetaType = 0x01
  	META_COPYRIGHT MetaType = 0x02
@@ -92,7 +165,7 @@ const (
  	META_LYRIC MetaType = 0x05
  	META_MARKER MetaType = 0x06
  	META_CUEPOINT MetaType = 0x07
- 	META_CHANNEL_PREFIX MetaType = 0x20
+ 	META_CHANNEL_PREFIX MetaType = 0x20  // obsolete ?
  	META_END_OF_TRACK MetaType = 0x2F
  	META_TEMPO MetaType = 0x51
  	META_SMPTE MetaType = 0x54
@@ -102,158 +175,63 @@ const (
 	NOT_META MetaType = 0xFF
 )
 
-var (
-	// Maps StatusByte to string mnemonic.
-	//
-	statusMnemonics = map[StatusByte]string {
-		NO_STATUS: "NONE",
-		KEYED_STATUS: "KEYED",
-		NOTE_OFF: "OFF ",
-		NOTE_ON: "ON  ",
-		POLY_PRESSURE: "PRES",
-		CONTROLLER: "CTRL",
-		PROGRAM: "PROG",
-		CHANNEL_PRESSURE: "CPRS",
-		BEND: "BEND",
-		META: "META",
-		CLOCK: "CLK",
-		START: "STRT",
-		CONTINUE: "CONT",
-		STOP: "STOP",
-		ACTIVE_SNESING: "ASEN",
-		SYSEX: "SYSX",
-		END_SYSEX: "EOX ",
-	}
-
-	channelStatusDataCount = map[StatusByte]int {
-		NOTE_OFF: 2,
-		NOTE_ON: 2,
-		POLY_PRESSURE: 2,
-		CONTROLLER: 2,
-		PROGRAM: 1,
-		CHANNEL_PRESSURE: 1,
-		BEND: 2,
-	}
-
-	// -1 indicates indeterminate.
-	systemStatusDataCount = map[StatusByte]int {
-		CLOCK: 0,
-		START: 0,
-		CONTINUE: 0,
-		STOP: 0,
-		ACTIVE_SNESING: 0,
-		SYSEX: -1,
-		END_SYSEX: 0,
-	}
-
-
-	// metaTypeTable maps MetaType to string mnemonic.
-	//
-	metaMnemonics map[MetaType]string = map[MetaType]string {
-		META_SEQUENCE_NUMBER: "SeqNum ",
-		META_TEXT:            "Text   ",
-		META_COPYRIGHT:       "CpyRite",
-		META_TRACK_NAME:      "TrkName",
-		META_INSTRUMENT_NAME: "InsName",
-		META_LYRIC:           "Lyric  ",
-		META_MARKER:          "Marker ",
-		META_CUEPOINT:        "Cue    ",
-		META_CHANNEL_PREFIX:  "ChanPre",
-		META_END_OF_TRACK:    "EOT    ",
-		META_TEMPO:           "Tempo  ",
-		META_SMPTE:           "SMPTE  ",
-		META_TIME_SIGNATURE:  "TSig   ",
-		META_KEY_SIGNATURE:   "KSig   ",
-		META_SEQUENCER_EVENT: "SeqEvnt",
-		NOT_META:            "<none> ",
-	}
-
-	metaTextTypes map[MetaType]bool = map[MetaType]bool{
-		META_TEXT: true,
-		META_COPYRIGHT: true,
-		META_TRACK_NAME: true,
-		META_INSTRUMENT_NAME: true,
-		META_LYRIC: true,
-		META_MARKER: true,
-		META_CUEPOINT: true,
-	}
-)
-
-
-
-
-// isStatusByte() returns true iff argument is a valid MIDI status byte.
-// For channel types the lower 4-bits must be masked out.
-//
-func isStatusByte(s byte) bool {
-	_, flag := statusMnemonics[StatusByte(s)]
-	return flag
-}
-
-// IsChannelStatus() returns true iff argument is a valid MIDI channel status byte.
-// The lower 4-bits are ignored.
-//
-func IsChannelStatus(s byte) bool {
-	_, flag := channelStatusDataCount[StatusByte(s & 0xF0)]
-	return flag
-}
-
-// isKeyedStatus() returns true iff argument is NOTE_OFF, NOTE_ON or POLY_PRESSURE.
-// The lower 4-bits are ignored.
-//
-func isKeyedStatus(s byte) bool {
-	sb := StatusByte(s)
-	return sb == NOTE_OFF || sb == NOTE_ON || sb == POLY_PRESSURE
-}
-
-
-// isSystemStatus() returns true iff argument is a system-message status byte.
-//
-func isSystemStatus(s byte) bool {
-	_, flag := systemStatusDataCount[StatusByte(s)]
-	return flag
-}
-
-// isMetaStatus() returns true iff argument is the meta status byte.
-//
-func isMetaStatus(s byte) bool {
-	return StatusByte(s) == META
-}
-
-// isMetaType() returns true iff argument is a valid META type -AND- it is not equal to NOT_META.
-//
-func isMetaType(s byte) bool {
-	_, flag := metaMnemonics[MetaType(s)]
-	flag = flag && !(MetaType(s) == NOT_META)
-	return flag
-}
-
-// IsMetaTextType() returns true iff argument is one of the META text types.
-//
-func IsMetaTextType(mt byte) bool {
-	_, flag := metaTextTypes[MetaType(mt)]
-	return flag
-}
-
-func (s StatusByte) String() string {
-	var c string
-	var flag bool
-	if IsChannelStatus(byte(s)) {
-		cs := s & StatusByte(0xF0)
-		c, flag = statusMnemonics[cs]
-	} else {
-		c, flag = statusMnemonics[s]
-	}
-	if !flag {
-		c = "?   "
-	}
-	return c
-}
+var metaMnemonics = map[MetaType]string {
+	META_SEQUENCE_NUMBER : "SEQ_NUMBER",
+ 	META_TEXT            : "TEXT",
+ 	META_COPYRIGHT       : "COPYRIGHT",
+ 	META_TRACK_NAME      : "TRK_NAME", 
+ 	META_INSTRUMENT_NAME : "INST_NAME",
+ 	META_LYRIC           : "LYRIC",
+ 	META_MARKER          : "MARKER",
+ 	META_CUEPOINT        : "CUEPOINT",
+ 	META_CHANNEL_PREFIX  : "CHAN PREFIX",
+ 	META_END_OF_TRACK    : "EOT",
+ 	META_TEMPO           : "TEMPO",
+ 	META_SMPTE           : "SMPTE",
+ 	META_TIME_SIGNATURE  : "TIMESIG",
+ 	META_KEY_SIGNATURE   : "KEYSIG",
+ 	META_SEQUENCER_EVENT : "SEQ_EVENT",
+	NOT_META             : "ERROR"}
 
 func (mt MetaType) String() string {
-	c, flag := metaMnemonics[mt]
+	rs, flag := metaMnemonics[mt]
 	if !flag {
-		c = "?      "
+		rs = "?META¿"
 	}
-	return c
+	return rs
 }
+
+
+
+
+func StringRepMessage(data []byte) string {
+	n := len(data)
+	if n < 1 {
+		return "MIDI Message data < 0 ?"
+	}
+	st := StatusByte(data[0])
+	acc := st.String()
+	if IsChannelStatus(st) {
+		c := MIDIChannel(st & 0x0F) + 1
+		acc += fmt.Sprintf(" %s", c)
+	}
+	if n > 1 {
+		maxOut := 16
+		acc += " DATA: "
+		for i, d := range data[1:] {
+			acc += fmt.Sprintf("%02X ", d)
+			if i > maxOut {
+				break
+			}
+		}
+		if len(data)-1 > maxOut {
+			acc += "..."
+		}
+		if IsKeyedStatus(st) {
+			acc += fmt.Sprintf("  KEY: %s", KeyName(data[1]))
+		}
+	}
+	return acc
+}
+
+

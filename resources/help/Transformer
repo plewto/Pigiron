@@ -1,6 +1,6 @@
-Operator Transposer
+Operator Transformer
 
-Transposer is an Operator which selectively modifies MIDI data bytes.
+Transformer is an Operator which selectively modifies MIDI data bytes.
 Either data byte of any channel message may be modified.
 
 General parameters:

@@ -22,5 +22,9 @@ Pigiron CHANGELOG
 
 0.1.03 beta
        Adds REPL command validation.
-	Fixes BUG 016 MIDIPlayer now recognizes tempo.
-	Removes Delay Operator.
+       Fixes BUG 016 MIDIPlayer now recognizes tempo.
+       Removes Delay Operator.
+
+0.2.00 beta
+       Replaces portmidi backend with gomidi.
+       Renamed Transposer operator to Transformer.

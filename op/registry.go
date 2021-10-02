@@ -13,7 +13,7 @@ var OperatorTypes = []string{
 	"MIDIOutput",
 	"MIDIPlayer",
 	"Monitor",
-	"Transposer"}
+	"Transformer"}
 
 // The registry is a global map holding all current operators. 
 // MIDIInput and MIDIOutput operators are stored separately.
@@ -84,8 +84,8 @@ func NewOperator(opType string, name string) (Operator, error) {
 		op = newDistributor(name)
 	// case "MIDIPlayer":
 	// 	op = newMIDIPlayer(name)
-	// case "Transposer":
-	// 	op = newTransposer(name)
+	case "Transformer":
+		op = newTransformer(name)
 	default:
 		sfmt := "Invalid Operator type: '%s'"
 		msg := fmt.Sprintf(sfmt, opType)

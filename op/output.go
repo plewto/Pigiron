@@ -68,12 +68,6 @@ func (op *MIDIOutput) DeviceName() string {
 	return op.port.String()
 }
 
-// func (op *MIDIOutput) IsOpen() bool {
-// 	return true
-// }
-
-// func (op *MIDIOutput) Close() {}
-
 func (op *MIDIOutput) Info() string {
 	s := op.commonInfo()
 	s += fmt.Sprintf("\tDevice Name : %s\n", op.port)

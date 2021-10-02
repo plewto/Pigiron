@@ -76,8 +76,8 @@ func NewOperator(opType string, name string) (Operator, error) {
 	switch opType {
 	case "Dummy":
 		op = newDummyOperator(name)
-	// case "Monitor":
-	// 	op  = newMonitor(name)
+	case "Monitor":
+		op  = newMonitor(name)
 	// case "ChannelFilter":
 	// 	op = newChannelFilter(name)
 	// case "Distributor":

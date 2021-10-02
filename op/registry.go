@@ -78,10 +78,10 @@ func NewOperator(opType string, name string) (Operator, error) {
 		op = newDummyOperator(name)
 	case "Monitor":
 		op  = newMonitor(name)
-	// case "ChannelFilter":
-	// 	op = newChannelFilter(name)
-	// case "Distributor":
-	// 	op = newDistributor(name)
+	case "ChannelFilter":
+		op = newChannelFilter(name)
+	case "Distributor":
+		op = newDistributor(name)
 	// case "MIDIPlayer":
 	// 	op = newMIDIPlayer(name)
 	// case "Transposer":

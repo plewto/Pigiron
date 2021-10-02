@@ -27,7 +27,9 @@ func newMIDIInput(name string, port gomidi.In) (*MIDIInput, error) {
 	op.addCommandHandler("q-device", op.remoteQueryDevice)
 	op.port = port
 	callback := func(msg gomidi.Message, delta int64) {
-		op.Send(msg)
+		if op.MIDIOutputEnabled() {
+			op.Send(msg)
+		}
 	}
 	listener, err := gomidi.NewListener(port, callback)
 	if err != nil {

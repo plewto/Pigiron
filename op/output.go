@@ -81,9 +81,10 @@ func (op *MIDIOutput) Info() string {
 }
 
 func (op *MIDIOutput) Send(msg gomidi.Message) {
-	fmt.Printf("OUT send %v\n", msg)
-	op.port.Send(msg.Data)
-	op.distribute(msg)
+	if op.MIDIOutputEnabled() {
+		op.port.Send(msg.Data)
+		op.distribute(msg)
+	}
 }
 
 

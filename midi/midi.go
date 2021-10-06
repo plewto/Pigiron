@@ -5,7 +5,6 @@ import (
 	"fmt"
 )
 
-
 // MIDIChannel type single MIDI channel, range 1..16 inclusive
 //
 type MIDIChannel byte
@@ -201,7 +200,10 @@ func (mt MetaType) String() string {
 	return rs
 }
 
-
+func IsMetaType(mt MetaType) bool {
+	_, exists := metaMnemonics[mt]
+	return exists
+}
 
 
 func StringRepMessage(data []byte) string {

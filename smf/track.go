@@ -5,21 +5,23 @@ package smf
 **
 */
 
+
+
 import (
  	"fmt"
 	"os"
-	"github.com/plewto/pigiron/midi"
- 	gomidi "gitlab.com/gomidi/midi/v2"
+	// "github.com/plewto/pigiron/midi"
+ 	// gomidi "gitlab.com/gomidi/midi/v2"
 )
 
-var TRACK_ID chunkID = [4]byte{0x4d, 0x54, 0x72, 0x6B}
+var trackID chunkID = [4]byte{0x4d, 0x54, 0x72, 0x6B}
 
 type Track struct {
 	events []Event
 }
 
 func (trk *Track) ID() chunkID {
-	return TRACK_ID
+	return trackID
 }
 
 func (trk *Track) Length() int {
@@ -41,16 +43,16 @@ func (trk *Track) Dump() {
 	}
 }
 		
-func ReadTrack(f *os.File) (track *Track, err error) {
+func readTrack(f *os.File) (track *Track, err error) {
 	var id chunkID
 	var length int
 	id, length, err = readChunkPreamble(f)
 	if err != nil {
 		return
 	}
-	if !id.eq(TRACK_ID) {
+	if !id.eq(trackID) {
 		msg := "Expected track id '%s', got '%s'"
-		err = fmt.Errorf(msg, TRACK_ID, id)
+		err = fmt.Errorf(msg, trackID, id)
 		return
 	}
 	var bytes = make([]byte, length)
@@ -62,20 +64,22 @@ func ReadTrack(f *os.File) (track *Track, err error) {
 		return
 	}
 	if err != nil {
-		msg := "smf.ReadTrack could not read track\n"
+		msg := "smf.readTrack could not read track\n"
 		msg += fmt.Sprintf("%s", err)
 		err = fmt.Errorf(msg)
 		return
 	}
-	track = new(Track)
-	var index int
-	index, err = track.convertEvents(bytes)
-	if err != nil {
-		errmsg := fmt.Sprintf("Error while converting smf track bytes to events.  index = %d", index)
-		err = fmt.Errorf("%s\n%s", errmsg, err)
-	}
+	// track = new(Track)
+	// var index int
+	// index, err = track.convertEvents(bytes)
+	// if err != nil {
+	// 	errmsg := fmt.Sprintf("Error while converting smf track bytes to events.  index = %d", index)
+	// 	err = fmt.Errorf("%s\n%s", errmsg, err)
+	// }
 	return
 }
+
+/* ****** SRC Commented REMOVE
 
 func (trk *Track) convertEvents(bytes []byte) (index int, err error) {
 	var acc = make([]Event, 0, 1024)
@@ -135,7 +139,6 @@ func (trk *Track) convertEvents(bytes []byte) (index int, err error) {
 				err = fmt.Errorf(errmsg, index, status)
 				return
 			}
-			
 		}
 		acc = append(acc, Event{uint64(deltaTime), gomidi.NewMessage(msgdata)})
 	} 
@@ -147,5 +150,5 @@ func (trk *Track) convertEvents(bytes []byte) (index int, err error) {
 	return
 	
 }
-	
+****** */	
 	

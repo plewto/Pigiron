@@ -45,7 +45,7 @@ func Warning(message string, more ...string) warning {
 		msg += fmt.Sprintf("\nWARNING: %s", s)
 	}
 	warn := baseWarning{msg}
-	fmt.Printf("%s\n", warn)
+	fmt.Printf("%s\n", warn.String())
 	return &warn
 }
 

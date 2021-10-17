@@ -11,7 +11,7 @@ import (
 	"github.com/plewto/pigiron/pigerr"
 )
 
-var HEADER_ID chunkID = [4]byte{0x4d, 0x54, 0x68, 0x64}
+var headerID chunkID = [4]byte{0x4d, 0x54, 0x68, 0x64}
 
 
 // SMFheadr strut implements Chunk interface for MIDI file headers.
@@ -28,7 +28,7 @@ func (h *Header) String() string {
 }
 
 func (h *Header) ID() chunkID {
-	return HEADER_ID
+	return headerID
 }
 
 // h.Format() return MIDI file format
@@ -60,18 +60,18 @@ func (h *Header) Dump() {
 }
 
 
-// ReadHeader function reads MIDI file header chuck from file.
+// readHeader function reads MIDI file header chuck from file.
 //
-func ReadHeader(f *os.File) (header *Header, err error) {
+func readHeader(f *os.File) (header *Header, err error) {
 	var id chunkID
 	var length int
 	id, length, err = readChunkPreamble(f)
 	if err != nil {
 		return
 	}
-	if !id.eq(HEADER_ID) {
+	if !id.eq(headerID) {
 		msg := "Expected header id '%s', got '%s'"
-		err = fmt.Errorf(msg, HEADER_ID, id)
+		err = fmt.Errorf(msg, headerID, id)
 		return
 	}
 	if length != 6 {
@@ -89,7 +89,7 @@ func ReadHeader(f *os.File) (header *Header, err error) {
 		return
 	}
 	if err != nil {
-		msg := "smf.ReadHeader could not read Header chunk\n"
+		msg := "smf.readHeader could not read Header chunk\n"
 		msg += fmt.Sprintf("%s", err)
 		err = fmt.Errorf(msg)
 		return

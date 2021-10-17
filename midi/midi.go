@@ -127,6 +127,9 @@ func IsKeyedStatus(st StatusByte) bool {
 	return hi == KEYED_STATUS || hi == NOTE_OFF || hi == NOTE_ON || hi == POLY_PRESSURE
 }
 
+func IsSystemRealtimeStatus(st StatusByte) bool {
+	return st == CLOCK || st == START || st == CONTINUE || st == STOP
+}
 
 func (st StatusByte) String() string {
 	var rs string

@@ -27,10 +27,15 @@ func expectVLQ(buffer []byte, index int) (vlq *VLQ, newIndex int, err error) {
 	var maxBytes = 4
 	var acc = make([]byte, 0, maxBytes)
 	count := 0
+	if index >= len(buffer) {
+		errmsg := "expectVLQ index out of bounds: %d"
+		err = fmt.Errorf(errmsg, index)
+		return
+	}
 	for i := index; i < len(buffer); i++ {
 		count++
 		if count > maxBytes {
-			errmsg := "Expected VLQ at index %d"
+			errmsg := "smf.expectVLQ, expected VLQ at index %d"
 			err = fmt.Errorf(errmsg, index)
 			return
 		}
@@ -40,123 +45,181 @@ func expectVLQ(buffer []byte, index int) (vlq *VLQ, newIndex int, err error) {
 			break
 		}
 	}
+	vlq = NewVLQ(0)
 	vlq.setBytes(acc)
 	newIndex = index + count
 	return
 }
-	
 
-
-// stch must contain both hi and low (command & channel) status-byte nibbles.
-// index -> first data byte of message
-//
-func expectChannelMessage(buffer []byte, stch byte, index int) (mdata []byte, newIndex int, err error) {
-	count := midi.ChannelMessageDataCount(midi.StatusByte(stch))
-	if len(buffer) < index + count {
-		errmsg := "expectChannelMessage index out of bounds. index = %d, status = 0x%02X"
-		err = fmt.Errorf(errmsg, index, stch)
+func expectDataByte(buffer []byte, index int) (value byte, err error) {
+	if index >= len(buffer) {
+		errmsg := "smf.expectDataByte index out of bounds at %d"
+		err = fmt.Errorf(errmsg, index)
 		return
 	}
-
-	var assertDataByte = func(d byte, i int) error {
-		var derr error
-		if d > 0x7F {
-			errmsg := "Expected MIDI data byte at index %d, got 0x%02X"
-			derr = fmt.Errorf(errmsg, i, d)
-		}
-		return derr
+	value = buffer[index]
+	if value > 0x7F {
+		errmsg := "smf.expectDataByte, expected MIDI data byte at index %d, got 0x%02X"
+		err = fmt.Errorf(errmsg, index, value)
 	}
-	
-	if count == 1 {
-		d1 := buffer[index]
-		err = assertDataByte(d1, index)
+	return
+}
+
+
+func expectRunningStatus(buffer []byte, status byte, index int) (mdata []byte, newIndex int, err error) {
+	count := midi.ChannelMessageDataCount(midi.StatusByte(status))
+	if len(buffer) <= index+count {
+		errmsg := "smf.expectRunningStatus index out of bounds %d, []byte length is %d"
+		err = fmt.Errorf(errmsg, index, len(buffer))
+		return
+	}
+	var d1, d2 byte
+	switch count {
+	case 1:
+		d1, err = expectDataByte(buffer, index)
 		if err != nil {
 			return
 		}
-		mdata = []byte{stch, d1}
+		mdata = []byte{status, d1}
 		newIndex = index + 1
-		return
-	} else { // assume 2 data bytes
-		d1 := buffer[index]
-		d2 := buffer[index + 1]
-		err = assertDataByte(d1, index)
+	case 2:
+		d1, err = expectDataByte(buffer, index)
 		if err != nil {
 			return
 		}
-		err = assertDataByte(d2, index)
+		d2, err = expectDataByte(buffer, index+1)
 		if err != nil {
 			return
 		}
-		mdata = []byte{stch, d1, d2}
+		mdata = []byte{status, d1, d2}
 		newIndex = index + 2
+	default:
+		errmsg := "smf.expectRunningStatus swtich fallthrough. Status byte was 0x%02X"
+		err = fmt.Errorf(errmsg, status)
+	}
+	return
+}
+
+func expectChannelMessage(buffer []byte, status byte, index int) (mdata []byte, newIndex int, err error) {
+	mdata, newIndex, err = expectRunningStatus(buffer, status, index+1)
+	return
+}
+
+
+func expectSysexMessage(buffer []byte, index int) (mdata []byte, newIndex int, err error) {
+	var acc = make([]byte, 1, 1024)
+	if index >= len(buffer) {
+		errmsg := "smf.expectSysexMessage index out of bounds at %d, []byte length is %d"
+		err = fmt.Errorf(errmsg, index, len(buffer))
 		return
 	}
-}
-		
-// index -> first data bytre after status
-//
-func expectSysexMessage(bytes []byte, index int) (mdata []byte, newIndex int, err error) {
+	st := buffer[index]
+	if st != 0xF0 {
+		errmsg := "Expected sysex status 0xF0 at index %d, got 0x02X"
+		err = fmt.Errorf(errmsg, index, st)
+	}
 	var b byte
-	newIndex = index
-	for b & 0xfF > 0x7f && newIndex < len(bytes) {
-		b = bytes[newIndex]
-		newIndex++
-	}
-	mdata = bytes[index-1:newIndex]
-	return
-}
-
-// index -> first byte after status
-//
-func expectSystemMessage(bytes []byte, index int) (mdata []byte, newIndex int, err error) {
-	st := bytes[index-1]
-	newIndex = index
-	mdata = []byte{st}
-	return
-}
-
-
-// index -> metaType byte
-//
-func expectMetaMessage(bytes []byte, index int) (mdata []byte, newIndex int, err error) {
-	var i = index
-	var mtype byte
-	if len(bytes) <= i {
-		errmsg := "expectMetaMessage index out of bounds, start-index = %d"
-		err = fmt.Errorf(errmsg, index-1)
-		return
-	}
-	mtype = byte(i)
-	if !midi.IsMetaType(midi.MetaType(mtype)) {
-		errmsg := "Expected Meta type bytes at index %d, got 0x%02X"
-		err = fmt.Errorf(errmsg, i, mtype)
-		return
-	}
-
-	i++
-	var vlq *VLQ
-	vlq, i, err = expectVLQ(bytes, i)
-	if err != nil {
-		errmsg := fmt.Sprintf("Expected meta VLQ at index %d", i-1)
-		err = fmt.Errorf("%s\n%s", errmsg, err)
-		return
-	}
-	mdata = make([]byte, 2, 2+vlq.Length()+vlq.Value())
-	mdata[0] = 0xFF
-	mdata[1] = mtype
-	for _, b := range vlq.Bytes() {
-		mdata = append(mdata, b)
-		i++
-	}
-	for j, count := i, 0; count < vlq.Value(); j, count = j+1, count+1 {
-		if j >= len(bytes) {
-			errmsg := "expectMetaMessage index out of bounds, start-index = %d"
-			err = fmt.Errorf(errmsg, index)
+	acc[0] = st
+	index++
+	for {
+		if index >= len(buffer) {
+			errmsg := "smf.expectSysexMessage index out of bounds at %d, []byte length is %d"
+			err = fmt.Errorf(errmsg, index, len(buffer))
 			return
 		}
-		mdata = append(mdata, bytes[j])
-		i++
+		b = buffer[index]
+		switch {
+		case b < 0x80:
+			acc = append(acc, b)
+		case b == 0xF7:
+			acc = append(acc, b)
+			index++
+			mdata = acc[0 : len(acc)]
+			newIndex = index
+			return
+		case midi.IsSystemRealtimeStatus(midi.StatusByte(b)):
+			// ignore
+		case b >= 0x80:
+			errmsg := "Sysex aborted by invalid status byte 0x%02X at index %d"
+			err = fmt.Errorf(errmsg, b, index)
+			return
+		default:
+			errmsg := "Sysex message aborted by unexpected status byte 0x%02X at index %d"
+			err = fmt.Errorf(errmsg, b, index)
+			return
+		}
+		index++
 	}
-	newIndex = i
 	return
 }
+	
+		
+
+// handles non-sysex system messages
+// Theses are all a single byte in length
+//
+func expectSystemMessage(buffer []byte, index int) (mdata []byte, newIndex int, err error) {
+	if index >= len(buffer) {
+		errmsg := "smf.expectSystemMessage index %d out of bounds, []byte length is %d"
+		err = fmt.Errorf(errmsg, index, len(buffer))
+		return
+	}
+	st := midi.StatusByte(buffer[index])
+	if !midi.IsSystemStatus(st) {
+		errmsg := "Expected MIDI real time system message at index %d, got 0x%02X"
+		err = fmt.Errorf(errmsg, index, st)
+		return
+	}
+	mdata = []byte{byte(st)}
+	newIndex = index+1
+	return
+}
+
+
+func expectMetaMessage(buffer []byte, index int) (mdata []byte, newIndex int, err error) {
+	if index >= len(buffer)-1 {
+		errmsg := "smf.expectMetaMessage index %d out of bounds, []byte length is %d"
+		err = fmt.Errorf(errmsg, index, len(buffer))
+		return
+	}
+	st := midi.StatusByte(buffer[index])
+	mt := midi.MetaType(buffer[index+1])
+	if !midi.IsMetaStatus(st) || !midi.IsMetaType(mt) {
+		errmsg := "Expected meta status 0xFF and valid meta type starting at index %d, "
+		errmsg += "got 0x%02x and 0x$02x"
+		err = fmt.Errorf(errmsg, index, byte(st), byte(mt))
+	}
+	acc := make([]byte, 2, 128)
+	acc[0] = byte(st)
+	acc[1] = byte(mt)
+	index += 2
+	var vlq *VLQ
+	vlq, index, err = expectVLQ(buffer, index)
+	if err != nil {
+		return
+	}
+	for _, b := range vlq.Bytes() {
+		acc = append(acc, b)
+		index++
+	}
+	for j, count := index, 0; count < vlq.Value(); j, count = j+1, count+1 {
+		if j >= len(buffer) {
+			errmsg := "smf.expectMetaMesage index %d out of bounds, []byte length is %d"
+			err = fmt.Errorf(errmsg, j, len(buffer))
+			return
+		}
+		acc = append(acc, buffer[j])
+		index++
+	}
+	mdata = acc[0 : len(acc)]
+	newIndex = index
+	return
+}
+	
+	
+		
+	
+	
+	
+		
+	

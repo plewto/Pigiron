@@ -5,7 +5,6 @@ import (
 	"fmt"
 )
 
-
 func TestTakeByte(t *testing.T) {
 	fmt.Print("")
 	buffer := []byte{1, 2, 3}

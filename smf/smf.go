@@ -7,7 +7,8 @@ package smf
 
 import (
 	"fmt"
-	// "os"
+	"os"
+	"github.com/plewto/pigiron/pigpath"
 	// "github.com/plewto/pigiron/pigerr"
 )
 
@@ -15,14 +16,14 @@ import (
 //
 type SMF struct {
 	filename string
-	header Header
+	header *Header
 	tracks[] Track
 }
 
 func NewSMF() *SMF {
 	smf := new(SMF)
 	smf.filename = ""
-	smf.header = Header{0, 1, 24}
+	smf.header = &Header{0, 1, 24}
 	smf.tracks = make([]Track, 0, 1)
 	return smf
 }
@@ -80,9 +81,32 @@ func (smf *SMF) Track(n int) (track Track, err error) {
 	track = smf.tracks[n]
 	return
 }
-			
+
 func ReadSMF(filename string) (smf *SMF, err error) {
+	filename = pigpath.SubSpecialDirectories(filename)
+	file, ferr := os.Open(filename)
+	if ferr != nil {
+		errmsg := "Can not open SMF file: '%s'\n%s"
+		err = fmt.Errorf(errmsg, filename, ferr.Error())
+		return
+	}
+	defer file.Close()
+	smf = NewSMF()
+	smf.header, err = readHeader(file)
+	if err != nil {
+		return smf, err
+	}
+	smf.tracks = make([]Track, 0, smf.header.trackCount)
+	for i := 0; i < smf.header.trackCount; i++ {
+		track, terr := readTrack(file)
+		if terr != nil {
+			errmsg := "Can not read track %d of smf file %s\n%s"
+			err = fmt.Errorf(errmsg, i, filename, terr.Error)
+			return
+		}
+		smf.tracks = append(smf.tracks, *track)
+	}
+	smf.filename = filename
 	return
 }
-		
-		
+	

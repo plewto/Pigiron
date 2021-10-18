@@ -48,8 +48,6 @@ func (h *Header) Length() int {
 	return 6
 }
 
-
-
 // h.Dump() displays contents of MIDI header chunk.
 //
 func (h *Header) Dump() {
@@ -114,7 +112,7 @@ func readHeader(f *os.File) (header *Header, err error) {
 		dflt := 24
 		msg1 := "MIDI file has out of bounds clock division"
 		msg2 := fmt.Sprintf("Expected division between 24 and 960, got %d", division)
-		msg3 := fmt.Sprintf("Usiong default %d", dflt)
+		msg3 := fmt.Sprintf("Using default %d", dflt)
 		pigerr.Warning(msg1, msg2, msg3)
 		header.division = dflt
 	}

@@ -188,6 +188,7 @@ func expectMetaMessage(buffer []byte, index int) (mdata []byte, newIndex int, er
 		errmsg := "Expected meta status 0xFF and valid meta type starting at index %d, "
 		errmsg += "got 0x%02x and 0x$02x"
 		err = fmt.Errorf(errmsg, index, byte(st), byte(mt))
+		return
 	}
 	acc := make([]byte, 2, 128)
 	acc[0] = byte(st)
@@ -200,7 +201,6 @@ func expectMetaMessage(buffer []byte, index int) (mdata []byte, newIndex int, er
 	}
 	for _, b := range vlq.Bytes() {
 		acc = append(acc, b)
-		index++
 	}
 	for j, count := index, 0; count < vlq.Value(); j, count = j+1, count+1 {
 		if j >= len(buffer) {

@@ -10,8 +10,8 @@ package smf
 import (
  	"fmt"
 	"os"
-	// "github.com/plewto/pigiron/midi"
- 	// gomidi "gitlab.com/gomidi/midi/v2"
+	"github.com/plewto/pigiron/midi"
+ 	gomidi "gitlab.com/gomidi/midi/v2"
 )
 
 var trackID chunkID = [4]byte{0x4d, 0x54, 0x72, 0x6B}
@@ -36,13 +36,7 @@ func (trk *Track) String() string {
 	return fmt.Sprintf("Track (%d events)", len(trk.events))
 }
 
-func (trk *Track) Dump() {
-	fmt.Println("Track:")
-	for i, ev := range trk.events {
-		fmt.Printf("[%5d] %s\n", i, ev.String())
-	}
-}
-		
+
 func readTrack(f *os.File) (track *Track, err error) {
 	var id chunkID
 	var length int
@@ -69,86 +63,83 @@ func readTrack(f *os.File) (track *Track, err error) {
 		err = fmt.Errorf(msg)
 		return
 	}
-	// track = new(Track)
-	// var index int
-	// index, err = track.convertEvents(bytes)
-	// if err != nil {
-	// 	errmsg := fmt.Sprintf("Error while converting smf track bytes to events.  index = %d", index)
-	// 	err = fmt.Errorf("%s\n%s", errmsg, err)
-	// }
+	track = new(Track)
+	var index int
+	index, err = track.convertEvents(bytes)
+	if err != nil {
+		errmsg := fmt.Sprintf("Error while converting smf track bytes to events.  index = %d", index)
+		err = fmt.Errorf("%s\n%s", errmsg, err)
+	}
 	return
 }
 
-/* ****** SRC Commented REMOVE
 
-func (trk *Track) convertEvents(bytes []byte) (index int, err error) {
+
+func (trk *Track) convertEvents(buffer []byte) (index int, err error) {
 	var acc = make([]Event, 0, 1024)
 	var runningStatus = midi.StatusByte(0)
 	index = 0
-	for index < len(bytes) {
+	for index < len(buffer) {
 		var vlq *VLQ
-		vlq, index, err = expectVLQ(bytes, index)
+		vlq, index, err = expectVLQ(buffer, index)
 		if err != nil {
 			return
 		}
-		var deltaTime = vlq.Value()
-		var b byte
-		b, index, err = expectByte(bytes, index)
-		status := midi.StatusByte(b)
-		if err != nil {
-			return
-		}
-		var msgdata []byte
-		if !midi.IsChannelStatus(status) { 
-			if !midi.IsChannelStatus(runningStatus) {
-				errmsg := "Expected running status at index %d"
-				err = fmt.Errorf(errmsg, index-1)
-				return
-			}
-			msgdata, index, err = expectChannelMessage(bytes, byte(runningStatus), index-1)
-			if err != nil {
-				return
-			}
-		} else {
+		var deltaTime = uint64(vlq.Value())
+		var b = buffer[index]
+		var msgBytes []byte
+		if b > 0x7F {   // new statys byte
+			var st = midi.StatusByte(b)
 			switch {
-			case midi.IsChannelStatus(status):
-				msgdata, index, err = expectChannelMessage(bytes, byte(status), index)
-				if err != nil {
-					return
-				}
-				runningStatus = status
-			case status == midi.SYSEX:
-				msgdata, index, err = expectSysexMessage(bytes, index)
-				if err != nil {
-					return
-				}
+			case midi.IsChannelStatus(st):
+				runningStatus = st
+				msgBytes, index, err = expectChannelMessage(buffer, b, index)
+			case b == byte(midi.SYSEX):
 				runningStatus = midi.StatusByte(0)
-			case midi.IsSystemStatus(status):
-				msgdata, index, err = expectSystemMessage(bytes, index)
-				if err != nil {
-					return
-				}
+				msgBytes, index, err = expectSysexMessage(buffer, index)
+			case midi.IsSystemRealtimeStatus(st):
 				runningStatus = midi.StatusByte(0)
-			case midi.IsMetaStatus(status):
-				msgdata, index, err = expectMetaMessage(bytes, index)
-				if err != nil {
-					return
+				msgBytes, index, err = expectSystemMessage(buffer, index)
+			case midi.IsMetaStatus(st):
+				runningStatus = midi.StatusByte(0)
+				msgBytes, index, err = expectMetaMessage(buffer, index)
+				if err == nil && msgBytes[1] == byte(midi.META_END_OF_TRACK) {
+					break
 				}
+			case runningStatus != 0:
+				msgBytes, index, err = expectRunningStatus(buffer, byte(runningStatus), index)
 			default:
-				errmsg := "Unhandled switch case. index = %d, status = 0x%02X"
-				err = fmt.Errorf(errmsg, index, status)
+				errmsg := "smf.Track.convertEvents switch default.\n"
+				errmsg += "This should never happen, buffer index was %d"
+				err = fmt.Errorf(errmsg, index)
+			}
+		} else { // assume running status
+			if runningStatus == 0 {
+				errmsg := "Expected running status at index %d"
+				err = fmt.Errorf(errmsg, index)
 				return
 			}
+			msgBytes, index, err = expectRunningStatus(buffer, byte(runningStatus), index)
 		}
-		acc = append(acc, Event{uint64(deltaTime), gomidi.NewMessage(msgdata)})
-	} 
+		if err != nil {
+			return
+		}
+		acc = append(acc, Event{deltaTime, gomidi.NewMessage(msgBytes)})
+	}
 	events := make([]Event, len(acc), len(acc))
 	for i, e := range acc {
 		events[i] = e
 	}
 	trk.events = events
 	return
-	
 }
-****** */	
-	
+
+func (trk *Track) Dump() string {
+	var acc = fmt.Sprintf("Track  %d events\n", len(trk.events))
+	var time = uint64(0)
+	for i, evnt := range trk.events {
+		acc += fmt.Sprintf("[%4d] t %8d %s\n", i, time, evnt.String())
+		time += evnt.deltaTime
+	}
+	return acc
+}

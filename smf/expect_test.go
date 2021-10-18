@@ -20,7 +20,7 @@ var testBuffer = []byte{
 	0xf0, 0x00, 0x01, 0x02, 0xF7,             // [ 27] valid sysex message
 	0xf0, 0x00, 0x80,                         // [ 32] invalid sysex message
 	0xf8,				          // [ 35] clock
-	0xff, 0x00, 0x20, 0x00, 0x01,             // [ 36] meta sequence number
+	0xff, 0x00, 0x02, 0x00, 0x01,             // [ 36] meta sequence number
 	0xff, 0x01, 0x04, 0x41, 0x42, 0x43, 0x44, // [ 41] meta text 'ABCD'
 	0xff, 0x60, 0x00,			  // [ 48] malformed meta message
 	0xff, 0x2f, 0x00}			  // [ 51] meta end-of-track
@@ -271,8 +271,12 @@ func TestExpectSystemMessage(t *testing.T) {
 
 func TestExpectMetaMessage(t *testing.T) {
 	fmt.Println("TestExpectMetaMessage")
-	index := 41
-	mdata, newIndex, err := expectMetaMessage(testBuffer, index)
+	var err error
+	var index, newIndex int
+	var mdata []byte
+
+	index = 41
+	mdata, newIndex, err = expectMetaMessage(testBuffer, index)
 		if err != nil {
 		t.Fatalf("Got unexpected errorL %s", err)
 	}

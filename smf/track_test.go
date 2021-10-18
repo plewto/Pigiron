@@ -1,19 +1,34 @@
 package smf
 
 import (
-	// "testing"
-	// "fmt"
+	"testing"
+	"fmt"
 )
 
-// var (
-// 	DATA_1 = []byte{0x80, 0x80, 0x60, 0x64,     // NOTE ON
-// 		0X81, 0X90, 0X60, 0X00}             // NOTE OFF
-// )
+var (
+	rawBytes = []byte {
+		0x00, 0xFF, 0x00, 0x02, 0x00, 0x01,	       // [  0] track number 0
+		0x00, 0xFF, 0x51, 0x03, 0x07, 0xA1, 0x20,      // [  6] tempo 120 BPM
+		0x00, 0xFF, 0x03, 0x04, 0x54, 0x65, 0x73, 0x74,// [ 13] track name "Test"
+		0x00, 0x90, 0x3c, 0x40,			       // [ 21] note on
+		0x01, 0x3d, 0x40,			       // [ 25] note on running status
+		0x02, 0x3c, 0x00,			       // [ 28] note off running status
+		0x03, 0x3d, 0x00,                     	       // [ 31] ntoe off running status
+		0x00, 0xF8,				       // [ 34] clock
+		0x00, 0xF0, 0x00, 0x01, 0xF7,		       // [ 36] sysex
+		0x01, 0x90, 0x3c, 0x7f,		               // [ 41] note on
+		0x01, 0xFF, 0x2F, 0x00,			       // [ 45] end of track
+		
+	}
+)
 
 
-// func TestTrackEventConversion(t *testing.T) {
-// 	fmt.Println()
-// 	var trk *Track = &Track{}
-// 	trk.convertEvents(DATA_1)
-// }
+func TestTrackEventConversion(t *testing.T) {
+	fmt.Println("TestTrackEventConversion")
+	trk := new(Track)
+	_, err := trk.convertEvents(rawBytes)
+	if err != nil {
+		t.Fatalf("%s", err)
+	}
+}
 

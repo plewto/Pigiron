@@ -3,6 +3,7 @@ package midi
 
 import (
 	"fmt"
+	gomidi "gitlab.com/gomidi/midi/v2"
 )
 
 // MIDIChannel type single MIDI channel, range 1..16 inclusive
@@ -10,7 +11,7 @@ import (
 type MIDIChannel byte
 
 
-// ValidateMIDIChannel() returns non-nil error if channel is out of bounds.
+// ValidateMIDIChannel function returns non-nil error if channel is out of bounds.
 // Valid channel range is [1,16].
 //
 func ValidateMIDIChannel(c MIDIChannel) error {
@@ -47,7 +48,7 @@ func (ci MIDIChannelNibble) String() string {
 }
 
 
-// DataNumber indicates 1st or 2nd data byte from MIDI channel message.
+// DataNumber type indicates 1st or 2nd data byte from MIDI channel message.
 //
 type DataNumber int
 
@@ -110,23 +111,36 @@ var statusMnemonics = map[StatusByte]string {
 		END_SYSEX        : "EOX  "}
 
 
+// IsChannelStatusStatus function returns true iff status byte is a channel message.
+//
 func IsChannelStatus(st StatusByte) bool {
 	return st == KEYED_STATUS || (st & 0xF0) < 0xF0
 }
 
+// IsMetaStatus function returns true iff status byte is for meta message.
+//
 func IsMetaStatus(st StatusByte) bool {
 	return st == META
 }
 
+// IsSystemStatus function returns true iff status byte is for MIDI system message.
+//
 func IsSystemStatus(st StatusByte) bool {
 	return !(IsMetaStatus(st) || IsChannelStatus(st))
 }
 
+
+// IsKeyedStatus function returns true iff status byte is for a keyed channel message.
+// Keyed messages include NOTE_ON, NOTE_OFF and POLY_PRESSURE.
+//
 func IsKeyedStatus(st StatusByte) bool {
 	hi := st & 0xF0
 	return hi == KEYED_STATUS || hi == NOTE_OFF || hi == NOTE_ON || hi == POLY_PRESSURE
 }
 
+// IsSystemRealtimeStatus function returns true iff status byte is for system realtime message.
+// System realtime messages include CLOCK, START, CONTINUE and STOP.
+//
 func IsSystemRealtimeStatus(st StatusByte) bool {
 	return st == CLOCK || st == START || st == CONTINUE || st == STOP
 }
@@ -144,6 +158,8 @@ func (st StatusByte) String() string {
 	return rs
 }
 
+// ChannelMessageDataCount returns number of data bytes used by given status byte.
+//
 func ChannelMessageDataCount(st StatusByte) int {
 	hi := st & 0xF0
 	if hi == 0xc0 || hi == 0xd0 {
@@ -152,7 +168,6 @@ func ChannelMessageDataCount(st StatusByte) int {
 		return 2
 	}
 }
-
 
 // MetaType type represents a META message type.
 //
@@ -203,12 +218,15 @@ func (mt MetaType) String() string {
 	return rs
 }
 
+// IsMetaType returns true iff MetaType is a valid MIDI meta type.
+//
 func IsMetaType(mt MetaType) bool {
 	_, exists := metaMnemonics[mt]
 	return exists
 }
 
-
+// StringRepMessage returns string representation for MIDI message bytes.
+//
 func StringRepMessage(data []byte) string {
 	n := len(data)
 	if n < 1 {
@@ -239,4 +257,30 @@ func StringRepMessage(data []byte) string {
 	return acc
 }
 
+// IsNoteOff function returns true iff MIDI message is a NOTE_OFF.
+// NOTE_ON messages with velocity 0 are treated as NOTE_OFF.
+//
+func IsNoteOff(msg gomidi.Message) bool {
+	d := msg.Data
+	if len(d) > 2 {
+		st := d[0] & 0xF0
+		vel := d[2]
+		return st == 0x80 || (st == 0x90 && vel == 0)
+	} else {
+		return false
+	}
+}
 
+// IsNoteOn function returns true iff MIDI message is a NOTE_ON.
+// NOTE_ON messages with velocity 0 are treated as NOTE_OFF and return false.
+//
+func IsNoteOn(msg gomidi.Message) bool {
+	d := msg.Data
+	if len(d) > 2 {
+		st := d[0] & 0xF0
+		vel := d[2]
+		return st == 0x90 && vel > 0
+	} else {
+		return false
+	}
+}

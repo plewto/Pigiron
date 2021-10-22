@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"os"
 	"github.com/plewto/pigiron/pigpath"
-	// "github.com/plewto/pigiron/pigerr"
 )
 
 // SMF struct defines a Standard MIDI File.
@@ -80,6 +79,10 @@ func (smf *SMF) Track(n int) (track Track, err error) {
 	}
 	track = smf.tracks[n]
 	return
+}
+
+func (smf *SMF) Filename() string {
+	return smf.filename
 }
 
 func ReadSMF(filename string) (smf *SMF, err error) {

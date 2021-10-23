@@ -174,7 +174,7 @@ func ChannelMessageDataCount(st StatusByte) int {
 type MetaType byte
 
 const (
-	META_SEQUENCE_NUMBER MetaType = 0x00  
+	META_SEQUENCE_NUMBER MetaType = 0x00
  	META_TEXT MetaType = 0x01
  	META_COPYRIGHT MetaType = 0x02
  	META_TRACK_NAME MetaType = 0x03
@@ -224,6 +224,11 @@ func IsMetaType(mt MetaType) bool {
 	_, exists := metaMnemonics[mt]
 	return exists
 }
+
+func IsMetaText(mt MetaType) bool {
+	return META_TEXT <= mt && mt <= META_CUEPOINT
+}
+
 
 // StringRepMessage returns string representation for MIDI message bytes.
 //
@@ -284,3 +289,5 @@ func IsNoteOn(msg gomidi.Message) bool {
 		return false
 	}
 }
+
+

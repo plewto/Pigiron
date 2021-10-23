@@ -26,3 +26,12 @@ func (ev *Event) Length() int {
 func (ev *Event) Dump() {
 	fmt.Println(ev.String())
 }
+
+func (ev *Event) DeltaTime() uint64 {
+	return ev.deltaTime
+}
+
+func (ev *Event) Message() gomidi.Message {
+	return ev.message
+}
+

@@ -64,8 +64,8 @@ type Transport interface {
 	IsPlaying() bool
 	LoadMedia(filename string) error
 	MediaFilename() string
-	Duration() int // msec
-	Position() int // msec
+	Duration() uint64
+	Position() uint64
 	EnableMIDITransport(flag bool)
 	MIDITransportEnabled() bool
 	addCommandHandler(command string, handler func(*goosc.Message)([]string, error))

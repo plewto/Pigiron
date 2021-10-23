@@ -46,7 +46,7 @@ func DumpRegistry() {
 }
 
 
-// NewOperator() creates a new Operator and adds it to the registry.
+// NewOperator function creates a new Operator and adds it to the registry.
 // All operators should be created by NewOperator.
 //
 // opType indicates the type of Operator
@@ -82,8 +82,8 @@ func NewOperator(opType string, name string) (Operator, error) {
 		op = newChannelFilter(name)
 	case "Distributor":
 		op = newDistributor(name)
-	// case "MIDIPlayer":
-	// 	op = newMIDIPlayer(name)
+	case "MIDIPlayer":
+		op = newMIDIPlayer(name)
 	case "Transformer":
 		op = newTransformer(name)
 	default:

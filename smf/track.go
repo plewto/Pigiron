@@ -5,8 +5,6 @@ package smf
 **
 */
 
-
-
 import (
  	"fmt"
 	"os"
@@ -34,6 +32,10 @@ func (trk *Track) Length() int {
 
 func (trk *Track) String() string {
 	return fmt.Sprintf("Track (%d events)", len(trk.events))
+}
+
+func (trk *Track) Events() []Event {
+	return trk.events
 }
 
 
@@ -145,3 +147,11 @@ func (trk *Track) Dump() string {
 }
 
 
+func (trk *Track) Duration() uint64 {
+	var acc uint64 = 0
+	for _, event := range trk.events {
+		acc += event.DeltaTime()
+	}
+	return acc
+}
+	

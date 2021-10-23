@@ -113,3 +113,13 @@ func ReadSMF(filename string) (smf *SMF, err error) {
 	return
 }
 	
+func (smf *SMF) Duration() uint64 {
+	var acc uint64 = 0
+	for _, trk := range smf.tracks {
+		tdur := trk.Duration()
+		if tdur > acc {
+			acc = tdur
+		}
+	}
+	return acc
+}

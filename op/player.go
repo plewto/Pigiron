@@ -4,6 +4,7 @@ import (
 	"time"
 	"fmt"
 	"github.com/plewto/pigiron/midi"
+	"github.com/plewto/pigiron/pigerr"
 	"github.com/plewto/pigiron/smf"
 	gomidi "gitlab.com/gomidi/midi/v2"
 )
@@ -17,19 +18,35 @@ const (
 	READY PlayerState = iota
 	STOP
 	STOPPING
+	PLAYING
 )
+
+func (st PlayerState) String() string {
+	var s string
+	switch st {
+	case READY: s = "READY"
+	case STOP: s = "STOP"
+	case STOPPING: s = "STOPPING"
+	case PLAYING: s = "PLAYING"
+	default:
+		s = "?"
+	}
+	return s
+}
+		
+
+
 
 type MIDIPlayer struct {
 	baseOperator
 	midifile *smf.SMF
 	noteQueue midi.NoteQueue
-	state chan PlayerState
+	state PlayerState
 	eventIndex int
 	tempo float64
 	tempoScale float64
-	tickDuration uint64 // usec
-	currentTime uint64  // usec
-	isPlaying bool
+	tickDuration uint64 // μseconds
+	currentTime float64 // seconds
 	enableMIDITransport bool
 }
 
@@ -39,17 +56,16 @@ func newMIDIPlayer(name string) *MIDIPlayer {
 	op.midifile = smf.NewSMF()
 	op.noteQueue = *midi.MakeNoteQueue()
 	initTransportHandlers(op)
-	op.Reset()
 	op.enableMIDITransport = true
+	go op.Reset()
 	return op
 }
 
 func (op *MIDIPlayer) Reset() {
-	op.Stop()
-	op.noteQueue.Reset()
+	op.killActiveNotes()
+	op.resetControllers()
+	op.state = READY
 }
-	
-
 
 func (op *MIDIPlayer) MediaFilename() string {
 	return op.midifile.Filename()
@@ -68,7 +84,7 @@ func (op *MIDIPlayer) Reload() error {
 	var err error
 	fname := op.MediaFilename()
 	if fname == "" {
-		errmsg := "Reload faild, No MIDI file specified"
+		errmsg := "Reload failed, No MIDI file specified"
 		err = fmt.Errorf(errmsg)
 		return err
 	}
@@ -97,12 +113,11 @@ func (op *MIDIPlayer) killActiveNotes() {
 
 func (op *MIDIPlayer) Stop() {
 	fmt.Printf("\nMIDIPlayer %s: STOP\n", op.Name())
-	op.state <- STOPPING
-	op.isPlaying = false
+	op.state = STOPPING
 	time.Sleep(20 * time.Millisecond)
 	op.killActiveNotes()
 	op.resetControllers()
-	op.state <- READY
+	op.state = READY
 }
 
 func (op *MIDIPlayer) Continue() error {
@@ -123,7 +138,7 @@ func (op *MIDIPlayer) Play() error {
 	if err != nil {
 		return err
 	}
-	op.currentTime = 0
+	op.currentTime = 0.0
 	op.eventIndex = 0
 	err = op.Continue()
 	return err
@@ -132,22 +147,26 @@ func (op *MIDIPlayer) Play() error {
 func (op *MIDIPlayer) playLoop() error {
 	var err error
 	var track smf.Track
-	if <- op.state != READY {
-		errmsg := "MIDIPlayer %s not ready"
+	if !(op.state == READY) {
+		errmsg := "MIDIPlayer %s is not ready, try again in a few seconds."
 		err = fmt.Errorf(errmsg, op.Name())
 		return err
 	}
+	op.state = PLAYING
 	time.Sleep(PLAYER_START_DELAY * time.Millisecond)
+	fmt.Printf("\nMIDIPlayer %s: PLAYING\n", op.Name())
 	track, err = op.midifile.Track(0)
 	if err != nil {
 		return err
 	}
 	events := track.Events()
+	// fmt.Println(track.Dump())
+
+	
 	op.eventIndex = 0
-	op.isPlaying = true
 	for op.eventIndex < len(events) {
 		event := events[op.eventIndex]
-		delay := time.Duration(op.tickDuration * event.DeltaTime() * uint64(1e6))
+		delay := time.Duration(op.tickDuration * event.DeltaTime())
 		time.Sleep(delay * time.Microsecond)
 		d := event.Message().Data
 		if len(d) == 0 {
@@ -170,54 +189,14 @@ func (op *MIDIPlayer) playLoop() error {
 		default:
 			// ignore
 		} 
-		select {
-		case s := <- op.state:
-			if s == STOP || s == STOPPING {
-				break
-			}
-		default:
-			// ignore
-		} 
-		op.currentTime += uint64(delay)
+		if op.state != PLAYING {
+			break
+		}
+		op.currentTime += float64(delay * 1e6)
 		op.eventIndex++
 	}
-	op.state <- STOPPING
-	op.isPlaying = false
+	op.Stop()
 	return err
-}
-
-func metaTempoMicroseconds(data []byte) (uint64, error) {
-	// 0xff 0x51 0x03 v1 v2 v3
-	var err error
-	var acc uint64
-	if len(data) < 6 || data[1] != 0x51 {
-		errmsg := "Malformed meta tempo: %v"
-		err = fmt.Errorf(errmsg, data)
-		return 0, err
-	}
-	for i, shift := 3, 16; i < 6; i, shift = i+1, shift-8 {
-		acc += uint64(data[i]) << shift
-	}
-	return acc, err
-}
-
-func tempoMicroToBPM(μsec uint64) float64 {
-	if μsec == 0 {
-		return 60.0
-	}
-	var k float64 = 60000000
-	return k/float64(μsec)
-}
-
-
-func (op *MIDIPlayer) setTickDuration(division int, tempo float64) {
-	division = division & 0x7FFF
-	if tempo == 0 {
-		tempo = 60.0
-	}
-	var qdur float64 = 60.0/tempo
-	dur := qdur/float64(division)
-	op.tickDuration = uint64(dur)
 }
 
 func (op *MIDIPlayer) handleMeta(msg gomidi.Message) (exitFlag bool, err error) {
@@ -229,17 +208,20 @@ func (op *MIDIPlayer) handleMeta(msg gomidi.Message) (exitFlag bool, err error) 
 	}
 	mtype := midi.MetaType(msg.Data[1])
 	switch {
-	case mtype == midi.META_TEMPO:
-		var μsec uint64
-		μsec, err = metaTempoMicroseconds(d)
+	case midi.IsTempoChange(msg):
+		op.tempo, err = midi.MetaTempoBPM(msg)
 		if err != nil {
-			return
+			errmsg := "Meta tempo message looks weird, using default 120 BPM"
+			pigerr.Warning(errmsg, err.Error())
+			op.tempo = 120.0
 		}
-		op.tempo = tempoMicroToBPM(μsec)
-		op.setTickDuration(op.midifile.Division(), op.tempo)
-		exitFlag = false
+		div := op.midifile.Division()
+		tck := smf.TickDuration(div, op.tempo)
+		op.tickDuration = uint64(tck * 1e6)
+		exitFlag, err = false, nil
+		return
 	case midi.IsMetaText(mtype):
-		fmt.Printf("META TEXT t %d  %v\n", op.currentTime, d)
+		fmt.Printf("META TEXT t %f  %v\n", op.currentTime, d)
 		exitFlag = false
 	case mtype == midi.META_END_OF_TRACK:
 		exitFlag = true
@@ -248,12 +230,17 @@ func (op *MIDIPlayer) handleMeta(msg gomidi.Message) (exitFlag bool, err error) 
 	}
 	return exitFlag, err
 }
-	
-func (op *MIDIPlayer) IsPlaying() bool {
-	return op.isPlaying
+
+func (op *MIDIPlayer) IsReady() bool {
+	return op.state == READY
 }
 
-func (op *MIDIPlayer) Duration() uint64 {
+
+func (op *MIDIPlayer) IsPlaying() bool {
+	return op.state == PLAYING
+}
+	
+func (op *MIDIPlayer) Duration() float64 {
 	if op.MediaFilename() == "" {
 		return 0
 	} else {
@@ -261,7 +248,7 @@ func (op *MIDIPlayer) Duration() uint64 {
 	}
 }
 
-func (op *MIDIPlayer) Position() uint64 {
+func (op *MIDIPlayer) Position() float64 {
 	return op.currentTime
 }
 	

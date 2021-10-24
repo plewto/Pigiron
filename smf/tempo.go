@@ -1,5 +1,10 @@
 package smf
 
+/*
+ * Defines functions on meta tempo change.
+*/
+
+
 import (
 	"fmt"
 	gomidi "gitlab.com/gomidi/midi/v2"

@@ -8,7 +8,9 @@ package smf
 import (
 	"fmt"
 	"os"
+	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/pigpath"
+	"github.com/plewto/pigiron/pigerr"
 )
 
 // SMF struct defines a Standard MIDI File.
@@ -112,14 +114,49 @@ func ReadSMF(filename string) (smf *SMF, err error) {
 	smf.filename = filename
 	return
 }
+
+// TickDuration calculates duration of single clock tick.
+// Args:
+//   division is smf clock Division.
+//   tempo in BPM.
+//
+func TickDuration(division int, tempo float64) float64 {
+	division = division & 0x7FFFF
+	if tempo == 0 {
+		dflt := 60.0
+		errmsg := "MIDI tempo is 0, using default %f"
+		pigerr.Warning(fmt.Sprintf(errmsg, dflt))
+		tempo = dflt
+	}
+	var qdur float64 = 60.0/tempo
+	return qdur/float64(division)
+}
 	
-func (smf *SMF) Duration() uint64 {
-	var acc uint64 = 0
-	for _, trk := range smf.tracks {
-		tdur := trk.Duration()
-		if tdur > acc {
-			acc = tdur
+// smf.Duration returns aproximate duration 0f track 0 in seconds.
+//
+func (smf *SMF) Duration() float64 {
+	if len(smf.tracks) == 0 {
+		return 0.0
+	}
+	var acc float64 = 0.0
+	var tempo float64 = 120
+	var tick = TickDuration(smf.Division(), tempo)
+	var track = smf.tracks[0]
+	for _, event := range track.events {
+		msg := event.Message()
+		if midi.IsTempoChange(msg) {
+			tempo, _ := midi.MetaTempoBPM(msg)
+			tick = TickDuration(smf.Division(), tempo)
 		}
+		acc += float64(event.deltaTime) * tick
 	}
 	return acc
 }
+			
+			
+		
+		
+		
+		
+			
+		

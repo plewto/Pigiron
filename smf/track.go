@@ -145,13 +145,3 @@ func (trk *Track) Dump() string {
 	}
 	return acc
 }
-
-
-func (trk *Track) Duration() uint64 {
-	var acc uint64 = 0
-	for _, event := range trk.events {
-		acc += event.DeltaTime()
-	}
-	return acc
-}
-	

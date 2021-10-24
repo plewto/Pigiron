@@ -70,6 +70,6 @@ func MetaTempoBPM(msg gomidi.Message) (tempo float64, err error) {
 //
 func IsTempoChange(msg gomidi.Message) bool {
 	d := msg.Data
-	return len(d) == 6 && d[0] = 0xFF && d[1] == 0x51
+	return len(d) == 6 && d[0] == 0xFF && d[1] == 0x51
 }
 	

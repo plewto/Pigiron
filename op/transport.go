@@ -38,11 +38,11 @@ import (
 //       osc command /pig/op <name>, q-media-filename
 //       osc returns filename
 //
-//  t.Duration() returns approximate media length in milliseconds.
+//  t.Duration() returns approximate media length in seconds.
 //       osc command /pig/op <name>, q-duration
 //       osc returns int time in milliseconds.
 //
-//  t.Position() returns current playback position in milliseconds.
+//  t.Position() returns current playback position in seconds.
 //       osc command /pig/op <name>, q-position
 //       osc returns int time in milliseconds.
 //
@@ -165,7 +165,7 @@ func initTransportHandlers(transport Transport) {
 		return formatResponse("q-is-playing", fmt.Sprintf("%v", flag)), err
 	}
 
-	// op <name> q-duration  --> time(msec)
+	// op <name> q-duration  --> time(sec)
 	//
 	remoteQueryDuration := func(msg *goosc.Message) ([]string, error) {
 		var err error
@@ -173,7 +173,7 @@ func initTransportHandlers(transport Transport) {
 		return formatResponse("q-duration", dur), err
 	}
 
-	// op <name> q-position  --> time(msec)
+	// op <name> q-position  --> time(sec)
 	//
 	remoteQueryPosition := func(msg *goosc.Message) ([]string, error) {
 		var err error

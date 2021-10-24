@@ -83,18 +83,19 @@ OSC Return: ACK bool.
 Command     op name, q-duration
 OSC         /pig/op name, q-duration
 
-Gets approximate duration of media in milliseconds.
 
-OSC Return: ACK duration in milliseconds.
+
+Gets approximate media duration in seconds.
+OSC Return: ACK duration in seconds.
 
 ------------------------------------------------------------
 
 Command     op name, q-position
 OSC         /pig/op name, q-position
 
-Gets current playback position in milliseconds.
+Gets current playback position in seconds.
 
-OSC Return: ACK position in milliseconds.
+OSC Return: ACK position in seconds.
 
 ------------------------------------------------------------
 

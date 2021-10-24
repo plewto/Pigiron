@@ -1,4 +1,4 @@
-package expect
+package smf
 
 /*
 ** take.go defines functions for extracting values from byte slices.

@@ -1,4 +1,4 @@
-package expect
+package smf
 
 import (
 	"fmt"
@@ -29,7 +29,7 @@ var testBuffer = []byte{
 func TestExpectByte(t *testing.T) {
 	fmt.Println("TestExpectByte")
 	index := 4
-	value, newIndex, err := expectByte(testBuffer, index)
+	value, newIndex, err := ExpectByte(testBuffer, index)
 	if err != nil {
 		t.Fatalf("Unexpected err: %s", err)
 	}
@@ -41,7 +41,7 @@ func TestExpectByte(t *testing.T) {
 		errmsg := "Expected byte value 0x%02X, got 0x%02X"
 		t.Fatalf(errmsg, testBuffer[index], value)
 	}
-	_, _, err = expectByte(testBuffer, len(testBuffer))
+	_, _, err = ExpectByte(testBuffer, len(testBuffer))
 	if err == nil {
 		errmsg := "Did not detect out of bounds index"
 		t.Fatalf(errmsg)
@@ -73,34 +73,34 @@ func TestExpectVLQ(t *testing.T) {
 	}
 
 	index = 0
-	vlq, newIndex, err = expectVLQ(testBuffer, index)
+	vlq, newIndex, err = ExpectVLQ(testBuffer, index)
 	validate(0, 1, err)
 
 	index = newIndex
-	vlq, newIndex, err = expectVLQ(testBuffer, index)
+	vlq, newIndex, err = ExpectVLQ(testBuffer, index)
 	validate(0x7f, 2, err)
 
 	index = newIndex
-	vlq, newIndex, err = expectVLQ(testBuffer, index)
+	vlq, newIndex, err = ExpectVLQ(testBuffer, index)
 	validate(0x80, 4, err)
 
 	index = newIndex
-	vlq, newIndex, err = expectVLQ(testBuffer, index)
+	vlq, newIndex, err = ExpectVLQ(testBuffer, index)
 	validate(0x1FFFFF, 7, err)
 
 	index = newIndex
-	vlq, newIndex, err = expectVLQ(testBuffer, index)
+	vlq, newIndex, err = ExpectVLQ(testBuffer, index)
 	validate(0x0FFFFFFF, 11, err)
 
 	index = newIndex
-	_, _, err = expectVLQ(testBuffer, index)
+	_, _, err = ExpectVLQ(testBuffer, index)
 	if err == nil {
 		errmsg := "Did not detect malformed VLQ at index 11"
 		t.Fatalf(errmsg)
 	}
 
 	index = len(testBuffer)
-	_, _, err = expectVLQ(testBuffer, index)
+	_, _, err = ExpectVLQ(testBuffer, index)
 	if err == nil {
 		errmsg := "Did not detect out of bounds index: %d"
 		t.Fatalf(errmsg, index)
@@ -109,7 +109,7 @@ func TestExpectVLQ(t *testing.T) {
 
 func TestExpectDataByte(t *testing.T) {
 	fmt.Println("TestExpectDataByte")
-	value, err := expectDataByte(testBuffer, 0)
+	value, err := ExpectDataByte(testBuffer, 0)
 	if err != nil {
 		errmsg := "Unexpected error at index 0: %s"
 		t.Fatalf(errmsg, err)
@@ -118,12 +118,12 @@ func TestExpectDataByte(t *testing.T) {
 		errmsg := "Expected data byte 0x00, got 0x%02X"
 		t.Fatalf(errmsg, value)
 	}
-	_, err = expectDataByte(testBuffer, 2)
+	_, err = ExpectDataByte(testBuffer, 2)
 	if err == nil {
 		errmsg := "Did not detect non-data byte at index 2"
 		t.Fatalf(errmsg)
 	}
-	_, err = expectDataByte(testBuffer, len(testBuffer))
+	_, err = ExpectDataByte(testBuffer, len(testBuffer))
 	if err == nil {
 		errmsg := "Did not detect out of bounds index: %d"
 		t.Fatalf(errmsg, len(testBuffer))
@@ -152,7 +152,7 @@ func matchArray(index int, template []byte, sample []byte) (err error) {
 func TestExpectRunningStatus(t *testing.T) {
 	fmt.Println("TestExpectRunningStatus")
 	index := 20
-	mdata, newIndex, err := expectRunningStatus(testBuffer,0x80, index)
+	mdata, newIndex, err := ExpectRunningStatus(testBuffer,0x80, index)
 	if err != nil {
 		errmsg := "Got unexpected error: %s"
 		t.Fatalf(errmsg, err)
@@ -166,14 +166,14 @@ func TestExpectRunningStatus(t *testing.T) {
 		t.Fatalf("%s", err)
 	}
 
-	_, _, err = expectRunningStatus(testBuffer, 0x80, 23)
+	_, _, err = ExpectRunningStatus(testBuffer, 0x80, 23)
 	if err == nil {
 		errmsg := "Did not detect malformed running-status at index 23"
 		t.Fatalf(errmsg)
 	}
 
 	// single byte running status
-	mdata, newIndex, err = expectRunningStatus(testBuffer, 0xc0, 26)
+	mdata, newIndex, err = ExpectRunningStatus(testBuffer, 0xc0, 26)
 	if err != nil {
 		errmsg := "Got unexpected error: %s"
 		t.Fatalf(errmsg, err)
@@ -188,7 +188,7 @@ func TestExpectRunningStatus(t *testing.T) {
 	}
 
 	// check index bounds
-	_, _, err = expectRunningStatus(testBuffer, 0x80, 53)
+	_, _, err = ExpectRunningStatus(testBuffer, 0x80, 53)
 	if err == nil {
 		errmsg := "Did not detect out of bounds index"
 		t.Fatalf(errmsg)
@@ -198,7 +198,7 @@ func TestExpectRunningStatus(t *testing.T) {
 func TestExpectChannelMessage(t *testing.T) {
 	fmt.Println("TestExpectChannelMessage")
 	index := 19
-	mdata, newIndex, err := expectChannelMessage(testBuffer, 0x80, index)
+	mdata, newIndex, err := ExpectChannelMessage(testBuffer, 0x80, index)
 	if err != nil {
 		errmsg := "Got unexpected error: %s"
 		t.Fatalf(errmsg, err)
@@ -217,7 +217,7 @@ func TestExpectChannelMessage(t *testing.T) {
 func TestExpectSysexMessage(t *testing.T) {
 	fmt.Println("TestExpectSysexMessage")
 	index := 27
-	mdata, newIndex, err := expectSysexMessage(testBuffer, index)
+	mdata, newIndex, err := ExpectSysexMessage(testBuffer, index)
 	if err != nil {
 		errmsg := "Got unexpected error: %s"
 		t.Fatalf(errmsg, err)
@@ -232,13 +232,13 @@ func TestExpectSysexMessage(t *testing.T) {
 	}
 
 	index = 32
-	_, _, err = expectSysexMessage(testBuffer, index)
+	_, _, err = ExpectSysexMessage(testBuffer, index)
 	if err == nil {
 		t.Fatalf("Did not detect malformed sysex message starting at index %d", index)
 	}
 
 	index = 28
-	_, _, err = expectSysexMessage(testBuffer, index)
+	_, _, err = ExpectSysexMessage(testBuffer, index)
 	if err == nil {
 		t.Fatalf("Did not detect missing sysex status at index %d", index)
 	}
@@ -248,7 +248,7 @@ func TestExpectSysexMessage(t *testing.T) {
 func TestExpectSystemMessage(t *testing.T) {
 	fmt.Println("TestExpectSystemMessage")
 	index := 35
-	mdata, newIndex, err := expectSystemMessage(testBuffer, index)
+	mdata, newIndex, err := ExpectSystemMessage(testBuffer, index)
 	if err != nil {
 		t.Fatalf("Got unexpected errorL %s", err)
 	}
@@ -262,7 +262,7 @@ func TestExpectSystemMessage(t *testing.T) {
 	}
 
 	index = 18
-	_, _, err = expectSystemMessage(testBuffer, index)
+	_, _, err = ExpectSystemMessage(testBuffer, index)
 	if err == nil {
 		t.Fatalf("Did not detect non-system message at index %d", index)
 	}
@@ -276,7 +276,7 @@ func TestExpectMetaMessage(t *testing.T) {
 	var mdata []byte
 
 	index = 41
-	mdata, newIndex, err = expectMetaMessage(testBuffer, index)
+	mdata, newIndex, err = ExpectMetaMessage(testBuffer, index)
 		if err != nil {
 		t.Fatalf("Got unexpected errorL %s", err)
 	}
@@ -290,7 +290,7 @@ func TestExpectMetaMessage(t *testing.T) {
 	}
 
 	index = 48
-	_, _, err = expectMetaMessage(testBuffer, index)
+	_, _, err = ExpectMetaMessage(testBuffer, index)
 	if err == nil {
 		t.Fatalf("Did not detect malformed meta message at index %d", index)
 	}

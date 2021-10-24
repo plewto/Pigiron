@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"os"
 	"github.com/plewto/pigiron/pigerr"
-	"github.com/plewto/pigiron/expect"
 )
 
 
@@ -67,7 +66,7 @@ func readChunkPreamble(f *os.File) (id chunkID, length int, err error) {
 	for i := 0; i < 4; i++ {
 		id[i] = buffer[i]
 	}
-	length, _, err = expect.TakeLong(buffer[4:])
+	length, _, err = TakeLong(buffer[4:])
 	return id, length, err
 }
 

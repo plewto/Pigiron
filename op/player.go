@@ -160,9 +160,6 @@ func (op *MIDIPlayer) playLoop() error {
 		return err
 	}
 	events := track.Events()
-	// fmt.Println(track.Dump())
-
-	
 	op.eventIndex = 0
 	for op.eventIndex < len(events) {
 		event := events[op.eventIndex]
@@ -220,9 +217,10 @@ func (op *MIDIPlayer) handleMeta(msg gomidi.Message) (exitFlag bool, err error) 
 		op.tickDuration = uint64(tck * 1e6)
 		exitFlag, err = false, nil
 		return
-	case midi.IsMetaText(mtype):
-		fmt.Printf("META TEXT t %f  %v\n", op.currentTime, d)
-		exitFlag = false
+		// ISSUE: TODO Handle text message
+	// case midi.IsMetaText(msg):
+	// 	fmt.Printf("META TEXT t %f  %v\n", op.currentTime, d)
+	// 	exitFlag = false
 	case mtype == midi.META_END_OF_TRACK:
 		exitFlag = true
 	default:

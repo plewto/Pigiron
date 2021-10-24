@@ -225,9 +225,9 @@ func IsMetaType(mt MetaType) bool {
 	return exists
 }
 
-func IsMetaText(mt MetaType) bool {
-	return META_TEXT <= mt && mt <= META_CUEPOINT
-}
+// func IsMetaText(mt MetaType) bool {
+// 	return META_TEXT <= mt && mt <= META_CUEPOINT
+// }
 
 
 // StringRepMessage returns string representation for MIDI message bytes.

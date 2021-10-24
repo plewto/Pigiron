@@ -1,4 +1,4 @@
-package expect
+package smf
 
 
 /*
@@ -10,6 +10,57 @@ import (
 	"fmt"
 	"github.com/plewto/pigiron/midi"
 )
+
+// const (
+// 	KEYED_STATUS byte = 0x01
+// 	CLOCK = byte 0xF8
+// 	START = byte 0xFA
+// 	CONTINUE = byte 0xFB
+// 	STOP = byte 0xFC
+// 	META = byte 0xFF
+// )
+
+
+// func channelMessageDataCount(st byte) int {
+// 	hi := st & 0xF0
+// 	if hi == 0xC0 || hi == 0xd0 {
+// 		return 1
+// 	} else {
+// 		return 2
+// 	}
+// }
+
+// func isChannelStatus(st byte) bool {
+// 	return st == midi.KEYED_STATUS || (st & 0xF0) < 0xF0
+// }
+	
+
+// func isSystemRealtimeStatus(st byte) bool {
+// 	return st == midi.CLOCK || st == START || st == CONTINUE || st == STOP
+// }
+
+// func isMetaStatus(st byte) bool {
+// 	return st == META
+// }
+
+// func isMetaType(mt byte) bool {
+// 	switch {
+// 	case 0x00 <= mt && mt <= 0x07:
+// 		return true
+// 	case mt == 0x20 || mt == 0x2F:
+// 		return true
+// 	case mt == 0x51 || mt == 0x54 || mt == 0x58 || mt == 0x59:
+// 		return true
+// 	case mt == 0x7F:
+// 		return true
+// 	default:
+// 		return false
+// 	}
+// }
+		
+// func isSystemStatus(st byte) bool {
+// 	return !(isMetaStatus(st) || isChannelStatus(st))
+// }
 
 func ExpectByte(buffer []byte, index int) (value byte, newIndex int, err error) {
 	if index >= len(buffer) {
@@ -164,8 +215,8 @@ func ExpectSystemMessage(buffer []byte, index int) (mdata []byte, newIndex int, 
 		err = fmt.Errorf(errmsg, index, len(buffer))
 		return
 	}
-	st := midi.StatusByte(buffer[index])
-	if !midi.IsSystemStatus(st) {
+	st := buffer[index]
+	if !midi.IsSystemStatus(midi.StatusByte(st)) {
 		errmsg := "Expected MIDI real time system message at index %d, got 0x%02X"
 		err = fmt.Errorf(errmsg, index, st)
 		return
@@ -182,9 +233,9 @@ func ExpectMetaMessage(buffer []byte, index int) (mdata []byte, newIndex int, er
 		err = fmt.Errorf(errmsg, index, len(buffer))
 		return
 	}
-	st := midi.StatusByte(buffer[index])
-	mt := midi.MetaType(buffer[index+1])
-	if !midi.IsMetaStatus(st) || !midi.IsMetaType(mt) {
+	st := buffer[index]
+	mt := buffer[index+1]
+	if !midi.IsMetaStatus(midi.StatusByte(st)) || !midi.IsMetaType(midi.MetaType(mt)) {
 		errmsg := "Expected meta status 0xFF and valid meta type starting at index %d, "
 		errmsg += "got 0x%02x and 0x$02x"
 		err = fmt.Errorf(errmsg, index, byte(st), byte(mt))

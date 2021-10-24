@@ -7,10 +7,11 @@ import (
 	"time"
 	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/osc"
-	"github.com/plewto/pigiron/midi"
+	// "github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/op"
 	"github.com/plewto/pigiron/piglog"
 	_ "github.com/plewto/pigiron/macro"
+	gomidi "gitlab.com/gomidi/midi/v2"
 )
 
 
@@ -75,7 +76,7 @@ func main() {
 		if osc.Exit {
 			Exit()
 		}
-		op.ProcessInputs()
+		// op.ProcessInputs()  // ISSUE commented for gomidi migration
 		time.Sleep(pollInterval * time.Millisecond)
 	}
 }
@@ -89,7 +90,7 @@ func Exit() {
 
 
 func Cleanup() {
-	midi.Cleanup()
+	gomidi.CloseDriver()
 	op.Cleanup()
 	osc.Cleanup()
 	piglog.Close()

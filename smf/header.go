@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"github.com/plewto/pigiron/pigerr"
+	"github.com/plewto/pigiron/expect"
 )
 
 var headerID chunkID = [4]byte{0x4d, 0x54, 0x68, 0x64}
@@ -98,9 +99,9 @@ func readHeader(f *os.File) (header *Header, err error) {
 	//
 
 	var format, trackCount, division int
-	format, data, _ = takeShort(data)
-	trackCount, data, _ = takeShort(data)
-	division, _, _ = takeShort(data)
+	format, data, _ = expect.TakeShort(data)
+	trackCount, data, _ = expect.TakeShort(data)
+	division, _, _ = expect.TakeShort(data)
 	header = &Header{format, trackCount, division}
 	if format < 0 || 2 < format {
 		dflt := 0

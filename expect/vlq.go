@@ -1,4 +1,4 @@
-package smf
+package expect
 
 /*
  * Defines MIDI variable-length quantity.

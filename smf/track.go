@@ -9,6 +9,7 @@ import (
  	"fmt"
 	"os"
 	"github.com/plewto/pigiron/midi"
+	"github.com/plewto/pigiron/expect"
  	gomidi "gitlab.com/gomidi/midi/v2"
 )
 
@@ -82,8 +83,8 @@ func (trk *Track) convertEvents(buffer []byte) (index int, err error) {
 	var runningStatus = midi.StatusByte(0)
 	index = 0
 	for index < len(buffer) {
-		var vlq *VLQ
-		vlq, index, err = expectVLQ(buffer, index)
+		var vlq *expect.VLQ
+		vlq, index, err = expect.ExpectVLQ(buffer, index)
 		if err != nil {
 			return
 		}
@@ -95,21 +96,21 @@ func (trk *Track) convertEvents(buffer []byte) (index int, err error) {
 			switch {
 			case midi.IsChannelStatus(st):
 				runningStatus = st
-				msgBytes, index, err = expectChannelMessage(buffer, b, index)
+				msgBytes, index, err = expect.ExpectChannelMessage(buffer, b, index)
 			case b == byte(midi.SYSEX):
 				runningStatus = midi.StatusByte(0)
-				msgBytes, index, err = expectSysexMessage(buffer, index)
+				msgBytes, index, err = expect.ExpectSysexMessage(buffer, index)
 			case midi.IsSystemRealtimeStatus(st):
 				runningStatus = midi.StatusByte(0)
-				msgBytes, index, err = expectSystemMessage(buffer, index)
+				msgBytes, index, err = expect.ExpectSystemMessage(buffer, index)
 			case midi.IsMetaStatus(st):
 				runningStatus = midi.StatusByte(0)
-				msgBytes, index, err = expectMetaMessage(buffer, index)
+				msgBytes, index, err = expect.ExpectMetaMessage(buffer, index)
 				if err == nil && msgBytes[1] == byte(midi.META_END_OF_TRACK) {
 					break
 				}
 			case runningStatus != 0:
-				msgBytes, index, err = expectRunningStatus(buffer, byte(runningStatus), index)
+				msgBytes, index, err = expect.ExpectRunningStatus(buffer, byte(runningStatus), index)
 			default:
 				errmsg := "smf.Track.convertEvents switch default.\n"
 				errmsg += "This should never happen, buffer index was %d"
@@ -121,7 +122,7 @@ func (trk *Track) convertEvents(buffer []byte) (index int, err error) {
 				err = fmt.Errorf(errmsg, index)
 				return
 			}
-			msgBytes, index, err = expectRunningStatus(buffer, byte(runningStatus), index)
+			msgBytes, index, err = expect.ExpectRunningStatus(buffer, byte(runningStatus), index)
 		}
 		if err != nil {
 			return

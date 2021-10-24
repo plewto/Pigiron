@@ -1,4 +1,4 @@
-package smf
+package expect
 
 /*
 ** take.go defines functions for extracting values from byte slices.
@@ -47,13 +47,13 @@ func requireBufferLength(buffer []byte, count int) error {
 	return err
 }
 		
-// takeByte() returns first byte in buffer.
+// TakeByte() returns first byte in buffer.
 // Returns:
 //   value - the first byte of buffer
 //   newBuffer - slice of buffer starting after first byte.
 //   error - non-nil if buffer is empty.
 //
-func takeByte(buffer []byte) (value byte, newBuffer []byte, err error) {
+func TakeByte(buffer []byte) (value byte, newBuffer []byte, err error) {
 	err = requireBufferLength(buffer, 1)
 	if err != nil {
 		return 0, []byte{}, err
@@ -61,20 +61,20 @@ func takeByte(buffer []byte) (value byte, newBuffer []byte, err error) {
 	return buffer[0], buffer[1:], err
 }
 
-func takeStatusByte(buffer []byte) (value midi.StatusByte, newBuffer []byte, err error) {
+func TakeStatusByte(buffer []byte) (value midi.StatusByte, newBuffer []byte, err error) {
 	var bvalue byte
-	bvalue, newBuffer, err = takeByte(buffer)
+	bvalue, newBuffer, err = TakeByte(buffer)
 	return midi.StatusByte(bvalue), newBuffer, err
 }
 
 
-// takeShort() returns first two buffer bytes as 16-bit int.
+// TakeShort() returns first two buffer bytes as 16-bit int.
 // Returns:
 //   value - 16-bit 'short' value
 //   newBuffer - slice of buffer starting at index 2.
 //   error - non-nil if buffer length less then 2.
 //
-func takeShort(buffer []byte) (value int, newBuffer []byte, err error) {
+func TakeShort(buffer []byte) (value int, newBuffer []byte, err error) {
 	err = requireBufferLength(buffer, 2)
 	if err != nil {
 		return 0, []byte{}, err
@@ -85,13 +85,13 @@ func takeShort(buffer []byte) (value int, newBuffer []byte, err error) {
 }
 
 
-// takeLong() returns first four buffer bytes as 32-bit int.
+// TakeLong() returns first four buffer bytes as 32-bit int.
 // Returns:
 //    value - 32-bit 'long' value
 //    newBuffer - slice of buffer starting after index 4.
 //    error - non-nil if buffer is not at least 4-bytes long.
 //
-func takeLong(buffer []byte) (value int, newBuffer []byte, err error) {
+func TakeLong(buffer []byte) (value int, newBuffer []byte, err error) {
 	err = requireBufferLength(buffer, 4)
 	if err != nil {
 		return 0, []byte{}, err
@@ -104,20 +104,20 @@ func takeLong(buffer []byte) (value int, newBuffer []byte, err error) {
 	return value, buffer[4:], err
 }
 
-// takeVLQ() returns variable length value from start of buffer.
+// TakeVLQ() returns variable length value from start of buffer.
 // The maximum number of bytes consumed is 4.
 // Returns:
 //    vlq - the 'value'
 //    newBuffer - slice of buffer after final vlq byte.
 //    error - non-nil if vlq is not terminated after reading 4 bytes.
 //
-func takeVLQ(buffer []byte) (vlq *VLQ, newBuffer []byte, err error) {
+func TakeVLQ(buffer []byte) (vlq *VLQ, newBuffer []byte, err error) {
 	vlq = new(VLQ)
 	var maxBytes = 4
 	var acc = make([]byte, 0, maxBytes)
 	for i := 0; i < maxBytes; i++ {
 		if i >= len(buffer) {
-			errmsg := "smf.takeVLQ index out of bounds, "
+			errmsg := "expect.TakeVLQ index out of bounds, "
 			errmsg += "index = %d, buffer length = %d"
 			err = pigerr.New(fmt.Sprintf(errmsg, i, len(buffer)))
 			return vlq, []byte{}, err

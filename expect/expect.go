@@ -1,4 +1,4 @@
-package smf
+package expect
 
 
 /*
@@ -11,9 +11,9 @@ import (
 	"github.com/plewto/pigiron/midi"
 )
 
-func expectByte(buffer []byte, index int) (value byte, newIndex int, err error) {
+func ExpectByte(buffer []byte, index int) (value byte, newIndex int, err error) {
 	if index >= len(buffer) {
-		errmsg := "expectByte, index out of bounds: %d"
+		errmsg := "ExpectByte, index out of bounds: %d"
 		err = fmt.Errorf(errmsg, index)
 		return
 	}
@@ -23,19 +23,19 @@ func expectByte(buffer []byte, index int) (value byte, newIndex int, err error) 
 }
 
 
-func expectVLQ(buffer []byte, index int) (vlq *VLQ, newIndex int, err error) {
+func ExpectVLQ(buffer []byte, index int) (vlq *VLQ, newIndex int, err error) {
 	var maxBytes = 4
 	var acc = make([]byte, 0, maxBytes)
 	count := 0
 	if index >= len(buffer) {
-		errmsg := "expectVLQ index out of bounds: %d"
+		errmsg := "ExpectVLQ index out of bounds: %d"
 		err = fmt.Errorf(errmsg, index)
 		return
 	}
 	for i := index; i < len(buffer); i++ {
 		count++
 		if count > maxBytes {
-			errmsg := "smf.expectVLQ, expected VLQ at index %d"
+			errmsg := "expect.ExpectVLQ, expected VLQ at index %d"
 			err = fmt.Errorf(errmsg, index)
 			return
 		}
@@ -51,65 +51,65 @@ func expectVLQ(buffer []byte, index int) (vlq *VLQ, newIndex int, err error) {
 	return
 }
 
-func expectDataByte(buffer []byte, index int) (value byte, err error) {
+func ExpectDataByte(buffer []byte, index int) (value byte, err error) {
 	if index >= len(buffer) {
-		errmsg := "smf.expectDataByte index out of bounds at %d"
+		errmsg := "expect.ExpectDataByte index out of bounds at %d"
 		err = fmt.Errorf(errmsg, index)
 		return
 	}
 	value = buffer[index]
 	if value > 0x7F {
-		errmsg := "smf.expectDataByte, expected MIDI data byte at index %d, got 0x%02X"
+		errmsg := "expect.ExpectDataByte, expected MIDI data byte at index %d, got 0x%02X"
 		err = fmt.Errorf(errmsg, index, value)
 	}
 	return
 }
 
 
-func expectRunningStatus(buffer []byte, status byte, index int) (mdata []byte, newIndex int, err error) {
+func ExpectRunningStatus(buffer []byte, status byte, index int) (mdata []byte, newIndex int, err error) {
 	count := midi.ChannelMessageDataCount(midi.StatusByte(status))
 	if len(buffer) <= index+count {
-		errmsg := "smf.expectRunningStatus index out of bounds %d, []byte length is %d"
+		errmsg := "expect.ExpectRunningStatus index out of bounds %d, []byte length is %d"
 		err = fmt.Errorf(errmsg, index, len(buffer))
 		return
 	}
 	var d1, d2 byte
 	switch count {
 	case 1:
-		d1, err = expectDataByte(buffer, index)
+		d1, err = ExpectDataByte(buffer, index)
 		if err != nil {
 			return
 		}
 		mdata = []byte{status, d1}
 		newIndex = index + 1
 	case 2:
-		d1, err = expectDataByte(buffer, index)
+		d1, err = ExpectDataByte(buffer, index)
 		if err != nil {
 			return
 		}
-		d2, err = expectDataByte(buffer, index+1)
+		d2, err = ExpectDataByte(buffer, index+1)
 		if err != nil {
 			return
 		}
 		mdata = []byte{status, d1, d2}
 		newIndex = index + 2
 	default:
-		errmsg := "smf.expectRunningStatus swtich fallthrough. Status byte was 0x%02X"
+		errmsg := "expect.ExpectRunningStatus swtich fallthrough. Status byte was 0x%02X"
 		err = fmt.Errorf(errmsg, status)
 	}
 	return
 }
 
-func expectChannelMessage(buffer []byte, status byte, index int) (mdata []byte, newIndex int, err error) {
-	mdata, newIndex, err = expectRunningStatus(buffer, status, index+1)
+func ExpectChannelMessage(buffer []byte, status byte, index int) (mdata []byte, newIndex int, err error) {
+	mdata, newIndex, err = ExpectRunningStatus(buffer, status, index+1)
 	return
 }
 
 
-func expectSysexMessage(buffer []byte, index int) (mdata []byte, newIndex int, err error) {
+func ExpectSysexMessage(buffer []byte, index int) (mdata []byte, newIndex int, err error) {
 	var acc = make([]byte, 1, 1024)
 	if index >= len(buffer) {
-		errmsg := "smf.expectSysexMessage index out of bounds at %d, []byte length is %d"
+		errmsg := "expect.ExpectSysexMessage index out of bounds at %d, []byte length is %d"
 		err = fmt.Errorf(errmsg, index, len(buffer))
 		return
 	}
@@ -123,7 +123,7 @@ func expectSysexMessage(buffer []byte, index int) (mdata []byte, newIndex int, e
 	index++
 	for {
 		if index >= len(buffer) {
-			errmsg := "smf.expectSysexMessage index out of bounds at %d, []byte length is %d"
+			errmsg := "expect.ExpectSysexMessage index out of bounds at %d, []byte length is %d"
 			err = fmt.Errorf(errmsg, index, len(buffer))
 			return
 		}
@@ -158,9 +158,9 @@ func expectSysexMessage(buffer []byte, index int) (mdata []byte, newIndex int, e
 // handles non-sysex system messages
 // Theses are all a single byte in length
 //
-func expectSystemMessage(buffer []byte, index int) (mdata []byte, newIndex int, err error) {
+func ExpectSystemMessage(buffer []byte, index int) (mdata []byte, newIndex int, err error) {
 	if index >= len(buffer) {
-		errmsg := "smf.expectSystemMessage index %d out of bounds, []byte length is %d"
+		errmsg := "expect.ExpectSystemMessage index %d out of bounds, []byte length is %d"
 		err = fmt.Errorf(errmsg, index, len(buffer))
 		return
 	}
@@ -176,9 +176,9 @@ func expectSystemMessage(buffer []byte, index int) (mdata []byte, newIndex int, 
 }
 
 
-func expectMetaMessage(buffer []byte, index int) (mdata []byte, newIndex int, err error) {
+func ExpectMetaMessage(buffer []byte, index int) (mdata []byte, newIndex int, err error) {
 	if index >= len(buffer)-1 {
-		errmsg := "smf.expectMetaMessage index %d out of bounds, []byte length is %d"
+		errmsg := "expect.ExpectMetaMessage index %d out of bounds, []byte length is %d"
 		err = fmt.Errorf(errmsg, index, len(buffer))
 		return
 	}
@@ -195,7 +195,7 @@ func expectMetaMessage(buffer []byte, index int) (mdata []byte, newIndex int, er
 	acc[1] = byte(mt)
 	index += 2
 	var vlq *VLQ
-	vlq, index, err = expectVLQ(buffer, index)
+	vlq, index, err = ExpectVLQ(buffer, index)
 	if err != nil {
 		return
 	}
@@ -204,7 +204,7 @@ func expectMetaMessage(buffer []byte, index int) (mdata []byte, newIndex int, er
 	}
 	for j, count := index, 0; count < vlq.Value(); j, count = j+1, count+1 {
 		if j >= len(buffer) {
-			errmsg := "smf.expectMetaMesage index %d out of bounds, []byte length is %d"
+			errmsg := "expect.ExpectMetaMesage index %d out of bounds, []byte length is %d"
 			err = fmt.Errorf(errmsg, j, len(buffer))
 			return
 		}

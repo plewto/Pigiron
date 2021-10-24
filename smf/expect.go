@@ -11,57 +11,6 @@ import (
 	"github.com/plewto/pigiron/midi"
 )
 
-// const (
-// 	KEYED_STATUS byte = 0x01
-// 	CLOCK = byte 0xF8
-// 	START = byte 0xFA
-// 	CONTINUE = byte 0xFB
-// 	STOP = byte 0xFC
-// 	META = byte 0xFF
-// )
-
-
-// func channelMessageDataCount(st byte) int {
-// 	hi := st & 0xF0
-// 	if hi == 0xC0 || hi == 0xd0 {
-// 		return 1
-// 	} else {
-// 		return 2
-// 	}
-// }
-
-// func isChannelStatus(st byte) bool {
-// 	return st == midi.KEYED_STATUS || (st & 0xF0) < 0xF0
-// }
-	
-
-// func isSystemRealtimeStatus(st byte) bool {
-// 	return st == midi.CLOCK || st == START || st == CONTINUE || st == STOP
-// }
-
-// func isMetaStatus(st byte) bool {
-// 	return st == META
-// }
-
-// func isMetaType(mt byte) bool {
-// 	switch {
-// 	case 0x00 <= mt && mt <= 0x07:
-// 		return true
-// 	case mt == 0x20 || mt == 0x2F:
-// 		return true
-// 	case mt == 0x51 || mt == 0x54 || mt == 0x58 || mt == 0x59:
-// 		return true
-// 	case mt == 0x7F:
-// 		return true
-// 	default:
-// 		return false
-// 	}
-// }
-		
-// func isSystemStatus(st byte) bool {
-// 	return !(isMetaStatus(st) || isChannelStatus(st))
-// }
-
 func ExpectByte(buffer []byte, index int) (value byte, newIndex int, err error) {
 	if index >= len(buffer) {
 		errmsg := "ExpectByte, index out of bounds: %d"

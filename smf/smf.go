@@ -8,7 +8,6 @@ package smf
 import (
 	"fmt"
 	"os"
-	"github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/pigpath"
 	"github.com/plewto/pigiron/pigerr"
 )
@@ -144,8 +143,8 @@ func (smf *SMF) Duration() float64 {
 	var track = smf.tracks[0]
 	for _, event := range track.events {
 		msg := event.Message()
-		if midi.IsTempoChange(msg) {
-			tempo, _ := midi.MetaTempoBPM(msg)
+		if IsTempoChange(msg) {
+			tempo, _ := MetaTempoBPM(msg)
 			tick = TickDuration(smf.Division(), tempo)
 		}
 		acc += float64(event.deltaTime) * tick

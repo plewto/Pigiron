@@ -33,9 +33,6 @@ func (st PlayerState) String() string {
 	}
 	return s
 }
-		
-
-
 
 type MIDIPlayer struct {
 	baseOperator
@@ -205,8 +202,8 @@ func (op *MIDIPlayer) handleMeta(msg gomidi.Message) (exitFlag bool, err error) 
 	}
 	mtype := midi.MetaType(msg.Data[1])
 	switch {
-	case midi.IsTempoChange(msg):
-		op.tempo, err = midi.MetaTempoBPM(msg)
+	case smf.IsTempoChange(msg):
+		op.tempo, err = smf.MetaTempoBPM(msg)
 		if err != nil {
 			errmsg := "Meta tempo message looks weird, using default 120 BPM"
 			pigerr.Warning(errmsg, err.Error())

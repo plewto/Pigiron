@@ -1,4 +1,4 @@
-package midi
+package smf
 
 import (
 	"fmt"

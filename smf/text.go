@@ -7,6 +7,7 @@ package smf
 
 import (
 	"fmt"
+	"strings"
 	gomidi "gitlab.com/gomidi/midi/v2"
 )
 
@@ -55,7 +56,10 @@ func MakeTextMessage(textType byte, text string) (msg gomidi.Message, err error)
 	return 
 }
 
-func Text(msg gomidi.Message) (text string, txType byte, err error) {
+
+// ExtractMetaText returns tex contents of meta text message.
+//
+func ExtractMetaText(msg gomidi.Message) (text string, txType byte, err error) {
 	if !IsTextMessage(msg) {
 		errmsg := "Expected meta text message, got %v"
 		err = fmt.Errorf(errmsg, err)
@@ -75,4 +79,20 @@ func Text(msg gomidi.Message) (text string, txType byte, err error) {
 }
 			
 	
+func SplitTime(seconds float64) (hr int, min int, sec int, fsec float64) {
+	hr = int(seconds / 3600)
+	seconds -= float64(hr * 3600)
+	min = int(seconds / 60)
+	seconds -= float64(min * 60)
+	sec = int(seconds)
+	fsec = float64(sec) - seconds
+
+	return hr, min, sec, fsec
+}
 	
+func FormatTime(seconds float64) string {
+	hr, min, sec, fsec := SplitTime(seconds)
+	f := fmt.Sprintf("%f", fsec)
+	pos := strings.Index(f, ".")
+	return fmt.Sprintf("%02d:%02d:%02d%s", hr, min, sec, f[pos:])
+}

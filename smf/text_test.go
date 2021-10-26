@@ -1,6 +1,7 @@
 package smf
 
 import (
+	// "fmt"
 	"testing"
 	gomidi "gitlab.com/gomidi/midi/v2"
 )
@@ -37,7 +38,7 @@ func TestIsTextMessage(t *testing.T) {
 
 func TestText(t *testing.T) {
 	msg, _ := MakeTextMessage(0x02, "ABC")
-	text, txType, err := Text(msg)
+	text, txType, err := ExtractMetaText(msg)
 	if err != nil {
 		errmsg := "Text returned unexpected error: %s"
 		t.Fatalf(errmsg, err)
@@ -52,3 +53,7 @@ func TestText(t *testing.T) {
 	}
 }
 	
+// func TestSplitTime(t *testing.T) {
+// 	fmt.Println()
+// 	fmt.Println(FormatTime(3600.0 + 72.123))
+// }

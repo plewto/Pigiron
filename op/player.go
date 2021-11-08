@@ -13,6 +13,22 @@ const (
 	PLAYER_START_DELAY = 200 // msec
 )
 
+var (
+	ControllerDefaults = make(map[byte]byte)
+)
+
+func init() {
+	ControllerDefaults[1] = 0
+	ControllerDefaults[2] = 0
+	ControllerDefaults[4] = 127
+	ControllerDefaults[7] = 127
+	ControllerDefaults[10] = 64
+	ControllerDefaults[64] = 0
+	ControllerDefaults[65] = 0
+	ControllerDefaults[123] = 127  // all notes off 
+	
+}
+
 type PlayerState byte
 const (
 	READY PlayerState = iota
@@ -43,7 +59,7 @@ type MIDIPlayer struct {
 	tempo float64
 	tempoScale float64
 	tickDuration uint64 // μseconds
-	currentTime float64 // seconds
+	currentTime uint64  // μseconds
 	enableMIDITransport bool
 }
 
@@ -90,10 +106,19 @@ func (op *MIDIPlayer) Reload() error {
 }
 
 func (op *MIDIPlayer) resetControllers() {
-	// ISSUE: TODO implement MIDIPlayer.resetControllers()
-	fmt.Println("MIDIPlayer.resetControllers() not implemented.")
+	fmt.Println("Reseting controllers")
+	for ci := byte(0); ci < 16; ci++ {
+		st := byte(midi.CONTROLLER) | ci
+		for ctrl, value := range ControllerDefaults {
+			msg := gomidi.NewMessage([]byte{st, ctrl, value})
+			op.Send(msg)
+		}
+		time.Sleep(2 * time.Millisecond)
+		op.Send(gomidi.NewMessage([]byte{st, 123, 0}))  // Clear all-notes-off message
+		st = byte(midi.BEND) | ci
+		op.Send(gomidi.NewMessage([]byte{st, 64, 0}))  // center bend.
+	}
 }
-
 
 func (op *MIDIPlayer) killActiveNotes() {
 	counter := 0
@@ -109,12 +134,13 @@ func (op *MIDIPlayer) killActiveNotes() {
 
 
 func (op *MIDIPlayer) Stop() {
-	fmt.Printf("\nMIDIPlayer %s: STOP\n", op.Name())
+	fmt.Printf("\nMIDIPlayer %s: STOPPING\n", op.Name())
 	op.state = STOPPING
 	time.Sleep(20 * time.Millisecond)
 	op.killActiveNotes()
 	op.resetControllers()
 	op.state = READY
+	fmt.Printf("\nMIDIPlayer %s: STOPPED\n", op.Name())
 }
 
 func (op *MIDIPlayer) Continue() error {
@@ -135,7 +161,7 @@ func (op *MIDIPlayer) Play() error {
 	if err != nil {
 		return err
 	}
-	op.currentTime = 0.0
+	op.currentTime = 0
 	op.eventIndex = 0
 	err = op.Continue()
 	return err
@@ -186,7 +212,7 @@ func (op *MIDIPlayer) playLoop() error {
 		if op.state != PLAYING {
 			break
 		}
-		op.currentTime += float64(delay * 1e6)
+		op.currentTime += uint64(delay)
 		op.eventIndex++
 	}
 	op.Stop()
@@ -214,10 +240,10 @@ func (op *MIDIPlayer) handleMeta(msg gomidi.Message) (exitFlag bool, err error) 
 		op.tickDuration = uint64(tck * 1e6)
 		exitFlag, err = false, nil
 		return
-		// ISSUE: TODO Handle text message
-	// case midi.IsMetaText(msg):
-	// 	fmt.Printf("META TEXT t %f  %v\n", op.currentTime, d)
-	// 	exitFlag = false
+	case smf.IsTextMessage(msg):
+		tm := smf.FormatTime(op.Position())
+		tx, txt, _  := smf.ExtractMetaText(msg)
+		fmt.Printf("time %s %s : %s\n", tm, midi.MetaType(txt), tx)
 	case mtype == midi.META_END_OF_TRACK:
 		exitFlag = true
 	default:
@@ -244,7 +270,7 @@ func (op *MIDIPlayer) Duration() float64 {
 }
 
 func (op *MIDIPlayer) Position() float64 {
-	return op.currentTime
+	return float64(op.currentTime / 1e6)
 }
 	
 func (op *MIDIPlayer) EnableMIDITransport(flag bool) {

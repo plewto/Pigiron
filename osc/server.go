@@ -3,8 +3,7 @@ package osc
 import (
 	"fmt"
 	goosc "github.com/hypebeast/go-osc/osc"
-	"github.com/plewto/pigiron/piglog"
-	
+	"github.com/plewto/pigiron/piglog"	
 )
 
 

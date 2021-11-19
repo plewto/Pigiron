@@ -131,7 +131,7 @@ func TickDuration(division int, tempo float64) float64 {
 	return qdur/float64(division)
 }
 	
-// smf.Duration returns aproximate duration 0f track 0 in seconds.
+// smf.Duration returns aproximate duration of track 0 in seconds.
 //
 func (smf *SMF) Duration() float64 {
 	if len(smf.tracks) == 0 {

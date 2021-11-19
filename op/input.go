@@ -44,8 +44,6 @@ func newMIDIInput(name string, port gomidi.In) (*MIDIInput, error) {
 	return op, err
 }
 
-
-
 func NewMIDIInput(name string, deviceSpec string) (*MIDIInput, error) {
 	var op *MIDIInput
 	port, err := backend.GetMIDIInput(deviceSpec)
@@ -61,7 +59,6 @@ func NewMIDIInput(name string, deviceSpec string) (*MIDIInput, error) {
 	}
 	return op, err
 }
-
 
 func (op *MIDIInput) String() string {
 	msg := "%-12s name: \"%s\"  device: \"%s\""

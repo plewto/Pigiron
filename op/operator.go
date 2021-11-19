@@ -1,7 +1,6 @@
 package op
 
 import (
-	// "github.com/rakyll/portmidi"
 	goosc "github.com/hypebeast/go-osc/osc"
 	gomidi "gitlab.com/gomidi/midi/v2"
 	"github.com/plewto/pigiron/midi"

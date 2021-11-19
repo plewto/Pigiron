@@ -11,8 +11,7 @@ var (
 	GlobalServer PigServer
 	empty []string
 	commands map[string]bool
-	// Exit application if true.
-	Exit bool = false
+	Exit bool = false  // Flag to main-loop, if true exit application.
 )
 
 

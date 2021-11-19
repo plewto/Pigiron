@@ -2,7 +2,6 @@ package smf
 
 import (
 	"fmt"
-	// "math"
 	gomidi "gitlab.com/gomidi/midi/v2"
 )
 

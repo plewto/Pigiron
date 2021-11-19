@@ -20,6 +20,7 @@ var OperatorTypes = []string{
 //
 var registry map[string]Operator = make(map[string]Operator)
 
+
 // OperatorExists(name) returns true if the registry contains the named operator.
 //
 func OperatorExists(name string) bool {
@@ -35,6 +36,7 @@ func register(op Operator) string {
 	registry[op.Name()] = op
 	return op.Name()
 }
+
 
 // DumpRegistry() prints the contents of the operator registry.
 //
@@ -54,10 +56,10 @@ func DumpRegistry() {
 // Returns the new Operator and an error.
 // The error is non-nil if:
 //     1) opType was invalid
-//     2) if an Operator name exists and it's type does not match opType.
+//     2) if an Operator name exists and its type does not match opType.
 //
-// If Operator name exist with the same type as opType, a new operator 
-// is not created and the existing operator is reused.
+// If Operator name exist with the same type as opType, the existing
+// operator is reused.
 //
 func NewOperator(opType string, name string) (Operator, error) {
 	var err error

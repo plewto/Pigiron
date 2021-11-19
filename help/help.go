@@ -12,6 +12,9 @@ import (
 	"github.com/plewto/pigiron/pigpath"
 )
 
+
+// Help function returns documentation for topic.
+//
 func Help(topic string) (text string, err error) {
 	switch topic {
 	case "topics":

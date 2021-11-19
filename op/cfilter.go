@@ -8,7 +8,7 @@ import (
 )
 
 // ChannelFilter is an Operator which selectively blocks MIDI channels.
-// Only MIDI messages with channels enabled filter are allowed through.
+// Only MIDI messages with channels enabled are allowed through.
 // Separately non-channel messages may also be filtered.
 //
 type ChannelFilter struct {

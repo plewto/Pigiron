@@ -7,7 +7,6 @@ import (
 	"time"
 	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/osc"
-	// "github.com/plewto/pigiron/midi"
 	"github.com/plewto/pigiron/op"
 	"github.com/plewto/pigiron/piglog"
 	_ "github.com/plewto/pigiron/macro"
@@ -46,8 +45,6 @@ func printBanner() {
 		fmt.Printf("Logging disabled\n")
 	}
 	fmt.Printf("%s\n", VERSION.String())
-	
-
 	fmt.Print(config.GlobalParameters.TextColor)
 	fmt.Print("\n\n")
 }
@@ -76,7 +73,6 @@ func main() {
 		if osc.Exit {
 			Exit()
 		}
-		// op.ProcessInputs()  // ISSUE commented for gomidi migration
 		time.Sleep(pollInterval * time.Millisecond)
 	}
 }
@@ -86,7 +82,6 @@ func Exit() {
 	Cleanup()
 	os.Exit(0)
 }
-
 
 
 func Cleanup() {

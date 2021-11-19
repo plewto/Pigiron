@@ -36,7 +36,7 @@ func MakeTempoMessage(tempo float64) (msg gomidi.Message, err error) {
 	return
 }
 
-// MetaTempoMicroseconds return micro seconds per quarter not for meta temp message.
+// MetaTempoMicroseconds return micro seconds per quarter note from tempo message.
 // The error return is non-nil if message is not a meta tempo-change.
 //
 func MetaTempoMicroseconds(msg gomidi.Message) (usec uint64, err error) {

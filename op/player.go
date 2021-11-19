@@ -23,6 +23,7 @@ func init() {
 	ControllerDefaults[4] = 127
 	ControllerDefaults[7] = 127
 	ControllerDefaults[10] = 64
+	ControllerDefaults[11] = 127
 	ControllerDefaults[64] = 0
 	ControllerDefaults[65] = 0
 	ControllerDefaults[123] = 127  // all notes off 

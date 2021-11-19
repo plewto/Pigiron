@@ -8,8 +8,6 @@ package op
 import (
 	"fmt"
 	"strconv"
-	// "github.com/rakyll/portmidi"
-	// gomidi "gitlab.com/gomidi/midi/v2"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/osc"
 	"github.com/plewto/pigiron/midi"

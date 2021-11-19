@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"strings"
 	"strconv"
-	_ "gitlab.com/gomidi/midi/v2/drivers/rtmididrv" // autoregisters driver
+	_ "gitlab.com/gomidi/midi/v2/drivers/rtmididrv" // auto registers driver
 	gomidi "gitlab.com/gomidi/midi/v2"
 )
-
 
 
 func InputNames() []string {
@@ -20,14 +19,6 @@ func InputNames() []string {
 }
 
 
-func PrintInputs() {
-	fmt.Println("MIDI Inputs (rtmidi):")
-	for i, s := range InputNames() {
-		fmt.Printf("\t[%2d] %s\n", i, s)
-	}
-	fmt.Println()
-}
-
 func OutputNames() []string {
 	acc := make([]string,0, 8)
 	outs, _ := gomidi.Outs()
@@ -36,15 +27,6 @@ func OutputNames() []string {
 	}
 	return acc
 }
-
-func PrintOutputs() {
-	fmt.Println("MIDI Outputs (rtmidi):")
-	for i, n := range OutputNames() {
-		fmt.Printf("\t[%2d] %s\n", i, n)
-	}
-	fmt.Println()
-}
-
 
 func getOutputByIndex(s string) (gomidi.Out, error) {
 	var err error
@@ -60,8 +42,6 @@ func getOutputByIndex(s string) (gomidi.Out, error) {
 	}
 	return outs[index], nil
 }
-		
-
 
 func getOutputByName(pattern string) (gomidi.Out, error) {
 	var err error
@@ -77,10 +57,10 @@ func getOutputByName(pattern string) (gomidi.Out, error) {
 }
 		
 
-// pattern may be one of:
-//   int index (as string)
-//   substrng of device name.
-//   
+// GetMIDIOuput returns indicated MIDI output.
+// pattern may be either the output's index (as string)
+// or a sub-string of the port's name.
+//
 func GetMIDIOutput(pattern string) (gomidi.Out, error) {
 	var err error
 	var out gomidi.Out
@@ -108,7 +88,6 @@ func getInputByIndex(s string) (gomidi.In, error) {
 }
 		
 
-
 func getInputByName(pattern string) (gomidi.In, error) {
 	var err error
 	ins, _ := gomidi.Ins()
@@ -123,10 +102,10 @@ func getInputByName(pattern string) (gomidi.In, error) {
 }
 		
 
-// pattern may be one of:
-//   int index (as string)
-//   substrng of device name.
-//   
+// GetMIDIInput returns selected MIDI input port.
+// pattern may be either the output's index (as string)
+// or a sub-string of the port's name.
+//
 func GetMIDIInput(pattern string) (gomidi.In, error) {
 	var err error
 	var in gomidi.In

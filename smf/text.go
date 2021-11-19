@@ -57,7 +57,7 @@ func MakeTextMessage(textType byte, text string) (msg gomidi.Message, err error)
 }
 
 
-// ExtractMetaText returns tex contents of meta text message.
+// ExtractMetaText returns text contents of meta text message.
 //
 func ExtractMetaText(msg gomidi.Message) (text string, txType byte, err error) {
 	if !IsTextMessage(msg) {

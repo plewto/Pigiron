@@ -1,7 +1,7 @@
 package midi
 
 /*
-** Defines scheme for tracking and resolving open MIDI notes.
+** Defines scheme for resolving open MIDI notes.
 **
 */
 
@@ -74,7 +74,7 @@ func (nq *NoteQueue) Update(msg gomidi.Message) {
 // The channel parameter has interval 0 <= ci <= 15.
 //
 func (nq *NoteQueue) OpenCount(ci byte, key byte) int {
-	if ci < 0 || 16 < ci || key < 0 || 128 < key {
+	if ci < 0 || 16 < ci || key < 0 || 128 <= key {
 		return 0
 	}
 	nqc := nq.channels[ci] 

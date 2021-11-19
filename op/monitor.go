@@ -11,6 +11,7 @@ import (
 )
 
 // Monitor is an Operator for real-time monitoring of MIDI events.
+// It may optionally save events to a log file.
 //
 type Monitor struct {
 	baseOperator

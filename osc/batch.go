@@ -5,11 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
-	
 	"github.com/plewto/pigiron/config"
 	"github.com/plewto/pigiron/pigpath"
 	"github.com/plewto/pigiron/piglog"
-	
 )
 
 
@@ -35,8 +33,7 @@ func printBatchError(filename string, err error) {
 
 // BatchLoad() loads batch file.
 // A batch file is a sequence of osc commands with identical syntax to
-// interactive commands entered to the REPL.   Lines beginning with # are
-// ignored.
+// interactive commands.   Lines beginning with # are ignored.
 //
 // The filename argument may begin with the special characters:
 //    ~/  file is relative to the user's home directory.

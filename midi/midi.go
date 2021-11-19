@@ -162,7 +162,7 @@ func (st StatusByte) String() string {
 //
 func ChannelMessageDataCount(st StatusByte) int {
 	hi := st & 0xF0
-	if hi == 0xc0 || hi == 0xd0 {
+	if hi == 0xC0 || hi == 0xD0 {
 		return 1
 	} else {
 		return 2
@@ -224,10 +224,6 @@ func IsMetaType(mt MetaType) bool {
 	_, exists := metaMnemonics[mt]
 	return exists
 }
-
-// func IsMetaText(mt MetaType) bool {
-// 	return META_TEXT <= mt && mt <= META_CUEPOINT
-// }
 
 
 // StringRepMessage returns string representation for MIDI message bytes.

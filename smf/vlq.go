@@ -40,7 +40,7 @@ func (vlq *VLQ) SetValue(n int) {
 	vlq.bytes = reverse(acc)
 }
 
-// vlq.Value() returns the vlq' value.
+// vlq.Value() returns the vlq's value.
 //
 func (vlq *VLQ) Value() int {
 	acc := 0

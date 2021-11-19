@@ -38,7 +38,7 @@ func ToStringSlice(values []interface{}) []string {
 
 // ExpectValue struct holds return values for the Expect function.
 // Each field has a different type and the Expect function sets the appropriate
-// field based on it's template argument.  Only one field should ever have
+// field based on its template argument.  Only one field should ever have
 // a non-nil value.
 //
 type ExpectValue struct {
@@ -73,7 +73,6 @@ type ExpectValue struct {
 //
 func Expect(template string, values []interface{})([]ExpectValue, error) {
 
-	// BUGFIX BUG 005
 	trim := func(s string) string {
 		return strings.Trim(strings.TrimSpace(s), ",")
 	}

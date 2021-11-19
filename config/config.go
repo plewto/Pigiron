@@ -63,7 +63,7 @@ func hasPath(path string) bool {
 
 
 // readInt reads an int from the config file.
-// Returns fallback if path does not exists or it's value is invalid.
+// Returns fallback if path does not exists or its value is invalid.
 //
 func readInt(path string, fallback int64) int64 {
 	if hasPath(path) {
@@ -85,7 +85,7 @@ func readInt(path string, fallback int64) int64 {
 
 
 // readFloat reads float from config file.
-// Returns fallback if path does not exists or it's value is invalid.
+// Returns fallback if path does not exists or its value is invalid.
 //
 func readFloat(path string, fallback float64) float64 {
 	if hasPath(path) {
@@ -147,7 +147,6 @@ func readConfigurationFile(filename string) {
 		ResetGlobalParameters()
 		return
 	} else {
-		// fmt.Printf("Using configuration file: '%s'\n", filename)
 		GlobalParameters.EnableLogging = readBool("log.enable", true)
 		GlobalParameters.Logfile = pigpath.SubSpecialDirectories(readString("log.logfile", "!/log"))
 		GlobalParameters.BatchDirectory = pigpath.SubSpecialDirectories(readString("batch.directory", "!/batch"))

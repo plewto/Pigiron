@@ -23,7 +23,7 @@ var (
 	batchError bool = false
 
 	// true while in batch mode.
-	// OSC REPL client output suppressed while true
+	// OSC REPL client output suppressed while true.
 	inBatchMode bool = false
 )
 
@@ -54,7 +54,8 @@ func Read() string {
 }
 
 
-// splits command from arguments  
+// splits command from arguments
+//
 func splitCommand(s string)(string, string) {
 	s = strings.TrimSpace(s)
 	pos := strings.Index(s, " ")
@@ -77,7 +78,7 @@ func parse(s string)(string, []string) {
 	return command, acc
 }
 
-// Eval() evaluates REPL commands
+// Eval() evaluates REPL commands.
 //
 func Eval(command string, args []string) {
 	switch {

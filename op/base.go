@@ -9,7 +9,6 @@ package op
 import (
 	"fmt"
 	"errors"
-	// "github.com/rakyll/portmidi"
 	gomidi "gitlab.com/gomidi/midi/v2"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/midi"
@@ -31,7 +30,7 @@ type baseOperator struct {
 }
 
 // op.initOperator() initializes the baseOperator
-// This method should be call as part of the construction of all structs extending
+// This method should be called as part of the construction of all structs extending
 // baseOperator.
 //
 func initOperator(op *baseOperator, opType string, name string, mode midi.ChannelMode) {
@@ -67,17 +66,12 @@ func (op *baseOperator) Name() string {
 	return op.name
 }
 
-// // op.setName() sets the operator's name.
-// // 
-// func (op *baseOperator) setName(s string) {
-// 	op.name = s
-// }
 
 func (op *baseOperator) String() string {
 	return fmt.Sprintf("%-12s name: \"%s\"", op.opType, op.name)
 }
 
-// op.commonInfo() returns the base string for a bases operator's internal state.
+// op.commonInfo() returns string representation of the operator's internal state.
 // The Info() method for extending structures should use the result of commonInfo()
 // for the bulk of their results.
 //
@@ -105,7 +99,7 @@ func (op *baseOperator) commonInfo() string {
 }
 
 // op.Info() returns a string representation of the operator's internal state.
-// By default Info() simple returns the result of commonInfo().  Extending
+// By default Info() simply returns the result of commonInfo().  Extending
 // operator's may add additional details.
 //
 func (op *baseOperator) Info() string {
@@ -125,7 +119,7 @@ func (op *baseOperator) Panic() {
 }
 
 
-// op.Reset() returns state of Operator to an initial state.
+// op.Reset() restores Operator to an initial state.
 //
 func (op *baseOperator) Reset() {
 	op.SetMIDIOutputEnabled(true)
@@ -133,7 +127,7 @@ func (op *baseOperator) Reset() {
 
 // op.Close() is used at Operator destruction time to release resources.
 // It is mostly used to release MIDI devices on program shutdown.  An operator
-// should not be used after calling it's Close method.
+// should not be used after calling its Close method.
 //
 func (op *baseOperator) Close() {}
 
@@ -177,13 +171,13 @@ func (op *baseOperator) PrintTree() {
 }
 
 
-// op.parents() returns a list of the operator's parents.
+// op.parents() returns list of the operator's parents.
 //
 func (op *baseOperator) parents() map[string]Operator {
 	return op.parentMap
 }
 
-// op.children() returns a list of the operator's children.
+// op.children() returns list of the operator's children.
 //
 func (op *baseOperator) children() map[string]Operator {
 	return op.childrenMap
@@ -255,7 +249,7 @@ func (op *baseOperator) circularTreeTest(depth int) bool {
 // op.Connect() connects child as a child of operator.
 // Duplicate connections are silently ignored.
 //
-// Returns non-nil error if the connection should cause a circular tree.
+// Returns non-nil error if the connection causes a circular tree.
 //
 func (op *baseOperator) Connect(child Operator) error {
 	op.Disconnect(child)

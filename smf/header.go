@@ -94,7 +94,7 @@ func readHeader(f *os.File) (header *Header, err error) {
 	}
 	// DO NOT replace above lines with readRawChunk()
 	//    It may not detect non-smf files and attmpt to read
-	//    huge amountrs of data.
+	//    huge amounts of data.
 	//
 
 	var format, trackCount, division int

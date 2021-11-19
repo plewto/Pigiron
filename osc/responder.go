@@ -14,7 +14,7 @@ import (
 // There are two possible responses: Ack and Error.
 //
 // Ack() sends an Acknowledgment that an OSC message has been received
-// without error.  As part of it's "payload" it includes the original
+// without error.  As part of its "payload" it includes the original
 // message and any requested data.
 //
 // An Error() response indicates the last received OSC message caused an
@@ -28,7 +28,7 @@ type Responder interface {
 }
 
 // BasciResponder is the primary implementation of the Responder interface.
-// In addition to transmitting ACk and Error responses via OSC, it also
+// In addition to transmitting ACk and Error responses, it also
 // writes identical information to a temporary file.  This is useful for
 // clients which do not receive OSC.   The file is overwritten each time a
 // new OSC message is received.

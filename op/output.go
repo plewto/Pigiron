@@ -23,9 +23,9 @@ type MIDIOutput struct {
 var outputCache = make(map[string]*MIDIOutput)
 
 
-// ** Creates new MIDIOutput, does not cache it.
-// ** Only called when cached version does not exists.
-// **
+//  Creates new MIDIOutput, does not cache it.
+//  Only called when cached version does not exists.
+// 
 func newMIDIOutput(name string,  port gomidi.Out) *MIDIOutput {
 	var op *MIDIOutput
 	op = new(MIDIOutput)
@@ -38,7 +38,7 @@ func newMIDIOutput(name string,  port gomidi.Out) *MIDIOutput {
 	return op
 }
 
-// ** Factory creates new MIDIOutput or grabs it from the cache.
+//  Factory creates new MIDIOutput or grabs it from the cache.
 //
 
 func NewMIDIOutput(name string, deviceSpec string) (*MIDIOutput, error) {

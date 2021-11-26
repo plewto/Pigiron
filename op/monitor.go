@@ -113,8 +113,8 @@ func (op *Monitor) logEvent(s string) {
 	}
 }
 
-func (op *Monitor) Send(msg gomidi.Message) {
-	op.distribute(msg)
+
+func (op *Monitor) print(msg gomidi.Message){
 	if op.monitorMessage(msg) {
 		now := time.Now()
 		elapse := now.Sub(op.previousTime)
@@ -123,6 +123,19 @@ func (op *Monitor) Send(msg gomidi.Message) {
 		fmt.Print(s)
 		op.logEvent(s)
 	}
+}
+
+func (op *Monitor) Send(msg gomidi.Message) {
+	op.distribute(msg)
+	// if op.monitorMessage(msg) {
+	// 	now := time.Now()
+	// 	elapse := now.Sub(op.previousTime)
+	// 	op.previousTime = now
+	// 	s := formatEvent(elapse, msg)
+	// 	fmt.Print(s)
+	// 	op.logEvent(s)
+	// }
+	go op.print(msg)
 }
 
 func iMin(a int, b int) int {

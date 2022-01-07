@@ -133,5 +133,8 @@ BUG 016 24-Aug-2021 CLOSED
 
     MIDIPlayer does not recognize tempo changes.
 
-
-
+---------------------------------------------------------------------- 017
+BUG 017 07-Jan-2022 OPEN
+    MIDIPlayer timing not particularly good.
+    
+    Also when starting playback the first several events are often rushed.

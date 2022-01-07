@@ -1,6 +1,11 @@
 Command     q-commands
-OSC         /pig/q-commands
+OSC         /pig/q-commands [filter]
 
 Prints list of commands.
+
+The optional filter term may be used to limit the results.
+If filter is present, only those commands which contain the filter text as a
+sub-string are listed.
+
 
 OSC Return: ACK list of commands.

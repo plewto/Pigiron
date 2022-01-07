@@ -8,6 +8,7 @@ package op
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	goosc "github.com/hypebeast/go-osc/osc"
 	"github.com/plewto/pigiron/osc"
 	"github.com/plewto/pigiron/midi"
@@ -646,20 +647,35 @@ func remoteQueryGraph(msg *goosc.Message)([]string, error) {
 			
 // remoteQueryCommands() handler for /pig/q-commands
 // Prints list of all osc commands.
-// osc /pig/q-commands
+// osc /pig/q-commands [filter]
 // osc returns list of all commands.
 //
 func remoteQueryCommands(msg *goosc.Message)([]string, error) {
-	var err error
-	acc := osc.GlobalServer.Commands()
-	for _, op := range Operators() {
-		name := op.Name()
-		for _, cmd := range op.Commands() {
-			acc = append(acc, fmt.Sprintf("/pig/op %s, %s", name, cmd))
+	args, _ := ExpectMsg("s", msg)
+	filter := ""
+	if len(args) > 0 {
+		filter = args[0].S
+	}
+	cmds := osc.GlobalServer.Commands()
+	acc := make([]string, 0, len(cmds) + len(Operators()) * 6)
+	for _, cmd := range cmds {
+		if strings.Contains(cmd, filter) {
+			acc = append(acc, cmd)
 		}
 	}
+	for _, op := range Operators() {
+		for _, sub := range op.Commands() {
+			cmd := fmt.Sprintf("/pig/op %s, %s", op.Name(), sub)
+			if strings.Contains(cmd, filter) {
+				acc = append(acc, cmd)
+			}
+		}
+	}
+	var err error
 	return acc, err
 }
+	
+
 
 // remoteQueryChildren() handler for /pig/q-children
 // Prints list of operator's children.

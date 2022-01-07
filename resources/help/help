@@ -1,8 +1,13 @@
-Command     help topic
-OSC         /pig/help topic
+Command     help topic [filter]
+OSC         /pig/help topic [filter]
 
 Displays help for named topic.
 Use 'help topics' for list of available topics
+
+You may narrow the topics list by including an optional 'filter' term.
+Only topics which contain the filter text as a sub-string will be listed.
+
+
 
 OSC Return: ACK help text.
             ERROR if topic does not exists.

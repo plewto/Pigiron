@@ -8,6 +8,7 @@ package help
 
 import (
 	"fmt"
+	"strings"
 	"io/ioutil"
 	"github.com/plewto/pigiron/pigpath"
 )
@@ -16,11 +17,20 @@ import (
 // Help function returns documentation for topic.
 //
 func Help(topic string) (text string, err error) {
-	switch topic {
+	tokens := strings.Split(topic, " ")
+	if len(tokens) < 1 {
+		return
+	}
+	head := strings.TrimSpace(tokens[0])
+	switch head {
 	case "topics":
-		return helpTopics()
+		filter := ""
+		if len(tokens) > 1 {
+			filter = strings.TrimSpace(tokens[1])
+		}
+		return helpTopics(filter)
 	default:
-		filename := pigpath.ResourceFilename("help", topic)
+		filename := pigpath.ResourceFilename("help", head)
 		var data []byte
 		data, err = ioutil.ReadFile(filename)
 		text = string(data)
@@ -28,7 +38,7 @@ func Help(topic string) (text string, err error) {
 	}
 }
 	
-func helpTopics() (string, error) {
+func helpTopics(filter string) (string, error) {
 	dirname := pigpath.ResourceFilename("help")
 	topics, err := ioutil.ReadDir(dirname)
 	if err != nil {
@@ -38,7 +48,10 @@ func helpTopics() (string, error) {
 	}
 	acc := "Help topics:\n"
 	for _, info := range topics {
-		acc += fmt.Sprintf("\t%s\n", info.Name())
+		name := fmt.Sprintf("%s", info.Name())
+		if strings.Contains(name, filter) {
+			acc += fmt.Sprintf("\t%s\n", name)
+		}
 	}
 	acc += "\n"
 	return acc, err

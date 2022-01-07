@@ -42,7 +42,7 @@ BUG 005 22-July-2021 CLOSED
     FIX: Added explicit string trimming function to Expect values.
     
 ---------------------------------------------------------------------- 006
-BUG 006 23-July-2021 OPEN SERIOUS (hard to reproduce)
+BUG 006 23-July-2021 CLOSED (hard to reproduce)
     Program froze after entering 'op p, load, !/resources/testFiles/a2.mid'
     p was name of MIDIPlayer operator and named file was valid MIDI file.
     The failing command was entered after a long stream of transport test commands
@@ -57,6 +57,8 @@ BUG 006 23-July-2021 OPEN SERIOUS (hard to reproduce)
     Clarification: 'froze' is not the right description.   The REPL continued
     to accept input, it just would not process anything, similarly external
     OSC messages were ignored.
+
+    This bug has not occurred after switching to gomidi, presumed fixed.
 
 ---------------------------------------------------------------------- 007
 BUG 007 08-Aug-2021 CLOSED
@@ -99,9 +101,11 @@ BUG 011 15-Aug-2021 CLOSED
    Added explicit SysEx clause in convertTrackBytes.
 
 ---------------------------------------------------------------------- 012
-BUG 012 16-Aug-2021 OPEN  SERIOUS (hard to reproduce)
+BUG 012 16-Aug-2021 CLOSED (hard to reproduce)
    Executing MIDIPlayer stop sometimes causes segmentation violation.
    See stack trace in Pigiron/CrashLogs/BUG012/
+
+   This bug has not occurred after switching to gomidi, presumed fixed.
 
 ---------------------------------------------------------------------- 013
 BUG 013 16-Aug-2021 CLOSED

@@ -1,3 +1,4 @@
+
 Pigiron CHANGELOG
 
 0.1.0 beta
@@ -28,3 +29,8 @@ Pigiron CHANGELOG
 0.2.00 beta
        Replaces portmidi backend with gomidi.
        Renamed Transposer operator to Transformer.
+       Complete rewrite of MIDIPlayer and SMF.
+       Rewrites Monitor output function as go routine.
+       Closes BUGS 006 and 012.
+       Adds help topic filter.
+       Adds filter term to q-commands.

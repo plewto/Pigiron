@@ -11,6 +11,14 @@ receives a MIDI message, it determines if the message should be forwarded
 to it's outputs.  An Operator may also modify the message prior to
 re-sending it.  
 
+
+Version 0.2.0 replaces the original portmidi backend with gomidi.   After
+approximately 6 weeks of practical use, it appears to be more stable.  There
+are still timing issues with the MIDIPlayer.  It is OK for auditioning MIDI
+files, but not quite there for production use. 
+
+
+
 ## Operator Types
 
 The following Operators are currently available:
@@ -22,7 +30,7 @@ The following Operators are currently available:
 - MIDIOutput - wrapper for MIDI output device.
 - MIDIPlayer - MIDI file player.
 - Monitor - print incoming MIDI messages.
-- Transposer - manipulate MIDI data bytes.
+- Transformer - manipulate MIDI data bytes.
 
 
 There are three distinct ways to interact with Pigiron.

@@ -72,19 +72,25 @@ which illustrates several commands to set up a basic MIDI process.
 It is heavily annotated.
 
 
-
 ## Dependencies
     go 1.16
 	github.com/pelletier/go-toml
 	github.com/rakyll/portmidi
     github.com/hypebeast/go-osc
 
+    To compile on Ubuntu you the following packages must be installed
+
+    $ sudo apt update
+    $ sudo apt -y install build-essential
+    $ sudo apt -y install librtmidi-dev
+
 
 ## Installation
 
 **Build Pigiron**
 
-In a terminal navigate into the pigiron directory and enter
+
+In a terminal navigate into the Pigiron directory and enter
 
     [pigiron]$ go build .
 

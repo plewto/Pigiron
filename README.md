@@ -8,15 +8,13 @@ includes a MIDI file player and has a comprehensive OSC interface.
 The primary Pigiron object is called an **Operator**.  Each Operator has
 zero or more MIDI inputs and zero or more MIDI outputs.   When an Operator
 receives a MIDI message, it determines if the message should be forwarded
-to it's outputs.  An Operator may also modify the message prior to
+to its outputs.  An Operator may also modify the message prior to
 re-sending it.  
-
 
 Version 0.2.0 replaces the original portmidi backend with gomidi.   After
 approximately 6 weeks of practical use, it appears to be more stable.  There
 are still timing issues with the MIDIPlayer.  It is OK for auditioning MIDI
 files, but not quite there for production use. 
-
 
 
 ## Operator Types
@@ -40,30 +38,31 @@ There are three distinct ways to interact with Pigiron.
 3. Load a batch file of commands.
 
 
-The command syntax for these modes are nearly identical.  The only real
-difference is that the command 'foo' at the terminal prompt and in a batch
+The command syntax for these modes are nearly identical.  The only
+difference is that the command 'foo' at the terminal prompt or in a batch
 file is entered directly, while as an OSC message it is prefixed with the
 application OSC id (by default /pig/).
 
-	foo        command at terminal or in batch file.
-	/pig/foo   as OSC message.
-	
+        foo        command at terminal or in batch file.
+        /pig/foo   as OSC message.
+        
 
 ## Getting help
 
 On startup Pigiron displays a command prompt (by default /pig: ).   For a
 list of help topics enter
 
-	/pig:  help topics
-	
-For a list of commands enter
+**/pig:  help topics**
+        
+For a list of commands enter  
 
-	/pig: q-commands
-	
+**/pig: q-commands**
+        
+
 For details on how OSC messages are handled, enter
 
-	/pig: help OSC
-	
+**/pig: help OSC**
+        
 In general commands which begin with 'q-' (for query) returns some
 information.  
 
@@ -73,17 +72,21 @@ It is heavily annotated.
 
 
 ## Dependencies
-    go 1.16
-	github.com/pelletier/go-toml
-	github.com/rakyll/portmidi
-    github.com/hypebeast/go-osc
 
-    To compile on Ubuntu you the following packages must be installed
+    Pigiron has been compiled and tested on Linux.   For compilation on
+    Ubuntu 22.04 the following packages were required:
 
-    $ sudo apt update
-    $ sudo apt -y install build-essential
-    $ sudo apt -y install librtmidi-dev
+    - build-essential
+    - librtmidi-dev
+     
+    Golang dependencies are:
+    
+    - go 1.16
+    - github.com/pelletier/go-toml
+    - github.com/rakyll/portmidi
+    - github.com/hypebeast/go-osc
 
+  
 
 ## Installation
 
@@ -97,12 +100,8 @@ In a terminal navigate into the Pigiron directory and enter
 
 **Install**
 
-Either copy the pigiron executable to a location included on $HOME/$PATH, typical
+Copy the generated pigiron executable to a location included on $HOME/$PATH, typical
 locations would be ~/.local/bin or ~.bin
-
-Alternately you may install with the go command.
-
-    [pigiron]$ go install 
 
 
 **Configuration Directory**

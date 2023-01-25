@@ -56,7 +56,7 @@ new ChannelFilter, filter  # creates a ChannelFilter named 'filter'.
 #	[ 4] "FastTrack Pro MIDI 1" 
 #
 # The device at index 1 may be specified by either the number 1 or by a
-# sub-string of it's name.  If the sub-string matches more then
+# sub-string of its name.  If the sub-string matches more then
 # one device, the first matching device is used. 
 #
 
@@ -72,7 +72,7 @@ new Distributor, distributor
 new Monitor, monitor
 
 # The connect command makes non-branching connections between operators. At
-# a minimum it takes two operator arguments but may make any number of
+# a minimum it takes two operator arguments, but may make any number of
 # additional connections:
 #
 #    connect a, b, c, ...         # a -> b -> c -> ...
@@ -146,7 +146,7 @@ macro load, player, load, $0
 #    For Operators with SingleChannel mode, the final channel is selected.
 #
 #
-# deselect-channels operator-name. chan-A, chan-B, ...
+# deselect-channels operator-name, chan-A, chan-B, ...
 #    Disables all selected channels.
 #    Ignored by Operators with SingleChannelMode.
 #

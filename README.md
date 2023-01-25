@@ -23,6 +23,7 @@ The following Operators are currently available:
 
 
 - ChannelFilter - filter events by MIDI channel.
+- SingleChannelFilter - More efficient channel filter fir single channel filtering.
 - Distributor - transmit events over several MIDI channels.
 - MIDIInput - wrapper for MIDI input device.
 - MIDIOutput - wrapper for MIDI output device.

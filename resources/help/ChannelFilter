@@ -5,6 +5,8 @@ A ChannelFilter is an Operator which selectively blocks/passes MIDI
 messages based on channel.  Any number of channels may be selected
 simultaneously.  Separately non-channel messages my be blocked.
 
+Use the more efficient SingleChannelFilter for single MIDI channel
+selection.
 
 Sub-Commands:
 

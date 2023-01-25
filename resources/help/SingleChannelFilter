@@ -1,0 +1,24 @@
+Operator SingleChannelFilter
+
+
+A SingleChannelFilter is an Operator which selectively blocks/passes MIDI
+messages based on channel. Only a single channel may be selected at any time.
+Separately non-channel messages my be blocked.   Use ChannelFilter for
+multi-channel filtering.
+
+
+Sub-Commands:
+
+Command     op name, enable-system-events, bool
+OSC         /pig/op name, enable-system-events, bool
+
+Enables/disables filtering of MIDI system messages for named SingleChannelFilter
+
+OSC Return: AKC
+
+-----------------------------------------------------
+
+Command     op name, q-system-events-enabled
+OSC         /pig/op name, q-system-events-enabled
+
+OSC Return: AKC bool false if MIDI system messages are filtered.
